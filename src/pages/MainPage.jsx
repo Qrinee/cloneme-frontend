@@ -49,7 +49,7 @@ export default function MainPage() {
         throw new Error(data.message || "Login failed");
       }
 
-      window.location.reload() 
+      window.location.href = '/' 
     } catch (err) {
       setError(err.message || "Login failed. Please try again.");
       setIsLoading(false);

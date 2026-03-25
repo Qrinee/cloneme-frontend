@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import { 
@@ -90,14 +90,14 @@ const ethnicities = [
 ];
 
 const personalityTags = [
-  { value: "playful", label: "Playful", color: "from-pink-500 to-rose-500" },
-  { value: "flirty", label: "Flirty", color: "from-red-500 to-orange-500" },
-  { value: "sensual", label: "Sensual", color: "from-purple-500 to-pink-500" },
-  { value: "shy", label: "Shy", color: "from-blue-500 to-cyan-500" },
-  { value: "dominant", label: "Dominant", color: "from-red-600 to-red-800" },
-  { value: "innocent", label: "Innocent", color: "from-white to-gray-300" },
-  { value: "adventurous", label: "Adventurous", color: "from-yellow-500 to-orange-500" },
-  { value: "teasing", label: "Teasing", color: "from-pink-400 to-red-400" },
+  { value: "playful", label: "Playful" },
+  { value: "flirty", label: "Flirty" },
+  { value: "sensual", label: "Sensual" },
+  { value: "shy", label: "Shy" },
+  { value: "dominant", label: "Dominant" },
+  { value: "innocent", label: "Innocent" },
+  { value: "adventurous", label: "Adventurous" },
+  { value: "teasing", label: "Teasing" },
 ];
 
 const availableActions = [
@@ -119,9 +119,8 @@ function ImageTile({ item, isSelected, onClick }) {
     <button
       onClick={onClick}
       className={`
-        relative overflow-hidden rounded-2xl aspect-square transition-all duration-300
-        hover:scale-105 hover:shadow-xl hover:shadow-rose-500/20
-        ${isSelected ? 'ring-4 ring-rose-500 ring-offset-4 ring-offset-gray-900 scale-105' : 'opacity-80 hover:opacity-100'}
+        relative overflow-hidden rounded-3xl aspect-[3/4] transition-all duration-500
+        border-2 ${isSelected ? 'border-[#741818]' : 'border-transparent opacity-60 hover:opacity-100'}
       `}
     >
       <img 
@@ -129,14 +128,12 @@ function ImageTile({ item, isSelected, onClick }) {
         alt={item.label}
         className="w-full h-full object-cover"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-      
-      <div className="absolute bottom-0 left-0 right-0 p-4 flex flex-col items-center">
-        <span className="text-white font-bold text-lg drop-shadow-lg">{item.label}</span>
+      <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-[#0a0a0f] to-transparent">
+        <span className="text-white font-bold text-sm tracking-tight">{item.label}</span>
       </div>
 
       {isSelected && (
-        <div className="absolute top-3 right-3 w-8 h-8 bg-rose-500 rounded-full flex items-center justify-center shadow-lg">
+        <div className="absolute top-4 right-4 w-8 h-8 bg-[#741818] rounded-full flex items-center justify-center">
           <Check className="w-5 h-5 text-white" />
         </div>
       )}
@@ -147,18 +144,18 @@ function ImageTile({ item, isSelected, onClick }) {
 // Age Slider Component
 function AgeSlider({ value, onChange }) {
   return (
-    <div className="w-full">
-      <div className="flex justify-between items-center mb-4">
-        <span className="text-white/50 text-sm">Age</span>
+    <div className="w-full py-6">
+      <div className="flex justify-between items-center mb-6">
+        <span className="text-white/40 text-[10px] font-bold uppercase tracking-widest">Target Age</span>
         <div className="flex items-center gap-2">
-          <span className="text-3xl font-bold text-white">{value}</span>
-          <span className="text-white/50">years</span>
+          <span className="text-4xl font-bold text-white tracking-tighter">{value}</span>
+          <span className="text-white/20 text-xs font-medium">years</span>
         </div>
       </div>
       
-      <div className="relative h-4 bg-gray-800 rounded-full overflow-hidden">
+      <div className="relative h-2 bg-white/5 rounded-full">
         <div 
-          className="absolute inset-y-0 left-0 bg-red-700 rounded-full transition-all"
+          className="absolute inset-y-0 left-0 bg-[#741818] rounded-full"
           style={{ width: `${((value - 18) / (35 - 18)) * 100}%` }}
         />
         <input
@@ -171,7 +168,7 @@ function AgeSlider({ value, onChange }) {
         />
       </div>
       
-      <div className="flex justify-between mt-2 text-xs text-white/30">
+      <div className="flex justify-between mt-4 text-[10px] font-bold text-white/10 tracking-widest uppercase">
         <span>18</span>
         <span>35</span>
       </div>
@@ -183,21 +180,16 @@ export default function CreateGirlPage() {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
-    // Basic Info
     name: "",
     age: 22,
     bio: "",
-    // Appearance
     hairColor: "",
     eyeColor: "",
     bodyType: "",
     ethnicity: "",
-    // Personality
     tags: [],
     mood: "",
-    personality: "",
     initialMessage: "",
-    // Actions
     actions: [],
   });
 
@@ -228,7 +220,6 @@ export default function CreateGirlPage() {
       case 1: return formData.hairColor;
       case 2: return formData.eyeColor;
       case 3: return formData.bodyType;
-      case 4: return true; // ethnicity is optional
       case 5: return formData.name && formData.age && formData.bio;
       case 6: return formData.tags.length > 0 && formData.initialMessage;
       case 7: return formData.actions.length > 0;
@@ -240,14 +231,12 @@ export default function CreateGirlPage() {
     switch(currentStep) {
       case 1:
         return (
-          <div className="space-y-6 animate-fadeIn">
-            <div className="text-center mb-8">
-
-              <h2 className="text-3xl font-bold text-white">Hair Color</h2>
-              <p className="text-white/50 mt-2">Choose her hair color</p>
+          <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="text-center">
+              <h2 className="text-4xl font-bold text-white tracking-tighter">Hair Aesthetics</h2>
+              <p className="text-white/30 mt-2 font-medium">Select the signature style for your companion.</p>
             </div>
-
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
               {hairColors.map((color) => (
                 <ImageTile
                   key={color.value}
@@ -262,13 +251,12 @@ export default function CreateGirlPage() {
 
       case 2:
         return (
-          <div className="space-y-6 animate-fadeIn">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-white">Eye Color</h2>
-              <p className="text-white/50 mt-2">What color are her eyes?</p>
+          <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="text-center">
+              <h2 className="text-4xl font-bold text-white tracking-tighter">Ocular Hue</h2>
+              <p className="text-white/30 mt-2 font-medium">Choose the depth and color of her gaze.</p>
             </div>
-
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
               {eyeColors.map((color) => (
                 <ImageTile
                   key={color.value}
@@ -283,14 +271,12 @@ export default function CreateGirlPage() {
 
       case 3:
         return (
-          <div className="space-y-6 animate-fadeIn">
-            <div className="text-center mb-8">
-              <User className="w-16 h-16 text-pink-500 mx-auto mb-4 animate-pulse" />
-              <h2 className="text-3xl font-bold text-white">Body Type</h2>
-              <p className="text-white/50 mt-2">Choose her figure</p>
+          <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="text-center">
+              <h2 className="text-4xl font-bold text-white tracking-tighter">Physique Type</h2>
+              <p className="text-white/30 mt-2 font-medium">Define the silhouette of your perfect match.</p>
             </div>
-
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
               {bodyTypes.map((type) => (
                 <ImageTile
                   key={type.value}
@@ -305,14 +291,12 @@ export default function CreateGirlPage() {
 
       case 4:
         return (
-          <div className="space-y-6 animate-fadeIn">
-            <div className="text-center mb-8">
-              <Gem className="w-16 h-16 text-emerald-500 mx-auto mb-4 animate-pulse" />
-              <h2 className="text-3xl font-bold text-white">Ethnicity</h2>
-              <p className="text-white/50 mt-2">Optional - choose her background</p>
+          <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="text-center">
+              <h2 className="text-4xl font-bold text-white tracking-tighter">Ethnicity</h2>
+              <p className="text-white/30 mt-2 font-medium">Optionally define her heritage and background.</p>
             </div>
-
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
               {ethnicities.map((eth) => (
                 <ImageTile
                   key={eth.value}
@@ -322,34 +306,31 @@ export default function CreateGirlPage() {
                 />
               ))}
             </div>
-
             <button
-              onClick={() => updateFormData("ethnicity", "")}
-              className="w-full py-3 text-white/40 hover:text-white/60 transition-colors text-sm"
+              onClick={() => setCurrentStep(prev => prev + 1)}
+              className="w-full py-6 text-white/30 hover:text-white uppercase text-[10px] font-bold tracking-[0.2em] transition-all"
             >
-              Skip this step
+              Skip this discovery
             </button>
           </div>
         );
 
       case 5:
         return (
-          <div className="space-y-6 animate-fadeIn">
-            <div className="text-center mb-8">
-              <User className="w-16 h-16 text-rose-500 mx-auto mb-4" />
-              <h2 className="text-3xl font-bold text-white">Basic Info</h2>
-              <p className="text-white/50 mt-2">Give her a name and story</p>
+          <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="text-center">
+              <h2 className="text-4xl font-bold text-white tracking-tighter">Identity</h2>
+              <p className="text-white/30 mt-2 font-medium">Provide a name and a narrative for her essence.</p>
             </div>
-
-            <div className="space-y-6">
-              <div>
-                <label className="text-white/70 text-sm font-medium mb-2 block">Her Name</label>
+            <div className="space-y-8">
+              <div className="space-y-3">
+                <label className="text-white/40 text-[10px] font-bold uppercase tracking-widest block ml-1">Designation</label>
                 <input
                   type="text"
                   value={formData.name}
                   onChange={(e) => updateFormData("name", e.target.value)}
-                  placeholder="e.g., Sophia, Emma, Luna..."
-                  className="w-full bg-gray-800/50 border border-gray-700 rounded-xl px-4 py-4 text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-rose-500 text-lg"
+                  placeholder="Enter her name..."
+                  className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-5 text-white placeholder-white/20 focus:outline-none focus:border-[#741818] transition-all text-xl font-bold tracking-tight"
                 />
               </div>
 
@@ -358,16 +339,15 @@ export default function CreateGirlPage() {
                 onChange={(value) => updateFormData("age", value)}
               />
 
-              <div>
-                <label className="text-white/70 text-sm font-medium mb-2 block">Her Story</label>
+              <div className="space-y-3">
+                <label className="text-white/40 text-[10px] font-bold uppercase tracking-widest block ml-1">Narrative</label>
                 <textarea
                   value={formData.bio}
                   onChange={(e) => updateFormData("bio", e.target.value)}
-                  placeholder="Describe her personality, background, what makes her unique..."
+                  placeholder="What is her story?"
                   rows={4}
-                  className="w-full bg-gray-800/50 border border-gray-700 rounded-xl px-4 py-4 text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-rose-500 resize-none"
+                  className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-5 text-white placeholder-white/20 focus:outline-none focus:border-[#741818] transition-all resize-none leading-relaxed font-medium"
                 />
-                <p className="text-white/30 text-xs mt-2">Write something that will make users fall in love with her</p>
               </div>
             </div>
           </div>
@@ -375,25 +355,23 @@ export default function CreateGirlPage() {
 
       case 6:
         return (
-          <div className="space-y-6 animate-fadeIn">
-            <div className="text-center mb-8">
-              <Smile className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
-              <h2 className="text-3xl font-bold text-white">Personality</h2>
-              <p className="text-white/50 mt-2">How should she behave?</p>
+          <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="text-center">
+              <h2 className="text-4xl font-bold text-white tracking-tighter">Personality</h2>
+              <p className="text-white/30 mt-2 font-medium">Fine-tune her behavior and initial reception.</p>
             </div>
-
-            <div className="space-y-6">
-              <div>
-                <label className="text-white/70 text-sm font-medium mb-3 block">Choose her traits ✨</label>
+            <div className="space-y-10">
+              <div className="space-y-4">
+                <label className="text-white/40 text-[10px] font-bold uppercase tracking-widest block ml-1">Core Traits</label>
                 <div className="flex flex-wrap gap-3">
                   {personalityTags.map((tag) => (
                     <button
                       key={tag.value}
                       onClick={() => toggleTag(tag.value)}
-                      className={`px-5 py-3 rounded-full font-medium transition-all ${
+                      className={`px-6 py-3.5 rounded-2xl font-bold text-xs tracking-tight transition-all border ${
                         formData.tags.includes(tag.value)
-                          ? `bg-gradient-to-r ${tag.color} text-white`
-                          : 'bg-gray-800/50 text-white/50 hover:bg-gray-700/50'
+                          ? 'bg-[#741818] border-[#741818] text-white'
+                          : 'bg-white/5 border-white/5 text-white/40 hover:text-white hover:border-white/10'
                       }`}
                     >
                       {tag.label}
@@ -402,27 +380,15 @@ export default function CreateGirlPage() {
                 </div>
               </div>
 
-              <div>
-                <label className="text-white/70 text-sm font-medium mb-2 block">Current Mood 💭</label>
-                <input
-                  type="text"
-                  value={formData.mood}
-                  onChange={(e) => updateFormData("mood", e.target.value)}
-                  placeholder="e.g., Ready for you, Waiting impatiently..."
-                  className="w-full bg-gray-800/50 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-rose-500"
-                />
-              </div>
-
-              <div>
-                <label className="text-white/70 text-sm font-medium mb-2 block">Her Opening Message 💬</label>
+              <div className="space-y-3">
+                <label className="text-white/40 text-[10px] font-bold uppercase tracking-widest block ml-1">Opening Reception</label>
                 <textarea
                   value={formData.initialMessage}
                   onChange={(e) => updateFormData("initialMessage", e.target.value)}
-                  placeholder="The first thing she'll say when a user starts chatting..."
+                  placeholder="The first words she will speak..."
                   rows={3}
-                  className="w-full bg-gray-800/50 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-rose-500 resize-none"
+                  className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-5 text-white placeholder-white/20 focus:outline-none focus:border-[#741818] transition-all resize-none leading-relaxed font-medium"
                 />
-                <p className="text-white/30 text-xs mt-2">Make it flirty and inviting!</p>
               </div>
             </div>
           </div>
@@ -430,44 +396,35 @@ export default function CreateGirlPage() {
 
       case 7:
         return (
-          <div className="space-y-6 animate-fadeIn">
-            <div className="text-center mb-8">
-              <Play className="w-16 h-16 text-red-500 mx-auto mb-4" />
-              <h2 className="text-3xl font-bold text-white">Actions she can do</h2>
-              <p className="text-white/50 mt-2">Select what users can interact with</p>
+          <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="text-center">
+              <h2 className="text-4xl font-bold text-white tracking-tighter">Capabilities</h2>
+              <p className="text-white/30 mt-2 font-medium">Define the interactive depth of her existence.</p>
             </div>
-
-            <div className="space-y-3">
+            <div className="space-y-4 max-h-[400px] overflow-y-auto no-scrollbar pr-2">
               {availableActions.map((action) => (
                 <button
                   key={action.id}
                   onClick={() => toggleAction(action.id)}
-                  className={`w-full p-4 rounded-xl border-2 transition-all flex items-center justify-between ${
+                  className={`w-full p-5 rounded-2xl border transition-all flex items-center justify-between ${
                     formData.actions.includes(action.id)
-                      ? 'border-rose-500 bg-rose-500/20'
-                      : 'border-gray-700 bg-gray-800/30 hover:border-gray-600'
+                      ? 'bg-[#741818] border-[#741818] text-white'
+                      : 'bg-white/5 border-white/5 text-white/40 hover:border-white/10 hover:text-white'
                   }`}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                  <div className="flex items-center gap-4">
+                    <div className={`w-6 h-6 rounded-full flex items-center justify-center border ${
                       formData.actions.includes(action.id)
-                        ? 'bg-rose-500'
-                        : 'bg-gray-700'
+                        ? 'bg-white border-white text-[#741818]'
+                        : 'bg-transparent border-white/10 text-transparent'
                     }`}>
-                      {formData.actions.includes(action.id) && (
-                        <Check className="w-4 h-4 text-white" />
-                      )}
+                      <Check size={14} strokeWidth={4} />
                     </div>
-                    <span className="text-white font-medium">{action.label}</span>
+                    <span className="font-bold tracking-tight text-sm">{action.label}</span>
                   </div>
                   <div className="flex items-center gap-4">
-                    <span className="text-white/40 text-sm">{action.messagesNeeded} msgs</span>
-                    {action.premium && (
-                      <span className="flex items-center gap-1 text-yellow-400 text-xs">
-                        <Crown className="w-3 h-3" />
-                        Premium
-                      </span>
-                    )}
+                    <span className="text-[10px] font-bold uppercase tracking-widest opacity-40">{action.messagesNeeded} XP</span>
+                    {action.premium && <Crown size={14} className="text-yellow-500" />}
                   </div>
                 </button>
               ))}
@@ -477,63 +434,49 @@ export default function CreateGirlPage() {
 
       case 8:
         return (
-          <div className="space-y-6 animate-fadeIn">
-            <div className="text-center mb-8">
-              <Sparkles className="w-16 h-16 text-green-500 mx-auto mb-4" />
-              <h2 className="text-3xl font-bold text-white">Ready to create!</h2>
-              <p className="text-white/50 mt-2">Here's your girl preview</p>
+          <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="text-center">
+              <h2 className="text-4xl font-bold text-white tracking-tighter">Synthesis Complete</h2>
+              <p className="text-white/30 mt-2 font-medium">Review the essence of your creation.</p>
             </div>
 
-            <div className="bg-gray-800/50 rounded-2xl p-6 border border-gray-700">
-              <div className="flex items-start gap-4 mb-4">
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-rose-500 to-violet-500 flex items-center justify-center">
-                  <User className="w-10 h-10 text-white" />
+            <div className="bg-white/5 rounded-[2.5rem] p-8 border border-white/5">
+              <div className="flex items-center gap-6 mb-8">
+                <div className="w-24 h-24 rounded-full bg-white/5 border border-white/10 flex items-center justify-center relative overflow-hidden">
+                  <User className="w-10 h-10 text-white/20" />
                 </div>
-                <div className="flex-1">
-                  <h3 className="text-2xl font-bold text-white">{formData.name || "Your Girl"}</h3>
-                  <p className="text-white/50">{formData.age} years old</p>
+                <div>
+                  <h3 className="text-3xl font-bold text-white tracking-tighter">{formData.name || "Nameless Essence"}</h3>
+                  <p className="text-white/40 font-bold text-xs uppercase tracking-widest mt-1">{formData.age} Years Old • {formData.ethnicity || "Unknown origin"}</p>
                 </div>
               </div>
               
-              <div className="grid grid-cols-3 gap-2 mb-4">
-                {formData.hairColor && (
-                  <div className="bg-gray-700/50 rounded-lg p-2 text-center">
-                    <span className="text-white/50 text-xs">Hair</span>
-                    <p className="text-white text-sm capitalize">{formData.hairColor}</p>
+              <div className="grid grid-cols-3 gap-4 mb-8">
+                {[
+                  { label: "Visual", val: formData.hairColor },
+                  { label: "Gaze", val: formData.eyeColor },
+                  { label: "Physique", val: formData.bodyType }
+                ].map((stat, i) => (
+                  <div key={i} className="bg-white/5 rounded-2xl p-4 border border-white/5 text-center">
+                    <span className="text-[10px] font-bold text-white/20 uppercase tracking-widest block mb-1">{stat.label}</span>
+                    <p className="text-white font-bold tracking-tight capitalize">{stat.val || "—"}</p>
                   </div>
-                )}
-                {formData.eyeColor && (
-                  <div className="bg-gray-700/50 rounded-lg p-2 text-center">
-                    <span className="text-white/50 text-xs">Eyes</span>
-                    <p className="text-white text-sm capitalize">{formData.eyeColor}</p>
-                  </div>
-                )}
-                {formData.bodyType && (
-                  <div className="bg-gray-700/50 rounded-lg p-2 text-center">
-                    <span className="text-white/50 text-xs">Body</span>
-                    <p className="text-white text-sm capitalize">{formData.bodyType}</p>
-                  </div>
-                )}
-              </div>
-              
-              <p className="text-white/70 mb-4 italic">"{formData.bio}"</p>
-              
-              <div className="flex flex-wrap gap-2 mb-4">
-                {formData.tags.map(tag => (
-                  <span key={tag} className="px-3 py-1 bg-gray-700/50 rounded-full text-white/70 text-sm">
-                    {tag}
-                  </span>
                 ))}
               </div>
               
-              <div className="border-t border-gray-700 pt-4 mt-4">
-                <p className="text-white/40 text-sm mb-2">First message:</p>
-                <p className="text-white">{formData.initialMessage}</p>
+              <div className="space-y-6">
+                <div className="p-6 bg-white/5 rounded-2xl border border-white/5 italic text-white/70 leading-relaxed font-medium">
+                  "{formData.bio || "Her story remains unwritten..."}"
+                </div>
+                
+                <div className="flex flex-wrap gap-2">
+                  {formData.tags.map(tag => (
+                    <span key={tag} className="px-4 py-2 bg-[#741818]/20 border border-[#741818]/20 rounded-xl text-white text-[10px] font-bold uppercase tracking-widest">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
-
-            <div className="text-center">
-              <p className="text-white/40 text-sm">This will generate AI videos based on your description</p>
             </div>
           </div>
         );
@@ -545,77 +488,88 @@ export default function CreateGirlPage() {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-black p-6">
-        <div className="max-w-2xl mx-auto">
-          {/* Progress Steps */}
-          <div className="flex items-center justify-between mb-12 overflow-x-auto pb-2">
-            {steps.map((step, index) => (
-              <div key={step.id} className="flex items-center min-w-fit">
-                <div className={`flex flex-col items-center ${index < steps.length - 1 ? 'flex-1' : ''}`}>
-                  <div className={`
-                    w-10 h-10 rounded-full flex items-center justify-center transition-all
-                    ${currentStep >= step.id 
-                      ? 'bg-gradient-to-r from-rose-500 to-violet-500 text-white' 
-                      : 'bg-gray-800 text-white/40'}
-                  `}>
-                    <step.icon className="w-4 h-4" />
+      <div className="min-h-screen bg-[#0a0a0f] py-12 px-6 overflow-hidden">
+        <div className="max-w-3xl mx-auto">
+          {/* Progress Tracker - Modern Glass */}
+          <div className="bg-white/5 backdrop-blur-2xl border border-white/5 p-4 rounded-[2.5rem] mb-12 overflow-x-auto no-scrollbar">
+            <div className="flex items-center justify-between min-w-max px-2">
+              {steps.map((step, index) => (
+                <div key={step.id} className="flex items-center">
+                  <div className="flex flex-col items-center gap-3">
+                    <div className={`
+                      w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500
+                      ${currentStep === step.id 
+                        ? 'bg-[#741818] text-white' 
+                        : currentStep > step.id 
+                          ? 'bg-white/10 text-white' 
+                          : 'bg-white/5 text-white/20'}
+                    `}>
+                      <step.icon size={18} strokeWidth={currentStep === step.id ? 2.5 : 2} />
+                    </div>
                   </div>
-                  <span className={`text-xs mt-2 ${currentStep >= step.id ? 'text-white' : 'text-white/40'}`}>
-                    {step.title}
-                  </span>
+                  {index < steps.length - 1 && (
+                    <div className={`w-8 h-px mx-4 ${currentStep > step.id ? 'bg-[#741818]' : 'bg-white/5'}`} />
+                  )}
                 </div>
-                {index < steps.length - 1 && (
-                  <div className={`w-8 h-0.5 mx-1 ${currentStep > step.id ? 'bg-rose-500' : 'bg-gray-800'}`} />
-                )}
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
-          {/* Form Content */}
-          <div className="bg-gray-900/80 backdrop-blur-xl rounded-3xl p-6 md:p-8 border border-gray-800">
-            {renderStep()}
+          {/* Form Content Area */}
+          <div className="bg-white/5 backdrop-blur-3xl rounded-[3rem] p-10 md:p-14 border border-white/5 relative overflow-hidden mb-10">
+            {/* Subtle light effect inside */}
+            <div className="absolute -top-24 -right-24 w-64 h-64 bg-[#741818]/5 rounded-full blur-[80px] pointer-events-none" />
+            
+            <div className="relative z-10">
+              {renderStep()}
+            </div>
           </div>
 
-          {/* Navigation Buttons */}
-          <div className="flex justify-between mt-8">
+          {/* Nav Buttons */}
+          <div className="flex justify-between items-center bg-white/5 p-3 rounded-[2.5rem] border border-white/5">
             <button
               onClick={() => setCurrentStep(prev => Math.max(1, prev - 1))}
               disabled={currentStep === 1}
-              className={`flex items-center gap-2 px-6 py-3 rounded-full transition-all ${
+              className={`flex items-center gap-3 px-8 py-4 rounded-2xl font-bold transition-all ${
                 currentStep === 1 
-                  ? 'text-white/30 cursor-not-allowed' 
-                  : 'text-white bg-gray-800 hover:bg-gray-700'
+                  ? 'text-white/10 cursor-not-allowed opacity-50' 
+                  : 'text-white/60 hover:text-white hover:bg-white/5'
               }`}
             >
-              <ArrowLeft className="w-5 h-5" />
-              Back
+              <ArrowLeft size={20} strokeWidth={3} />
+              Return
             </button>
 
             {currentStep < 8 ? (
               <button
                 onClick={() => setCurrentStep(prev => prev + 1)}
                 disabled={!canProceed()}
-                className={`flex items-center gap-2 px-8 py-3 rounded-full font-medium transition-all ${
+                className={`flex items-center gap-3 px-10 py-4 rounded-2xl font-bold transition-all ${
                   canProceed()
-                    ? 'bg-red-700 text-white hover:scale-105'
-                    : 'bg-gray-800 text-white/40 cursor-not-allowed'
+                    ? 'bg-[#741818] text-white hover:bg-[#8d1d1d] active:scale-95'
+                    : 'bg-white/5 text-white/10 cursor-not-allowed'
                 }`}
               >
-                Next
-                <ArrowRight className="w-5 h-5" />
+                Continue
+                <ArrowRight size={20} strokeWidth={3} />
               </button>
             ) : (
               <button
-                onClick={() => console.log("Create girl:", formData)}
-                className="flex items-center gap-2 px-8 py-3 rounded-full font-medium bg-red-700 text-white hover:scale-105 transition-all"
+                onClick={() => navigate('/collection')}
+                className="flex items-center gap-3 px-12 py-4 bg-white text-black font-bold rounded-2xl hover:bg-white/90 transition-all active:scale-95"
               >
-                <Heart className="w-5 h-5" />
-                Create Girl
+                Synthesize Soul
+                <Heart size={20} fill="currentColor" />
               </button>
             )}
           </div>
         </div>
       </div>
+
+      <style>{`
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      `}</style>
     </Layout>
   );
 }

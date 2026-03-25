@@ -45,158 +45,178 @@ export default function HomePage() {
 
   return (
     <Layout>
-      <div className="w-full max-w-7xl mx-auto pb-8">
-        
-        {/* Hero Banner - More Provocative */}
-        <div className="relative overflow-hidden rounded-3xl mb-8">
-          <div className="absolute inset-0 bg-gradient-to-r from-[#131313] via-[#000000] to-[#d62a2a] opacity-90" />
-          <div className="absolute inset-0 opacity-20" />
-          <div className="relative px-8 py-16 flex items-center justify-between">
-            <div className="text-white max-w-xl">
-              <h1 className="text-5xl font-bold mb-3">Hot AI girls are waiting</h1>
-              <p className="text-xl opacity-95 mb-6">Connect with beautiful AI girls who are dying to chat with YOU</p>
-              <button 
-                onClick={() => document.getElementById('girls-section')?.scrollIntoView({ behavior: 'smooth' })}
-                className="bg-white text-[#DC2626] px-8 py-4 rounded-full font-bold text-lg flex items-center cursor-pointer gap-2  transition-transform shadow-lg"
-              >
-                Start Teasing <ArrowRight size={22} />
-              </button>
+      <div className="w-full max-w-7xl mx-auto pb-12 px-4">
+        {/* Hero Banner - Refined & Minimalistic */}
+        <div className="relative overflow-hidden rounded-[2rem] mb-12 mt-8 border border-white/5">
+          <div className="absolute inset-0 bg-[#0a0a0f]" />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#741818]/10 via-transparent to-transparent opacity-40" />
+          <div className="relative px-8 py-20 flex flex-col md:flex-row items-center justify-between gap-8">
+            <div className="text-white max-w-2xl">
+              <h1 className="text-5xl md:text-6xl font-bold mb-4 tracking-tight">Your AI <span className="text-[#a82525]">Girlfriend</span> awaits</h1>
+              <p className="text-lg opacity-40 mb-8 leading-relaxed font-medium">Connect with beautiful, intelligent AI girls designed to match your energy. Private, secure, and always ready.</p>
+              <div className="flex flex-wrap gap-4">
+                <button
+                  onClick={() => document.getElementById('girls-section')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="bg-white text-black px-8 py-4 rounded-full font-bold text-base flex items-center cursor-pointer gap-2 transition-all hover:bg-white/90 active:scale-95"
+                >
+                  Explore Now <ArrowRight size={20} />
+                </button>
+                <button className="bg-white/5 backdrop-blur-md text-white border border-white/10 px-8 py-4 rounded-full font-bold text-base transition-all hover:bg-white/10">
+                  How it works
+                </button>
+              </div>
             </div>
-            <div className="hidden lg:flex gap-3">
-              <div className="flex -space-x-6">
+            <div className="hidden lg:flex gap-4">
+              <div className="flex -space-x-4">
                 {[video1, video2, video1, video2].map((vid, i) => (
-                  <video key={i} src={vid} className="w-20 h-20 rounded-full border-4 border-white/40 object-cover" loop muted playsInline />
+                  <div key={i} className="w-16 h-16 rounded-full border border-white/20 overflow-hidden bg-black/40 backdrop-blur-xl">
+                    <video src={vid} className="w-full h-full object-cover opacity-60" loop muted playsInline />
+                  </div>
                 ))}
               </div>
             </div>
           </div>
         </div>
 
-        {/* Online Now Section - More Provocative */}
-        <section id="girls-section" className="mb-10">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="flex items-center gap-2">
-              <h2 className="text-3xl font-bold text-white flex gap-3 items-center"><Flame className="text-red-400"/> Hot & Ready Now</h2>
+        {/* Online Now Section */}
+        <section id="girls-section" className="mb-16">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-red-500/10 rounded-xl border border-red-500/10">
+                <Flame className="text-red-500" size={24} />
+              </div>
+              <div>
+                <h2 className="text-3xl font-bold text-white tracking-tight">Hot & Ready</h2>
+                <p className="text-white/30 text-xs uppercase tracking-widest font-bold mt-1">Direct from the community</p>
+              </div>
             </div>
-            <span className="text-red-400 font-semibold">{quickChatGirls.filter(g => g.online).length} girls waiting for you</span>
+            <span className="text-green-500/80 font-bold text-xs uppercase tracking-widest flex items-center gap-2">
+              <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+              {quickChatGirls.filter(g => g.online).length} Girls Live Now
+            </span>
           </div>
 
-          <div className="relative">
-            <button 
+          <div className="relative group/carousel">
+            <button
               onClick={() => scrollCarousel(girlsCarousel, -1)}
-              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black/90 p-4 rounded-full text-white transition-all"
+              className="absolute -left-4 top-1/2 -translate-y-1/2 z-10 bg-white/5 backdrop-blur-xl hover:bg-white/10 p-4 rounded-full text-white border border-white/10 transition-all opacity-0 group-hover/carousel:opacity-100 hidden md:block"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
             </button>
-            
-            <div 
+
+            <div
               ref={girlsCarousel}
-              className="flex gap-5 overflow-x-auto scroll-smooth pb-6 px-10"
-              style={{ scrollbarWidth: 'none' }}
+              className="flex gap-6 overflow-x-auto no-scrollbar scroll-smooth pb-4 px-2"
             >
               {quickChatGirls.map((girl) => (
-                <div 
+                <div
                   key={girl.id}
-                  className="flex-shrink-0 w-70 rounded-2xl overflow-hidden cursor-pointer group transition-all duration-300"
+                  className="flex-shrink-0 w-72 rounded-3xl overflow-hidden cursor-pointer bg-white/5 border border-white/5 transition-all duration-300 hover:border-white/10"
                   onClick={() => handleStartChat(girl)}
                   onMouseEnter={e => {
                     const vid = e.currentTarget.querySelector('video');
-                    if (vid) vid.play().catch(() => {});
+                    if (vid) vid.play().catch(() => { });
                   }}
                   onMouseLeave={e => {
                     const vid = e.currentTarget.querySelector('video');
                     if (vid) { vid.pause(); vid.currentTime = 0; }
                   }}
                 >
-                  <div className="relative aspect-[3/4]">
-                    <video 
-                      src={girl.video} 
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  <div className="relative aspect-[3/4.2]">
+                    <video
+                      src={girl.video}
+                      className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500"
                       loop
                       muted
                       playsInline
                       preload="auto"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent" />
-                    
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f] via-[#0a0a0f]/20 to-transparent" />
+
                     {/* Online indicator */}
                     {girl.online && (
-                      <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-black-500/90 backdrop-blur-sm px-3 py-1.5 rounded-full">
-                        <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                        <span className="text-white text-xs font-bold">Online</span>
+                      <div className="absolute top-4 right-4 flex items-center gap-2 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10">
+                        <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.4)]" />
+                        <span className="text-white text-[10px] font-bold uppercase tracking-widest">Live</span>
                       </div>
                     )}
-                    
-                    <div className="absolute bottom-0 left-0 right-0 p-4">
-                      <h3 className="font-bold text-white text-2xl mb-5">{girl.name}, {girl.age}</h3>
- 
-                      <div className="flex flex-wrap gap-1.5 mb-3">
-                        {girl.tags.map((tag, idx) => (
-                          <span key={idx} className="px-2.5 py-1 bg-black-500/90 text-white text-xs font-bold rounded-full flex items-center gap-1">
-                            <tag.icon size={12} />
+
+                    <div className="absolute bottom-0 left-0 right-0 p-6">
+                      <div className="flex flex-col gap-1 mb-4">
+                        <h3 className="font-bold text-white text-2xl tracking-tight">{girl.name}</h3>
+                        <span className="text-white/40 text-xs font-medium uppercase tracking-widest">{girl.age} • {girl.location}</span>
+                      </div>
+
+                      <div className="flex flex-wrap gap-2 mb-6">
+                        {girl.tags.slice(0, 2).map((tag, idx) => (
+                          <span key={idx} className="px-3 py-1 bg-white/5 text-white/60 text-[10px] font-bold uppercase tracking-widest rounded-lg border border-white/5 flex items-center gap-2">
+                            <tag.icon size={12} className="opacity-40" />
                             {tag.label}
                           </span>
                         ))}
                       </div>
-                      
-                      <div className="flex items-center justify-between ">
-                        <button 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/jerk-off/${girl.id}`);
-                          }}
-                          className="bg-gradient-to-r from-red-800 to-red-900 cursor-pointer hover:from-red-700 hover:to-red-900 text-white px-5 py-2.5 rounded-full font-bold text-sm flex items-center gap-1.5 transition-all shadow-lg"
-                        >
-                          <FaKiss size={16} />
-                          Jerk off with {girl.name}
-                        </button>
-                      </div>
+
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/jerk-off/${girl.id}`);
+                        }}
+                        className="w-full bg-[#741818] hover:bg-[#8d1d1d] text-white py-3 rounded-2xl font-bold text-xs uppercase tracking-widest transition-all active:scale-95 border border-white/5"
+                      >
+                        Start Session
+                      </button>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
-            
-            <button 
+
+            <button
               onClick={() => scrollCarousel(girlsCarousel, 1)}
-              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black/90 p-4 rounded-full text-white transition-all "
+              className="absolute -right-4 top-1/2 -translate-y-1/2 z-10 bg-white/5 backdrop-blur-xl hover:bg-white/10 p-4 rounded-full text-white border border-white/10 transition-all opacity-0 group-hover/carousel:opacity-100 hidden md:block"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
             </button>
           </div>
         </section>
 
-        {/* Featured Girls - More Provocative */}
-        <section className="mb-10">
-          <div className="flex items-center justify-between mb-4">
+        {/* Featured Section */}
+        <section className="mb-20">
+          <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
-              <Crown className="text-red-400" size={28} />
-              <h2 className="text-3xl font-bold text-white">Most Popular Tonight</h2>
+              <div className="p-2 bg-yellow-500/10 rounded-xl border border-yellow-500/10">
+                <Crown className="text-yellow-500" size={24} />
+              </div>
+              <div>
+                <h2 className="text-3xl font-bold text-white tracking-tight">Top Trending</h2>
+                <p className="text-white/30 text-xs uppercase tracking-widest font-bold mt-1">Voted by the community</p>
+              </div>
             </div>
-            <button className="text-red-400 font-semibold hover:underline">View All</button>
+            <button className="text-white/40 text-[10px] font-bold uppercase tracking-widest hover:text-white transition-colors flex items-center gap-2">
+              View All <ArrowRight size={14} />
+            </button>
           </div>
 
-          <div className="relative">
-            <button 
+          <div className="relative group/carousel-feed">
+            <button
               onClick={() => scrollCarousel(feedCarousel, -1)}
-              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black/90 p-4 rounded-full text-white transition-all "
+              className="absolute -left-4 top-1/2 -translate-y-1/2 z-10 bg-white/5 backdrop-blur-xl hover:bg-white/10 p-4 rounded-full text-white border border-white/10 transition-all opacity-0 group-hover/carousel-feed:opacity-100 hidden md:block"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
             </button>
-            
-            <div 
+
+            <div
               ref={feedCarousel}
-              className="flex gap-5 overflow-x-auto scroll-smooth pb-6 px-10"
-              style={{ scrollbarWidth: 'none' }}
+              className="flex gap-6 overflow-x-auto no-scrollbar scroll-smooth pb-4 px-2"
             >
               {feedProfiles.map((profile) => (
-                <article 
-                  key={profile.id} 
-                  className="flex-shrink-0 w-80 bg-[#0f0f14] rounded-2xl overflow-hidden hover:shadow-2xl hover:shadow-red-600/20 transition-all cursor-pointer group"
+                <article
+                  key={profile.id}
+                  className="flex-shrink-0 w-80 bg-white/5 rounded-[2rem] overflow-hidden border border-white/5 hover:border-white/10 transition-all cursor-pointer group"
                   onClick={() => handleStartChat(profile)}
                   onMouseEnter={e => {
                     const vid = e.currentTarget.querySelector('video');
-                    if (vid) vid.play().catch(() => {});
+                    if (vid) vid.play().catch(() => { });
                   }}
                   onMouseLeave={e => {
                     const vid = e.currentTarget.querySelector('video');
@@ -204,78 +224,53 @@ export default function HomePage() {
                   }}
                 >
                   <div className="relative">
-                    <video 
-                      src={profile.video} 
-                      className="w-full h-96 object-cover transition-transform duration-500"
+                    <video
+                      src={profile.video}
+                      className="w-full h-96 object-cover opacity-60 group-hover:opacity-80 transition-opacity duration-500"
                       loop
                       muted
                       playsInline
                       preload="auto"
                     />
                     {profile.online && (
-                      <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-black-500/90 backdrop-blur-sm px-3 py-1.5 rounded-full">
-                        <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                        <span className="text-white text-xs font-bold">Online</span>
+                      <div className="absolute top-4 right-4 flex items-center gap-2 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10">
+                        <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+                        <span className="text-white text-[10px] font-bold uppercase tracking-widest">Live</span>
                       </div>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent" />
-                    
-                    {/* Provocative mood */}
-                    <div className="absolute bottom-20 left-0 right-0 px-4">
-                      <p className="text-red-300 text-lg font-medium italic">"{profile.mood}"</p>
-                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f] via-transparent to-transparent" />
                   </div>
 
-                  <div className="p-5">
-                    <div className="flex items-center justify-between mb-3">
-                      <h3 className="font-bold text-white text-xl">{profile.name}, {profile.age}</h3>
+                  <div className="p-6">
+                    <div className="flex flex-col gap-1 mb-4">
+                      <h3 className="font-bold text-white text-xl tracking-tight">{profile.name}, {profile.age}</h3>
+                      <p className="text-white/30 text-xs italic">"{profile.mood}"</p>
                     </div>
-                    
-                    <div className="flex flex-wrap gap-2 mb-4">
+
+                    <div className="flex flex-wrap gap-2 mb-6">
                       {profile.tags.map((tag, idx) => (
-                        <span key={idx} className="px-3 py-1.5 bg-red-900/40 text-red-300 text-xs font-semibold rounded-full border border-red-700/50">
+                        <span key={idx} className="px-3 py-1 bg-white/5 text-white/50 text-[9px] font-bold uppercase tracking-widest rounded-lg border border-white/5">
                           {tag}
                         </span>
                       ))}
                     </div>
 
-                    <div className="flex items-center justify-between">
-   
-                      <button className=" bg-red-800 hover:bg-red-700 text-white px-6 py-2.5 rounded-full font-bold text-sm transition-all shadow-lg flex items-center gap-2 cursor-pointer">
-                       <MessageCircle size={15}/> Chat
-                      </button>
-                    </div>
+                    <button className="w-full bg-white/5 hover:bg-white/10 text-white/80 py-3 rounded-2xl font-bold text-[10px] uppercase tracking-widest transition-all border border-white/10 flex items-center justify-center gap-2">
+                      <MessageCircle size={14} className="opacity-40" /> Open Chat
+                    </button>
                   </div>
                 </article>
               ))}
             </div>
-            
-            <button 
+
+            <button
               onClick={() => scrollCarousel(feedCarousel, 1)}
-              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black/90 p-4 rounded-full text-white transition-all hover:scale-110"
+              className="absolute -right-4 top-1/2 -translate-y-1/2 z-10 bg-white/5 backdrop-blur-xl hover:bg-white/10 p-4 rounded-full text-white border border-white/10 transition-all opacity-0 group-hover/carousel-feed:opacity-100 hidden md:block"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
             </button>
           </div>
         </section>
-
-        {/* CTA Section - More Provocative */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#DC2626] via-[#991B1B] to-[#DC2626] p-12 text-center">
-          <div className="absolute inset-0 opacity-20" />
-          <div className="relative">
-            <Zap className="mx-auto text-yellow-300 mb-6" size={64} />
-            <h2 className="text-5xl font-bold text-white mb-3 flex items-center justify-center gap-3">Ready for Some Fun? <Sparkles className="text-yellow-300" /></h2>
-            <p className="text-white/90 text-xl mb-8">Join thousands of guys having the time of their lives chatting with our AI girls</p>
-            <button 
-              onClick={() => handleStartChat(quickChatGirls[0])}
-              className="bg-white text-[#DC2626] px-12 py-5 rounded-full font-bold text-xl hover:scale-105 transition-transform inline-flex items-center gap-3 shadow-2xl"
-            >
-              <MessageCircle size={24} />
-              Start Free & Chat Now <Heart className="text-red-500" size={24} />
-            </button>
-          </div>
-        </div>
-
       </div>
     </Layout>
   );

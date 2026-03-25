@@ -2,19 +2,17 @@ import { useState } from "react";
 import { FiMenu, FiX, FiHome, FiCompass, FiMessageCircle, FiStar, FiUser, FiGlobe, FiMail, FiSettings, FiLogOut } from "react-icons/fi";
 import { FaFemale, FaMale, FaDragon } from "react-icons/fa";
 import logo from '../assets/gpt.png';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Layout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("girls");
   const [activeNav, setActiveNav] = useState("home");
-
+  const navigate = useNavigate()
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
   const tabs = [
     { id: "girls", label: "Girls", icon: <FaFemale /> },
-    { id: "anime", label: "Anime", icon: <FaDragon /> },
-    { id: "guys", label: "Guys", icon: <FaMale /> },
   ];
 
   const navItems = [
@@ -22,15 +20,42 @@ const Layout = ({ children }) => {
     { id: "discover", label: "Discover", icon: <FiCompass />, link: "/discover" },
     { id: "chat", label: "Chat", icon: <FiMessageCircle />, badge: "3", link: "/chat/123" },
     { id: "collection", label: "Collection", icon: <FiStar />, link: "/collection" },
-    { id: "create", label: "Create", icon: <FiUser />, link: "/clone" },
+    { id: "create", label: "Create", icon: <FiUser />, link: "/create-girl" },
   ];
 
+  const handleLogout = async (e) => {
+    e.preventDefault();
+    console.log("Logout clicked");
+    
+    try {
+      const response = await fetch(`${import.meta.env.VITE_URL}/auth/logout`, {
+        credentials: "include"
+      });
+      const data = await response.json();
+      console.log("Logout response:", data);
+      
+      if (!data.success) {
+        console.error("Logout failed:", data.message);
+        // Still navigate even if logout reports failure
+        window.location.href = '/login';
+        return;
+      }
+      
+      console.log("Logout successful, navigating to /login");
+      window.location.href = '/login';
+    } catch (err) {
+      console.error("Logout error:", err);
+      // Navigate on error
+      window.location.href = '/login';
+    }
+  };
+
   const footerItems = [
-    { id: "contact", label: "Contact Us", icon: <FiMail /> },
-    { id: "language", label: "Language", icon: <FiGlobe /> },
     { id: "settings", label: "Settings", icon: <FiSettings /> },
-    { id: "logout", label: "Log Out", icon: <FiLogOut /> },
+    { id: "logout", label: "Log Out", icon: <FiLogOut />, onClick: handleLogout },
   ];
+
+
 
   return (
     <div className="flex h-screen bg-[#0a0a0f] text-gray-100">
@@ -69,7 +94,7 @@ const Layout = ({ children }) => {
                         <span className="text-lg mr-3">{item.icon}</span>
                         <span>{item.label}</span>
                         {item.badge && (
-                          <span className="ml-auto bg-[#DC2626] text-white text-xs px-2 py-0.5 rounded-full">
+                          <span className="ml-auto bg-[#a32e2e] text-white text-xs px-2 py-0.5 rounded-full">
                             {item.badge}
                           </span>
                         )}
@@ -86,7 +111,10 @@ const Layout = ({ children }) => {
               <ul className="space-y-1">
                 {footerItems.map((item) => (
                   <li key={item.id}>
-                    <button className="w-full flex items-center px-3 py-2.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/50 transition-all duration-200 text-sm font-medium">
+                    <button
+                      onClick={item.onClick}
+                      className="w-full flex items-center px-3 py-2.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/50 transition-all duration-200 text-sm font-medium"
+                    >
                       <span className="text-lg mr-3">{item.icon}</span>
                       <span>{item.label}</span>
                     </button>
@@ -114,42 +142,7 @@ const Layout = ({ children }) => {
 
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
-        <header className="bg-gray-850 shadow-lg px-4 py-3 border-b border-gray-700">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between space-y-4 md:space-y-0">
-            {/* Left section */}
-            <div className="flex items-center space-x-4 w-full md:w-auto">
-              <button 
-                className="md:hidden text-gray-100 hover:text-[#DC2626] transition-colors duration-200 p-2 hover:bg-gray-800 rounded-lg"
-                onClick={toggleSidebar}
-              >
-                {sidebarOpen ? <FiX size={24} /> : <FiMenu size={24} />}
-              </button>
 
-              <div className="flex space-x-1 rounded-xl p-1">
-                {tabs.map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`
-                      flex items-center space-x-2 px-4 py-2.5 rounded-lg transition-all duration-200
-                      ${activeTab === tab.id 
-                        ? 'bg-gradient-to-r from-red-900/40 to-red-900/40 text-[#DC2626] shadow-lg shadow-red-900/20' 
-                        : 'text-gray-400 hover:text-gray-300 hover:bg-gray-700/50'
-                      }
-                    `}
-                  >
-                    <span className="text-lg">{tab.icon}</span>
-                    <span className="font-semibold">{tab.label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Profile */}
-
-          </div>
-        </header>
 
         {/* Page content */}
         <main className="flex-1 p-4 overflow-auto">

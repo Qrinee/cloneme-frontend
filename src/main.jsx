@@ -17,6 +17,7 @@ import DiscoverPage from './pages/DiscoverPage'
 import CollectionPage from './pages/CollectionPage'
 import JerkOffPage from './pages/JerkOffPage'
 import CreateGirlPage from './pages/CreateGirlPage'
+import HowItWorksPage from './pages/HowItWorksPage'
 
 // Dashboard component for authenticated users
 
@@ -112,6 +113,11 @@ function Application() {
       <Route 
         path='/create-girl' 
         element={<CreateGirlPage />} 
+      />
+
+      <Route 
+        path='/how-it-works' 
+        element={<HowItWorksPage />} 
       />
 
       <Route path="*" element={<NotFound />} />

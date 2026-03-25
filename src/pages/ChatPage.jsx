@@ -185,229 +185,278 @@ export default function ChatPage() {
         <Content />
       </Dialog>
 
-      {/* Level Up Modal */}
-      {showLevelUp && (
-        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center animate-fade-in">
-          <div className="bg-gradient-to-br from-[#6c5ce7] to-[#a855f7] p-8 rounded-3xl text-center transform animate-bounce">
-            <div className="text-6xl mb-4">🎉</div>
-            <h2 className="text-3xl font-bold text-white mb-2">Level Up!</h2>
-            <p className="text-white/80 text-xl">Doszedłeś do poziomu {relationshipLevel}!</p>
-            <div className="mt-4 text-5xl">⭐</div>
-          </div>
-        </div>
-      )}
-
-      {/* Unlock Modal */}
-      {showUnlockModal && newUnlock && (
-        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center animate-fade-in">
-          <div className="bg-gradient-to-br from-yellow-600 to-orange-500 p-8 rounded-3xl text-center max-w-sm mx-4">
-            <div className="text-6xl mb-4">{newUnlock.icon}</div>
-            <h2 className="text-2xl font-bold text-white mb-2">Odblokowano!</h2>
-            <p className="text-white/90 text-lg mb-4">{newUnlock.name}</p>
-            <p className="text-white/70 text-sm">{newUnlock.description}</p>
-            <button 
-              onClick={() => setShowUnlockModal(false)}
-              className="mt-6 px-8 py-3 bg-white text-yellow-600 rounded-full font-bold hover:scale-105 transition-transform"
-            >
-              Super! 💕
-            </button>
-          </div>
-        </div>
-      )}
-
-      <div className="flex h-full  text-white">
-
-        {/* LEFT – CHAT LIST */}
-        <div className="hidden md:flex w-80  border-r border-white/10 flex-col">
-        <h3 className="text-2xl">Chat</h3>
-          <div className="p-4">
+      <div className="flex h-screen bg-[#0a0a0f] text-white overflow-hidden">
+        {/* LEFT – CHAT LIST - Refined */}
+        <div className="hidden md:flex w-80 border-r border-white/5 flex-col bg-[#0a0a0f]">
+          <div className="p-6">
+            <h3 className="text-2xl font-bold tracking-tight mb-6">Messages</h3>
             <div className="relative">
-              <FaSearch className="absolute left-3 top-3 text-white/40" />
-              <Input
-                placeholder="Search..."
-                className="pl-9  border-none text-sm"
+              <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" size={14} />
+              <input
+                placeholder="Search conversations..."
+                className="w-full bg-white/5 border border-white/5 rounded-2xl py-3 pl-10 pr-4 text-sm outline-none focus:border-white/10 transition-colors placeholder:text-white/20"
               />
             </div>
           </div>
 
-          <ScrollArea className="flex-1 px-2">
-            {chats.map((chat) => (
-              <div
-                key={chat._id}
-                onClick={() => navigate(`/chat/${chat._id}`)}
-                className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-white/5 ${
-                  id === chat._id && "bg-white/10"
-                }`}
-              >
-                <Avatar>
-                  <AvatarImage src={`${import.meta.env.VITE_URL}${chat.avatar}`} />
-                  <AvatarFallback>{chat.name?.[0]}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                  <p className="font-medium text-sm">{chat.name}</p>
-                  <p className="text-xs text-white/40 truncate">
-                    {chat.lastMessage}
-                  </p>
+          <ScrollArea className="flex-1 px-4">
+            <div className="space-y-2">
+              {chats.map((chat) => (
+                <div
+                  key={chat._id}
+                  onClick={() => navigate(`/chat/${chat._id}`)}
+                  className={`flex items-center gap-3 p-4 rounded-[1.5rem] cursor-pointer transition-all ${
+                    id === chat._id 
+                      ? "bg-white/5 border border-white/10" 
+                      : "hover:bg-white/5 border border-transparent"
+                  }`}
+                >
+                  <div className="relative">
+                    <Avatar className="w-12 h-12 border border-white/10">
+                      <AvatarImage src={`${import.meta.env.VITE_URL}${chat.avatar}`} />
+                      <AvatarFallback className="bg-white/5 text-white/40">{chat.name?.[0]}</AvatarFallback>
+                    </Avatar>
+                    <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-[#0a0a0f]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-sm tracking-tight">{chat.name}</p>
+                    <p className="text-[10px] text-white/30 truncate font-medium uppercase tracking-widest mt-0.5">
+                      {chat.lastMessage || "Start a new conversation"}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </ScrollArea>
 
-          <Link to="/" className="p-4">
-            <Button variant="outline" className="w-full">
-              <FaPlus className="mr-2" /> New Chat
-            </Button>
-          </Link>
+          <div className="p-6">
+            <Link to="/">
+              <button className="w-full bg-white/5 backdrop-blur-md border border-white/10 text-white py-4 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-white/10 transition-all active:scale-95 flex items-center justify-center gap-2">
+                <FaPlus size={12} /> New Chat
+              </button>
+            </Link>
+          </div>
         </div>
 
-        {/* CENTER – CHAT */}
-        <div className="flex-1 flex flex-col">
+        {/* CENTER – CHAT AREA */}
+        <div className="flex-1 flex flex-col bg-[#0a0a0f] relative">
           {!id ? (
-            <div className="flex-1 flex items-center justify-center text-white/50">
-              Select a chat
+            <div className="flex-1 flex flex-col items-center justify-center text-white/20 gap-4">
+              <div className="w-16 h-16 rounded-3xl bg-white/5 border border-white/5 flex items-center justify-center">
+                <Sparkles size={32} />
+              </div>
+              <p className="text-xs font-bold uppercase tracking-[0.2em]">Select a conversation to begin</p>
             </div>
           ) : (
             <>
               {/* Header with relationship progress */}
-              <div className="flex flex-col px-4 py-3 border-b border-white/10 ">
+              <div className="px-6 py-4 border-b border-white/5 flex flex-col gap-4">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="md:hidden"
+                  <div className="flex items-center gap-4">
+                    <button
+                      className="md:hidden p-2 hover:bg-white/5 rounded-xl transition-colors"
                       onClick={() => navigate("/")}
                     >
-                      <FaArrowLeft />
-                    </Button>
-                    <Avatar>
-                      <AvatarImage
-                        src={`${import.meta.env.VITE_URL}${activeChat?.avatar}`}
-                      />
-                    </Avatar>
+                      <FaArrowLeft size={18} />
+                    </button>
+                    <div className="flex items-center gap-3">
+                      <Avatar className="w-10 h-10 border border-white/10">
+                        <AvatarImage src={`${import.meta.env.VITE_URL}${activeChat?.avatar}`} />
+                      </Avatar>
+                      <div>
+                        <h2 className="font-bold text-base tracking-tight">{activeChat?.name}</h2>
+                        <div className="flex items-center gap-2">
+                          <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+                          <span className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Online Now</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <Button size="icon" variant="ghost" onClick={handleDeleteChat}>
-                    <FaTrash />
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <div className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-xl flex items-center gap-2">
+                      <Star size={12} className="text-yellow-500" />
+                      <span className="text-[10px] font-bold uppercase tracking-widest">Level {relationshipLevel}</span>
+                    </div>
+                    <button onClick={handleDeleteChat} className="p-3 hover:bg-white/5 text-white/20 hover:text-red-500 rounded-xl transition-all">
+                      <FaTrash size={14} />
+                    </button>
+                  </div>
                 </div>
-                
 
+                {/* Affinity Progress Bar - Mini version */}
+                <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden relative">
+                  <div 
+                    className="absolute inset-y-0 left-0 bg-[#741818] transition-all duration-1000 ease-out"
+                    style={{ width: `${progressPercent}%` }}
+                  />
+                </div>
               </div>
 
-              {/* Messages */}
-              <ScrollArea className="flex-1 p-4">
-                <div className="space-y-3">
+              {/* Messages Area */}
+              <ScrollArea className="flex-1 px-6 py-8">
+                <div className="space-y-6 max-w-4xl mx-auto">
                   {messages.map((m) => (
                     <div
                       key={m.id}
-                      className={`flex ${
-                        m.sender === "me" ? "justify-end" : "justify-start"
-                      }`}
+                      className={`flex ${m.sender === "me" ? "justify-end" : "justify-start"}`}
                     >
                       <div
-                        className={`max-w-[70%] px-4 py-2 rounded-2xl text-sm ${
+                        className={`max-w-[80%] px-5 py-3.5 rounded-[1.5rem] text-sm leading-relaxed ${
                           m.sender === "me"
-                            ? "bg-[#6c5ce7] rounded-br-md"
-                            : "bg-[#1a1a1a] border border-white/10 rounded-bl-md"
+                            ? "bg-[#741818] text-white rounded-br-none font-medium"
+                            : "bg-white/5 backdrop-blur-xl border border-white/5 text-white/90 rounded-bl-none"
                         }`}
                       >
                         {m.text}
                       </div>
                     </div>
                   ))}
+                  {isLoading && (
+                    <div className="flex justify-start">
+                      <div className="bg-white/5 backdrop-blur-xl border border-white/5 px-5 py-3.5 rounded-[1.5rem] rounded-bl-none">
+                        <div className="flex gap-1">
+                          <div className="w-1.5 h-1.5 bg-white/20 rounded-full animate-bounce" />
+                          <div className="w-1.5 h-1.5 bg-white/20 rounded-full animate-bounce [animation-delay:0.2s]" />
+                          <div className="w-1.5 h-1.5 bg-white/20 rounded-full animate-bounce [animation-delay:0.4s]" />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   <div ref={bottomRef} />
                 </div>
               </ScrollArea>
 
-              {/* Input */}
-              <div className="p-4 border-t border-white/10 ">
-                <div className="flex items-center gap-2 border-2 rounded-full px-3 py-2">
-                  <FaSmile className="text-white/40" />
-                  <FaImage className="text-white/40" />
-                  <input
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && handleSend()}
-                    placeholder="Write a message..."
-                    className="flex-1 bg-transparent outline-none text-sm"
-                  />
-                  <button
-                    onClick={handleSend}
-                    className="w-9 h-9 bg-[#6c5ce7] rounded-full flex items-center justify-center"
-                  >
-                    <FaPaperPlane />
-                  </button>
+              {/* Chat Input */}
+              <div className="p-6">
+                <div className="max-w-4xl mx-auto">
+                  <div className="bg-white/5 border border-white/5 rounded-[2rem] p-1.5 flex items-center gap-2 group transition-all focus-within:border-white/10">
+                    <button className="p-3 text-white/20 hover:text-white/40 transition-colors">
+                      <FaSmile size={18} />
+                    </button>
+                    <button className="p-3 text-white/20 hover:text-white/40 transition-colors">
+                      <FaImage size={18} />
+                    </button>
+                    <input
+                      value={newMessage}
+                      onChange={(e) => setNewMessage(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                      placeholder={`Message ${activeChat?.name}...`}
+                      className="flex-1 bg-transparent border-none outline-none text-sm px-2 text-white placeholder:text-white/20"
+                    />
+                    <button
+                      onClick={handleSend}
+                      disabled={!newMessage.trim()}
+                      className={`w-11 h-11 rounded-[1.25rem] flex items-center justify-center transition-all active:scale-90 ${
+                        newMessage.trim() 
+                          ? "bg-[#741818] text-white hover:bg-[#8d1d1d]" 
+                          : "bg-white/5 text-white/10 border border-white/5 cursor-not-allowed"
+                      }`}
+                    >
+                      <FaPaperPlane size={14} />
+                    </button>
+                  </div>
                 </div>
               </div>
             </>
           )}
         </div>
 
-        {/* RIGHT – PROFILE */}
+        {/* RIGHT – PROFILE SIDEBAR */}
         {activeChat && (
-          <div className="hidden xl:flex w-[360px] bg-[#0f0f0f] border-l border-white/10 flex-col">
-            <div className="relative h-[420px]">
-              <img
-                src={`${import.meta.env.VITE_URL}${activeChat.avatar}`}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-            </div>
-
-            <div className="p-4 space-y-4">
-              <h2 className="text-xl font-semibold">{activeChat.name}</h2>
-              <p className="text-sm text-white/60">
-                Alternative goth model working part-time at a goth store.
-              </p>
-
-              <Button className="w-full bg-red-600 hover:bg-red-700">
-                📞 Call Me
-              </Button>
-              <Button variant="outline" className="w-full border-red-600 text-red-600">
-                ✨ Generate Image
-              </Button>
-
-              <div className="grid grid-cols-2 gap-3 text-sm pt-4 border-t border-white/10">
-                <div><p className="text-white/40">Age</p>19</div>
-                <div><p className="text-white/40">Body</p>Slim</div>
-                <div><p className="text-white/40">Ethnicity</p>Canadian</div>
-                <div><p className="text-white/40">Language</p>English</div>
-              </div>
-
-              {/* Unlocked Content Section */}
-              <div className="mt-4 pt-4 border-t border-white/10">
-                <h3 className="text-sm font-semibold text-white/80 mb-3">🎁 Odblokowane</h3>
-                <div className="space-y-2">
-                  {unlockables.slice(0, relationshipLevel).map((unlock, idx) => (
-                    <div 
-                      key={idx}
-                      className="flex items-center gap-3 p-3 bg-[#DC2626]/20 rounded-xl border border-[#DC2626]/30"
-                    >
-                      <span className="text-2xl">{unlock.icon}</span>
-                      <div>
-                        <p className="text-sm font-medium text-white">{unlock.name}</p>
-                        <p className="text-xs text-white/50">{unlock.description}</p>
-                      </div>
-                    </div>
-                  ))}
-                  {unlockables.slice(relationshipLevel).slice(0, 2).map((locked, idx) => (
-                    <div 
-                      key={idx}
-                      className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/10 opacity-60"
-                    >
-                      <span className="text-2xl grayscale">🔒</span>
-                      <div>
-                        <p className="text-sm font-medium text-white/60">Wymagany poziom {locked.level}</p>
-                        <p className="text-xs text-white/40">{locked.name}</p>
-                      </div>
-                    </div>
-                  ))}
+          <div className="hidden xl:flex w-96 border-l border-white/5 flex-col bg-[#0a0a0f]">
+            <ScrollArea className="flex-1">
+              <div className="relative aspect-[4/5]">
+                <img
+                  src={`${import.meta.env.VITE_URL}${activeChat.avatar}`}
+                  className="w-full h-full object-cover opacity-80"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f] via-transparent to-transparent" />
+                <div className="absolute bottom-6 left-6">
+                  <h2 className="text-3xl font-bold tracking-tight mb-1">{activeChat.name}</h2>
+                  <p className="text-white/30 text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+                    <Heart size={14} className="text-[#741818]" /> {activeChat.location}
+                  </p>
                 </div>
               </div>
-            </div>
+
+              <div className="p-8 space-y-8">
+                <div>
+                  <h3 className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] mb-4">About Me</h3>
+                  <p className="text-sm text-white/60 leading-relaxed font-medium">
+                    Designed to be your perfect adaptive companion. I learn from our conversations to better match your energy and preferences.
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  <button className="w-full bg-white text-black py-4 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-white/90 transition-all active:scale-95">
+                    Start Video Call
+                  </button>
+                  <button className="w-full bg-white/5 border border-white/10 text-white py-4 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-white/10 transition-all">
+                    Generate Images
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-2 gap-6 p-6 bg-white/5 rounded-[2rem] border border-white/5">
+                  <div><p className="text-[9px] font-bold text-white/20 uppercase tracking-[0.15em] mb-1">Age</p><span className="text-sm font-bold">22</span></div>
+                  <div><p className="text-[9px] font-bold text-white/20 uppercase tracking-[0.15em] mb-1">Status</p><span className="text-sm font-bold">Single</span></div>
+                  <div><p className="text-[9px] font-bold text-white/20 uppercase tracking-[0.15em] mb-1">Mood</p><span className="text-sm font-bold">Playful</span></div>
+                  <div><p className="text-[9px] font-bold text-white/20 uppercase tracking-[0.15em] mb-1">Language</p><span className="text-sm font-bold">English</span></div>
+                </div>
+
+                {/* Relationship Milestone Section */}
+                <div className="space-y-4">
+                  <h3 className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em]">Next Milestone</h3>
+                  <div className="space-y-3">
+                    {unlockables.slice(0, relationshipLevel).map((unlock, idx) => (
+                      <div 
+                        key={idx}
+                        className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/10"
+                      >
+                        <div className="w-12 h-12 rounded-xl bg-[#741818]/20 flex items-center justify-center text-xl">
+                          {unlock.icon}
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold text-white/80">{unlock.name}</p>
+                          <p className="text-[10px] text-white/30 uppercase tracking-widest font-bold">Unlocked</p>
+                        </div>
+                      </div>
+                    ))}
+                    {unlockables.filter(u => u.level > relationshipLevel).slice(0, 1).map((locked, idx) => (
+                      <div 
+                        key={idx}
+                        className="flex items-center gap-4 p-4 bg-transparent rounded-2xl border border-white/5 opacity-40 grayscale"
+                      >
+                        <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-xl">
+                          <Lock size={20} />
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold text-white/60">{locked.name}</p>
+                          <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Level {locked.level} Required</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </ScrollArea>
           </div>
         )}
       </div>
+
+      {/* Level Up Notification - Refined */}
+      {showLevelUp && (
+        <div className="fixed top-12 left-1/2 -translate-x-1/2 z-50 animate-fade-in-up">
+          <div className="bg-[#741818] text-white px-8 py-4 rounded-[2rem] border border-white/20 flex items-center gap-4 shadow-[0_0_40px_rgba(116,24,24,0.4)]">
+            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+              <Sparkles size={20} />
+            </div>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-widest opacity-60">Level Up!</p>
+              <p className="font-bold text-lg leading-none">You reached Level {relationshipLevel}</p>
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>
   );
 }

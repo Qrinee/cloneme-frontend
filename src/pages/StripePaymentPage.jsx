@@ -8,7 +8,6 @@ import {
 } from "@stripe/react-stripe-js";
 import { Button } from "@/components/ui/button";
 
-// 👉 Ustaw swój publiczny klucz Stripe
 const stripePromise = loadStripe("pk_test_XXXXXXXXXXXXXXXXXXXXXXXX");
 
 const CheckoutForm = () => {
@@ -46,7 +45,7 @@ const CheckoutForm = () => {
 };
 
 export default function StripePaymentPage() {
-  const clientSecret = "pi_3RQbHaHbdhs7jgas0PnuMCPq_secret_BKdS55MNUk0wxvwWDDOWxDOQH"; // 🔐 Wstaw swój z backendu
+  const clientSecret = "pi_3RQbHaHbdhs7jgas0PnuMCPq_secret_BKdS55MNUk0wxvwWDDOWxDOQH"; // 🔐 
 
   const options = {
     clientSecret,

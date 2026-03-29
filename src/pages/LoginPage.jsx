@@ -97,21 +97,21 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex flex-col bg-[var(--bg-primary)]">
       {/* Minimal header */}
-      <header className="absolute top-0 left-0 right-0 p-6 flex justify-center">
+      <header className="absolute top-0 left-0 right-0 p-4 sm:p-6 flex justify-center">
         <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-          <img src={logo} alt="Logo" className="h-8" />
+          <img src={logo} alt="Logo" className="h-6 sm:h-8" />
         </Link>
       </header>
 
       {/* Main Content - Centered */}
-      <main className="flex-grow flex items-center justify-center p-4">
-        <div className="w-full max-w-sm">
+      <main className="flex-grow flex items-center justify-center px-3 sm:p-4">
+        <div className="w-full max-w-sm sm:max-w-md">
           {/* Logo section */}
-          <div className="text-center mb-8">
-            <h1 className="text-2xl font-semibold text-[var(--foreground)]">
+          <div className="text-center mb-6 sm:mb-8">
+            <h1 className="text-xl sm:text-2xl font-semibold text-[var(--foreground)]">
               {view === "register" ? "Create account" : view === "login" ? "Welcome back" : "Sign in"}
             </h1>
-            <p className="text-sm text-[var(--text-muted)] mt-2">
+            <p className="text-xs sm:text-sm text-[var(--text-muted)] mt-2">
               {view === "register" 
                 ? "Get started for free" 
                 : view === "login" 
@@ -129,18 +129,18 @@ export default function LoginPage() {
                 exit="exit"
                 variants={variants}
                 transition={{ duration: 0.2 }}
-                className="space-y-3"
+                className="space-y-2 sm:space-y-3"
               >
                 <Button
                   onClick={() => window.location = `${import.meta.env.VITE_URL}/auth/google`}
                   variant="outline"
-                  className="w-full h-11 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] hover:bg-[var(--bg-tertiary)] hover:border-[var(--border-subtle)]"
+                  className="w-full h-11 sm:h-12 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] hover:bg-[var(--bg-tertiary)] hover:border-[var(--border-subtle)] text-sm sm:text-base"
                 >
                   <FcGoogle size={18} className="mr-2" />
                   Continue with Google
                 </Button>
 
-                <div className="flex items-center gap-3 my-4">
+                <div className="flex items-center gap-3 my-3 sm:my-4">
                   <div className="flex-1 h-px bg-[var(--border-subtle)]" />
                   <span className="text-xs text-[var(--text-muted)]">or</span>
                   <div className="flex-1 h-px bg-[var(--border-subtle)]" />
@@ -148,13 +148,13 @@ export default function LoginPage() {
 
                 <Button
                   onClick={() => setView("login")}
-                  className="w-full h-11 bg-[var(--accent-primary)] text-white hover:bg-[var(--accent-primary)]/90"
+                  className="w-full h-11 sm:h-12 bg-[var(--accent-primary)] text-white hover:bg-[var(--accent-primary)]/90 text-sm sm:text-base"
                 >
                   <HiOutlineMail size={18} className="mr-2" />
                   Continue with email
                 </Button>
 
-                <p className="text-xs text-[var(--text-muted)] text-center mt-6">
+                <p className="text-xs text-[var(--text-muted)] text-center mt-4 sm:mt-6">
                   By continuing, you agree to our{" "}
                   <a href="#" className="underline hover:text-[var(--foreground)]">Terms</a>
                   {" "}and{" "}
@@ -171,44 +171,44 @@ export default function LoginPage() {
                 exit="exit"
                 variants={variants}
                 transition={{ duration: 0.2 }}
-                className="space-y-4"
+                className="space-y-3 sm:space-y-4"
                 onSubmit={handleLogin}
               >
                 <div className="space-y-1.5">
-                  <Label htmlFor="email" className="text-xs text-[var(--text-muted)]">Email</Label>
+                  <Label htmlFor="email" className="text-xs sm:text-sm text-[var(--text-muted)]">Email</Label>
                   <Input
                     id="email"
                     type="email"
                     placeholder="name@example.com"
                     required
                     onChange={handleChange}
-                    className="h-10 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
+                    className="h-10 sm:h-11 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="password" className="text-xs text-[var(--text-muted)]">Password</Label>
+                  <Label htmlFor="password" className="text-xs sm:text-sm text-[var(--text-muted)]">Password</Label>
                   <Input
                     id="password"
                     placeholder="••••••••"
                     type="password"
                     required
                     onChange={handleChange}
-                    className="h-10 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
+                    className="h-10 sm:h-11 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
                   />
                 </div>
 
-                {error && <p className="text-xs text-red-400">{error}</p>}
+                {error && <p className="text-xs sm:text-sm text-red-400">{error}</p>}
 
-                <Button 
-                  type="submit" 
-                  className="w-full h-10 bg-[var(--accent-primary)] text-white hover:bg-[var(--accent-primary)]/90"
+                <Button
+                  type="submit"
+                  className="w-full h-10 sm:h-11 bg-[var(--accent-primary)] text-white hover:bg-[var(--accent-primary)]/90 text-sm sm:text-base"
                   disabled={isLoading}
                 >
                   {isLoading ? "Signing in..." : "Sign in"}
                 </Button>
 
-                <div className="flex items-center justify-between mt-4">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-0 mt-3 sm:mt-4">
                   <button
                     type="button"
                     className="text-xs text-[var(--text-muted)] hover:text-[var(--foreground)] transition-colors"
@@ -234,68 +234,68 @@ export default function LoginPage() {
                 exit="exit"
                 variants={variants}
                 transition={{ duration: 0.2 }}
-                className="space-y-3"
+                className="space-y-2 sm:space-y-3"
                 onSubmit={handleRegister}
               >
                 <div className="space-y-1.5">
-                  <Label htmlFor="username" className="text-xs text-[var(--text-muted)]">Username</Label>
+                  <Label htmlFor="username" className="text-xs sm:text-sm text-[var(--text-muted)]">Username</Label>
                   <Input
                     id="username"
                     placeholder="johndoe"
                     type="text"
                     required
                     onChange={handleChange}
-                    className="h-10 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
+                    className="h-10 sm:h-11 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="email" className="text-xs text-[var(--text-muted)]">Email</Label>
+                  <Label htmlFor="email" className="text-xs sm:text-sm text-[var(--text-muted)]">Email</Label>
                   <Input
                     id="email"
                     type="email"
                     placeholder="name@example.com"
                     required
                     onChange={handleChange}
-                    className="h-10 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
+                    className="h-10 sm:h-11 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="password" className="text-xs text-[var(--text-muted)]">Password</Label>
+                  <Label htmlFor="password" className="text-xs sm:text-sm text-[var(--text-muted)]">Password</Label>
                   <Input
                     id="password"
                     type="password"
                     placeholder="••••••••"
                     required
                     onChange={handleChange}
-                    className="h-10 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
+                    className="h-10 sm:h-11 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="repeat-password" className="text-xs text-[var(--text-muted)]">Confirm password</Label>
+                  <Label htmlFor="repeat-password" className="text-xs sm:text-sm text-[var(--text-muted)]">Confirm password</Label>
                   <Input
                     id="repeat-password"
                     type="password"
                     placeholder="••••••••"
                     required
                     onChange={handleChange}
-                    className="h-10 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
+                    className="h-10 sm:h-11 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
                   />
                 </div>
 
-                {error && <p className="text-xs text-red-400">{error}</p>}
+                {error && <p className="text-xs sm:text-sm text-red-400">{error}</p>}
 
-                <Button 
-                  type="submit" 
-                  className="w-full h-10 bg-[var(--accent-primary)] text-white hover:bg-[var(--accent-primary)]/90 mt-2"
+                <Button
+                  type="submit"
+                  className="w-full h-10 sm:h-11 bg-[var(--accent-primary)] text-white hover:bg-[var(--accent-primary)]/90 mt-1 sm:mt-2 text-sm sm:text-base"
                   disabled={isLoading}
                 >
                   {isLoading ? "Creating account..." : "Create account"}
                 </Button>
 
-                <p className="text-xs text-[var(--text-muted)] text-center mt-4">
+                <p className="text-xs sm:text-sm text-[var(--text-muted)] text-center mt-2 sm:mt-4">
                   Already have an account?{" "}
                   <button
                     type="button"
@@ -312,8 +312,8 @@ export default function LoginPage() {
       </main>
 
       {/* Minimal footer */}
-      <footer className="py-4 text-center">
-        <Link to="/" className="text-xs text-[var(--text-muted)] hover:text-[var(--foreground)] transition-colors">
+      <footer className="py-3 sm:py-4 text-center">
+        <Link to="/" className="text-xs sm:text-sm text-[var(--text-muted)] hover:text-[var(--foreground)] transition-colors">
           ← Back to home
         </Link>
       </footer>

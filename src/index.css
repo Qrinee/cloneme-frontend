@@ -8,6 +8,11 @@
    Glassmorphism • Glow Effects • Smooth Animations
    ============================================ */
 
+
+   
+  button{
+    cursor: pointer;
+  }
 /* Modern CSS Custom Properties */
 :root {
   /* Base */
@@ -494,8 +499,15 @@ html {
 
 /* Focus styles */
 *:focus-visible {
-  outline: 2px solid var(--accent-primary);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: none;
+}
+
+/* Chat input specific: no focus ring */
+.chat-input-container input:focus {
+  outline: none;
+  box-shadow: none;
+  border: none;
 }
 
 /* Selection color */

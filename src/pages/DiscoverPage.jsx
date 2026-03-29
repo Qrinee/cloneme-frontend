@@ -1,10 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
 import Layout from '../components/Layout';
+import { useAuthFetch } from '../utils/authFetch';
+import { useNavigate } from 'react-router-dom';
 import g1 from '../assets/girls/1.png';
 import g2 from '../assets/girls/2.png';
 import g3 from '../assets/girls/3.png';
 import g4 from '../assets/girls/4.png';
 import g5 from '../assets/girls/5.png';
+
+import { useState, useRef, useEffect } from 'react';
 import {
   ChevronUp,
   ChevronDown,
@@ -15,20 +18,16 @@ import {
   MoreHorizontal,
   Sparkles
 } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 // Mock video data for AI dating platform
-const mockProfiles = [
-  { id: 1, name: "Sophia", age: 22, location: "Paris", tags: ["Calm", "Sweet", "Student"], image: g1, video: null, likes: "1.2k", views: "5.4k", match: 98, bio: "Passionate about classical art and late-night philosophy." },
-  { id: 2, name: "Emma", age: 24, location: "London", tags: ["Dominant", "Mature", "Professional"], image: g2, video: null, likes: "2.5k", views: "12k", match: 85, bio: "I appreciate ambition and a good sense of humor." },
-  { id: 3, name: "Olivia", age: 21, location: "NYC", tags: ["Playful", "Youni", "Night owl"], image: g3, video: null, likes: "3.1k", views: "8.9k", match: 92, bio: "Let's explore the hidden gems of the city together." },
-  { id: 4, name: "Isabella", age: 23, location: "Tokyo", tags: ["Kawaii", "Shy", "Mommy"], image: g4, video: null, likes: "4.2k", views: "15k", match: 95, bio: "Finding beauty in the small, everyday moments." },
-  { id: 5, name: "Ava", age: 25, location: "LA", tags: ["Active", "Sporty", "Fun"], image: g5, video: null, likes: "1.8k", views: "6.2k", match: 88, bio: "Always down for an adventure or a good workout." },
-  { id: 6, name: "Mia", age: 20, location: "Berlin", tags: ["Artistic", "Creative", "Student"], image: g1, video: null, likes: "958", views: "3.1k", match: 90, bio: "Creating art and looking for my next muse." },
-  { id: 7, name: "Charlotte", age: 23, location: "Sydney", tags: ["Adventurous", "Travel", "Wild"], image: g2, video: null, likes: "1.5k", views: "4.7k", match: 82, bio: "Exploring the world, one sunset at a time." },
-  { id: 8, name: "Amelia", age: 22, location: "Dubai", tags: ["Luxury", "Model", "Confident"], image: g3, video: null, likes: "5.6k", views: "22k", match: 97, bio: "Living a life of elegance and looking for a partner in crime." },
-];
+// Mock data replaced by API
+const mockProfiles = [];
 
 export default function DiscoverPage() {
+  const navigate = useNavigate();
+  const authFetch = useAuthFetch();
+  const [girlfriends, setGirlfriends] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const [message, setMessage] = useState("");
@@ -48,8 +47,20 @@ export default function DiscoverPage() {
 
   // Simulate loading
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 500);
-    return () => clearTimeout(timer);
+    const fetchGirlfriends = async () => {
+      try {
+        const res = await authFetch(`${import.meta.env.VITE_API_URL}/girlfriends`);
+        const data = await res.json();
+        if (data.type === "success") {
+          setGirlfriends(data.girlfriends);
+        }
+      } catch (err) {
+        console.error("Failed to fetch girlfriends:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchGirlfriends();
   }, []);
 
   // Handle scroll detection
@@ -61,7 +72,7 @@ export default function DiscoverPage() {
       const scrollTop = container.scrollTop;
       const itemHeight = isMobile ? window.innerHeight : window.innerHeight * 0.85;
       const newIndex = Math.round(scrollTop / itemHeight);
-      if (newIndex !== currentIndex && newIndex >= 0 && newIndex < mockProfiles.length) {
+      if (newIndex !== currentIndex && newIndex >= 0 && newIndex < girlfriends.length) {
         setCurrentIndex(newIndex);
       }
     };
@@ -71,7 +82,7 @@ export default function DiscoverPage() {
   }, [currentIndex, isMobile]);
 
   const scrollToIndex = (index) => {
-    if (index < 0 || index >= mockProfiles.length) return;
+    if (index < 0 || index >= girlfriends.length) return;
 
     if (containerRef.current) {
       const itemHeight = isMobile ? window.innerHeight : window.innerHeight * 0.85;
@@ -93,12 +104,27 @@ export default function DiscoverPage() {
 
   const handleSendMessage = () => {
     if (message.trim()) {
-      window.location.href = `/chat/${mockProfiles[currentIndex].id}?msg=${encodeURIComponent(message)}`;
+      navigate(`/chat/${girlfriends[currentIndex]._id}?msg=${encodeURIComponent(message)}`);
     }
   };
 
-  const toggleLike = (id) => {
-    setIsLiked(prev => ({ ...prev, [id]: !prev[id] }));
+  const toggleLike = async (id) => {
+    try {
+      if (isLiked[id]) {
+        // Remove from favorites - we'll need to check if there's a delete endpoint
+        // For now just toggle local state
+        setIsLiked(prev => ({ ...prev, [id]: false }));
+      } else {
+        await authFetch(`${import.meta.env.VITE_API_URL}/users/favorites`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ girlfriendId: id })
+        });
+        setIsLiked(prev => ({ ...prev, [id]: true }));
+      }
+    } catch (err) {
+      console.error("Failed to toggle favorite:", err);
+    }
   };
 
   // Container height based on device
@@ -162,47 +188,55 @@ export default function DiscoverPage() {
             relative
           `}>
 
-            {/* Scrollable content with snap */}
+            {/* Scrollable container for profiles */}
             <div
               ref={containerRef}
               className={`${containerHeight} overflow-y-scroll snap-y snap-mandatory no-scrollbar`}
               style={{ scrollBehavior: 'smooth' }}
             >
-              {mockProfiles.map((profile, index) => (
+              {girlfriends.map((profile, index) => (
                 <div
-                  key={profile.id}
+                  key={profile._id}
                   className={`${containerHeight} w-full relative snap-start snap-always`}
                 >
                   {/* Background Image/Video */}
                   <div className="absolute inset-0">
-                    <img
-                      src={profile.image}
-                      alt={profile.name}
-                      className="w-full h-full object-cover opacity-80"
-                    />
-                    {/* Gradient overlay - Refined */}
+                    {profile.mainVideo ? (
+                      <video
+                        src={profile.mainVideo}
+                        className="w-full h-full object-cover opacity-80"
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                      />
+                    ) : (
+                      <img
+                        src={profile.mainVideo || profile.cloneAvatarPhotoUrl}
+                        alt={profile.name}
+                        className="w-full h-full object-cover opacity-80"
+                      />
+                    )}
+                    {/* Gradient overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f] via-transparent to-[#0a0a0f]/20"></div>
                   </div>
 
-
                   <div className="relative h-full flex flex-col justify-end p-6 ">
                     <div className="bg-white/5 backdrop-blur-2xl rounded-[2.5rem] p-6 border border-white/5 mb-4">
-
-
                       {/* Profile info */}
                       <div className="flex items-center gap-4 mb-4">
                         <div className="relative">
-                          <img
-                            src={profile.image}
-                            alt={profile.name}
-                            className="w-16 h-16 rounded-full border border-white/10 object-cover"
-                          />
+                          <Avatar className="w-16 h-16 border border-white/10 object-contain">
+                            <AvatarImage src={profile.mainPhoto || profile.cloneAvatarPhotoUrl} className="object-cover" />
+                            <AvatarFallback>{profile.name?.[0]}</AvatarFallback>
+                          </Avatar>
                           <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-[#0a0a0f]" />
                         </div>
                         <div className="flex-1">
                           <h3 className="text-white font-bold text-2xl tracking-tight">
                             {profile.name}, {profile.age}
                           </h3>
+                          <p className="text-[#c7c7c7] text-[10px] font-bold uppercase tracking-widest">{profile.relationship || "Stranger"}</p>
                         </div>
                       </div>
 
@@ -213,12 +247,12 @@ export default function DiscoverPage() {
 
                       {/* Tags */}
                       <div className="flex flex-wrap gap-2 mb-6">
-                        {profile.tags.map((tag, idx) => (
+                        {profile.tags?.map((tag, idx) => (
                           <span
                             key={idx}
                             className="px-3 py-1 bg-white/5 text-white/40 text-[9px] font-bold uppercase tracking-widest rounded-lg border border-white/5"
                           >
-                            {tag}
+                            {tag.label || tag}
                           </span>
                         ))}
                       </div>
@@ -233,6 +267,12 @@ export default function DiscoverPage() {
                           className="flex-1 bg-transparent text-white placeholder:text-white/20 px-5 py-3 text-sm outline-none"
                           onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                         />
+                        <button
+                          onClick={() => toggleLike(profile._id)}
+                          className={`p-3 rounded-xl transition-all active:scale-95 ${isLiked[profile._id] ? 'bg-[#741818] text-white' : 'bg-white/5 text-white/40 hover:text-white/80 border border-white/5'}`}
+                        >
+                          <Heart size={16} fill={isLiked[profile._id] ? "currentColor" : "none"} />
+                        </button>
                         <button
                           onClick={handleSendMessage}
                           disabled={!message.trim()}
@@ -259,7 +299,7 @@ export default function DiscoverPage() {
 
                   {/* Vertical Progress Bar */}
                   <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-2">
-                    {mockProfiles.map((_, idx) => (
+                    {girlfriends.map((_, idx) => (
                       <div
                         key={idx}
                         className={`w-1 rounded-full transition-all duration-500 ${idx === currentIndex
@@ -278,7 +318,7 @@ export default function DiscoverPage() {
           {!isMobile && (
             <div className="flex flex-col gap-4">
               <button
-                onClick={goToPrev}
+                onClick={() => { console.log('goToPrev clicked, currentIndex:', currentIndex); goToPrev(); }}
                 disabled={currentIndex === 0}
                 className={`p-5 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 text-white transition-all ${currentIndex === 0
                   ? 'opacity-20 cursor-not-allowed'
@@ -288,9 +328,9 @@ export default function DiscoverPage() {
                 <ChevronUp size={24} />
               </button>
               <button
-                onClick={goToNext}
-                disabled={currentIndex === mockProfiles.length - 1}
-                className={`p-5 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 text-white transition-all ${currentIndex === mockProfiles.length - 1
+                onClick={() => { console.log('goToNext clicked, currentIndex:', currentIndex, 'length:', girlfriends.length); goToNext(); }}
+                disabled={currentIndex === girlfriends.length - 1}
+                className={`p-5 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 text-white transition-all ${currentIndex === girlfriends.length - 1
                   ? 'opacity-20 cursor-not-allowed'
                   : 'hover:bg-white/10 active:scale-90'
                   }`}

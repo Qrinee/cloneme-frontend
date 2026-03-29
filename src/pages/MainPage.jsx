@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { FcGoogle } from "react-icons/fc";
 import { HiOutlineMail } from "react-icons/hi";
 import { motion, AnimatePresence } from "framer-motion";
-import characterVideo from "../assets/video2.mp4";
+import characterVideo from "../assets/20260326183922173497.mp4";
 import logo from "../assets/gpt.png";
 
 export default function MainPage() {
@@ -89,7 +89,7 @@ export default function MainPage() {
   };
 
   return (
-    <div className="min-h-screen flex bg-[var(--bg-primary)]">
+    <div className="min-h-screen w-full flex bg-[var(--bg-primary)]">
       {/* Desktop: Left side - Form */}
       <div className="hidden lg:flex lg:w-1/2 items-center justify-center p-8">
         <div className="w-full max-w-sm">
@@ -278,9 +278,9 @@ export default function MainPage() {
 
           <p className="text-xs text-[var(--text-muted)] text-center mt-8">
             By continuing, you agree to our{" "}
-            <a href="#" className="underline hover:text-[var(--foreground)]">Terms</a>
+            <a href="/terms" className="underline hover:text-[var(--foreground)]">Terms</a>
             {" "}and{" "}
-            <a href="#" className="underline hover:text-[var(--foreground)]">Privacy</a>
+            <a href="/privacy" className="underline hover:text-[var(--foreground)]">Privacy</a>
           </p>
         </div>
       </div>
@@ -307,7 +307,7 @@ export default function MainPage() {
       </div>
 
       {/* Mobile: Full screen video with overlay */}
-      <div className="lg:hidden flex flex-col min-h-screen">
+      <div className="lg:hidden w-full flex flex-col min-h-screen">
         <div className="flex-1 relative">
           <video
             src={characterVideo}
@@ -361,9 +361,9 @@ export default function MainPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="email-mobile" className="text-xs text-[var(--text-muted)]">Email</Label>
+                  <Label htmlFor="email" className="text-xs text-[var(--text-muted)]">Email</Label>
                   <Input
-                    id="email-mobile"
+                    id="email"
                     type="email"
                     placeholder="name@example.com"
                     required
@@ -373,9 +373,9 @@ export default function MainPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="password-mobile" className="text-xs text-[var(--text-muted)]">Password</Label>
+                  <Label htmlFor="password" className="text-xs text-[var(--text-muted)]">Password</Label>
                   <Input
-                    id="password-mobile"
+                    id="password"
                     type="password"
                     placeholder="••••••••"
                     required
@@ -430,9 +430,9 @@ export default function MainPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="username-mobile" className="text-xs text-[var(--text-muted)]">Username</Label>
+                  <Label htmlFor="username" className="text-xs text-[var(--text-muted)]">Username</Label>
                   <Input
-                    id="username-mobile"
+                    id="username"
                     type="text"
                     placeholder="johndoe"
                     required
@@ -442,9 +442,9 @@ export default function MainPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="email-mobile" className="text-xs text-[var(--text-muted)]">Email</Label>
+                  <Label htmlFor="email" className="text-xs text-[var(--text-muted)]">Email</Label>
                   <Input
-                    id="email-mobile"
+                    id="email"
                     type="email"
                     placeholder="name@example.com"
                     required
@@ -454,9 +454,9 @@ export default function MainPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="password-mobile" className="text-xs text-[var(--text-muted)]">Password</Label>
+                  <Label htmlFor="password" className="text-xs text-[var(--text-muted)]">Password</Label>
                   <Input
-                    id="password-mobile"
+                    id="password"
                     type="password"
                     placeholder="••••••••"
                     required
@@ -466,9 +466,9 @@ export default function MainPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="repeat-password-mobile" className="text-xs text-[var(--text-muted)]">Confirm password</Label>
+                  <Label htmlFor="repeat-password" className="text-xs text-[var(--text-muted)]">Confirm password</Label>
                   <Input
-                    id="repeat-password-mobile"
+                    id="repeat-password"
                     type="password"
                     placeholder="••••••••"
                     required

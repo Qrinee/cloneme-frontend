@@ -6,361 +6,214 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
-import { Zap, Sparkles, Gem, Check, Info } from "lucide-react";
+import { Zap, Sparkles, Gem, Crown, Flame, Infinity, Coins } from "lucide-react";
 
 export default function Content() {
   const [activeTab, setActiveTab] = useState('subscription');
-  const [showTooltip, setShowTooltip] = useState(false);
+
+  // Credit pricing: 
+  // - Creating an AI girl costs 350 credits (5 AI videos + photo + visibility)
+  // - Each message costs ~0.25 credits (1 credit = ~4 messages)
 
   const subscriptionPlans = [
     {
-      name: "Free Trial",
-      messages: "10 messages/month",
-      price: "$0/mo",
-      link: "#",
-      icon: <Zap className="w-5 h-5 text-red-500" />,
-      delay: 0.1,
-      features: [
-        { name: "Monthly Messages", value: "10", included: true },
-        { name: "Basic Bots", value: "1", included: true },
-
-        { name: "Priority Support", value: "No", included: false },
-      ]
-    },
-    {
-      name: "Standard",
-      messages: "100 messages/month",
-      price: "$5/mo",
+      name: "Starter",
+      credits: "500 credits/mo",
+      price: "$9.99/mo",
       link: "https://buy.stripe.com/4gM7sK56W9PPeICeZN6sw02",
-      icon: <Zap className="w-5 h-5 text-blue-500" />,
-      delay: 0.2,
-      features: [
-        { name: "Monthly Messages", value: "100", included: true },
-        { name: "Basic Bots", value: "3", included: true },
-        { name: "Priority Support", value: "No", included: false },
-      ]
+      icon: <Zap className="w-6 h-6 text-red-400" />,
+      color: "bg-red-900",
+      popular: false,
+      messages: "2,000 messages/mo",
+      value: "Create 1 AI girl + 1,300 messages",
     },
     {
       name: "Premium",
-      messages: "300 messages/month",
-      price: "$12/mo",
+      credits: "1,500 credits/mo",
+      price: "$19.99/mo",
       link: "https://buy.stripe.com/bJedR87f4aTTgQK5pd6sw01",
-      icon: <Sparkles className="w-5 h-5 text-purple-500" />,
-      delay: 0.3,
-      features: [
-        { name: "Monthly Messages", value: "300", included: true },
-        { name: "Basic Bots", value: "10", included: true },
-        { name: "Priority Support", value: "Yes", included: true },
-      ]
+      icon: <Sparkles className="w-6 h-6 text-pink-400" />,
+      color: "bg-pink-900",
+      popular: true,
+      messages: "6,000 messages/mo",
+      value: "Create 4 AI girls + 2,900 messages",
     },
     {
       name: "Ultimate",
-      messages: "1000 messages/month",
-      price: "$30/mo",
+      credits: "5,000 credits/mo",
+      price: "$39.99/mo",
       link: "https://buy.stripe.com/dRmbJ042S4vv6c6cRF6sw00",
-      icon: <Gem className="w-5 h-5 text-amber-500" />,
-      delay: 0.4,
-      features: [
-        { name: "Monthly Messages", value: "1000", included: true },
-        { name: "Basic Bots", value: "Unlimited", included: true },
-        { name: "Priority Support", value: "24/7", included: true },
-      ]
+      icon: <Crown className="w-6 h-6 text-yellow-400" />,
+      color: "bg-yellow-900",
+      popular: false,
+      messages: "20,000 messages/mo",
+      value: "Create 14 AI girls + 11,400 messages",
     }
   ];
 
   const oneTimePlans = [
     {
-      name: "Starter Pack",
-      messages: "50 messages",
-      price: "$3",
+      name: "Quickie",
+      credits: "100 credits",
+      price: "$3.99",
       link: "https://buy.stripe.com/28E9ASdDs1jjfMGdVJ6sw05",
-      icon: <Zap className="w-5 h-5 text-blue-500" />,
-      delay: 0.2,
-      features: [
-        { name: "Total Messages", value: "50", included: true },
-        { name: "Expiration", value: "Never", included: true },
-      ]
+      icon: <Flame className="w-6 h-6 text-red-400" />,
+      color: "bg-red-900/50",
+      messages: "400 messages",
+      value: "Create 0.28 AI girl",
     },
     {
-      name: "Pro Pack",
-      messages: "200 messages",
-      price: "$10",
+      name: "Session",
+      credits: "200 credits",
+      price: "$7.99",
       link: "https://buy.stripe.com/eVqcN4bvkfa90RM04T6sw04",
-      icon: <Sparkles className="w-5 h-5 text-purple-500" />,
-      delay: 0.3,
-      features: [
-        { name: "Total Messages", value: "200", included: true },
-        { name: "Expiration", value: "Never", included: true },
-      ]
+      icon: <Gem className="w-6 h-6 text-purple-400" />,
+      color: "bg-purple-900/50",
+      messages: "800 messages",
+      value: "Create 0.57 AI girl",
     },
     {
-      name: "Mega Pack",
-      messages: "500 messages",
-      price: "$20",
+      name: "Marathon",
+      credits: "350 credits",
+      price: "$14.99",
       link: "https://buy.stripe.com/fZu3cudDs7HHgQK6th6sw03",
-      icon: <Gem className="w-5 h-5 text-amber-500" />,
-      delay: 0.4,
-      features: [
-        { name: "Total Messages", value: "500", included: true },
-        { name: "Expiration", value: "Never", included: true },
-      ]
+      icon: <Infinity className="w-6 h-6 text-pink-400" />,
+      color: "bg-pink-900/50",
+      messages: "1,400 messages",
+      value: "Create 1 AI girl",
     }
   ];
 
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { 
-      opacity: 1, 
-      y: 0, 
-      transition: { 
-        type: "spring",
-        stiffness: 100,
-        damping: 10
-      } 
-    }
-  };
-
   return (
     <DialogContent 
-      className="max-w-[95vw] sm:max-w-[85vw] md:max-w-[80vw] lg:max-w-[70vw] xl:max-w-[50vw] overflow-y-scroll h-[90vh]"
+      className="max-w-[95vw] sm:max-w-[90vw] md:max-w-[80vw] bg-[#0a0a0f] border-red-900/30 overflow-hidden"
     >
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-      >
-        <DialogHeader>
-          <DialogTitle className="text-xl sm:text-2xl font-bold text-center">
-            Renew Your Messages
-          </DialogTitle>
-          <DialogDescription className="text-center max-w-2xl mx-auto text-xs sm:text-sm">
-            Choose a plan to automatically refresh your message count each month or 
-            purchase message packs for one-time use
-          </DialogDescription>
-        </DialogHeader>
-      </motion.div>
+      {/* Premium Header */}
+      <div className="text-center py-6 px-4 ">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="inline-flex items-center gap-2 mb-2"
+        >
+          <Coins className="w-5 h-5 text-red-400" />
+          <span className="text-xs font-bold tracking-[0.3em] text-red-400 uppercase">Credit System</span>
+          <Coins className="w-5 h-5 text-red-400" />
+        </motion.div>
+        <DialogTitle className="text-3xl md:text-4xl font-bold text-white">
+          Get Credits
+        </DialogTitle>
+        <p className="text-white/40 mt-2 text-sm max-w-md mx-auto">
+          Credits = AI generation cost. 350 credits = 1 AI girl (5 videos + photo + visibility)
+        </p>
+      </div>
 
-      {/* Responsive Tab Navigation */}
-      <div className="flex flex-col sm:flex-row justify-center my-4 sm:my-6">
-        <div className="flex flex-col sm:flex-row rounded-lg bg-muted" role="group">
+
+
+      {/* Tab Navigation */}
+      <div className="flex justify-center mb-6 px-4">
+        <div className="flex bg-white/5 rounded-full p-1 border border-white/10">
           <button
             onClick={() => setActiveTab('subscription')}
-            className={`px-4 py-3 sm:py-2 sm:rounded-l-lg ${
+            className={`px-6 py-2.5 cursor-pointer rounded-full text-sm font-bold transition-all ${
               activeTab === 'subscription' 
-                ? 'bg-primary text-primary-foreground' 
-                : 'hover:bg-accent'
-            } transition-colors`}
+                ? 'bg-red-800 text-white shadow-lg' 
+                : 'text-white/40 hover:text-white'
+            }`}
           >
-            Subscription Plans
+            Monthly Plans
           </button>
           <button
             onClick={() => setActiveTab('one-time')}
-            className={`px-4 py-3 sm:py-2 sm:rounded-r-lg ${
+            className={`px-6 py-2.5 cursor-pointer rounded-full text-sm font-bold transition-all ${
               activeTab === 'one-time' 
-                ? 'bg-primary text-primary-foreground' 
-                : 'hover:bg-accent'
-            } transition-colors`}
+                ? 'bg-red-800 text-white shadow-lg' 
+                : 'text-white/40 hover:text-white'
+            }`}
           >
             One-Time Packs
           </button>
         </div>
       </div>
 
-      {/* Responsive Feature Table */}
-      <div className="mb-4 sm:mb-6">
-        <div className="hidden md:block">
-          <table className="w-full text-sm text-left border-collapse">
-            <thead>
-              <tr className="border-b">
-                <th className="p-3 font-medium">Features</th>
-                {activeTab === 'subscription' 
-                  ? subscriptionPlans.map(plan => (
-                      <th key={plan.name} className="p-3 font-medium text-center">
-                        {plan.name}
-                      </th>
-                    ))
-                  : oneTimePlans.map(plan => (
-                      <th key={plan.name} className="p-3 font-medium text-center">
-                        {plan.name}
-                      </th>
-                    ))
-                }
-              </tr>
-            </thead>
-            <tbody>
-              {(activeTab === 'subscription' 
-                ? subscriptionPlans[0].features 
-                : oneTimePlans[0].features
-              ).map((feature, idx) => (
-                <tr key={idx} className="border-b hover:bg-muted/50">
-                  <td className="p-3 font-medium">{feature.name}</td>
-                  {activeTab === 'subscription' 
-                    ? subscriptionPlans.map(plan => (
-                        <td key={`${plan.name}-${idx}`} className="p-3 text-center">
-                          {plan.features[idx].included ? (
-                            <span className="flex items-center justify-center">
-                              <Check className="w-4 h-4 text-green-500 mr-1" />
-                              {plan.features[idx].value}
-                            </span>
-                          ) : (
-                            <span className="text-muted-foreground">-</span>
-                          )}
-                        </td>
-                      ))
-                    : oneTimePlans.map(plan => (
-                        <td key={`${plan.name}-${idx}`} className="p-3 text-center">
-                          {plan.features[idx].included ? (
-                            <span className="flex items-center justify-center">
-                              <Check className="w-4 h-4 text-green-500 mr-1" />
-                              {plan.features[idx].value}
-                            </span>
-                          ) : (
-                            <span className="text-muted-foreground">-</span>
-                          )}
-                        </td>
-                      ))
-                  }
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <div className="md:hidden text-sm text-center p-2">
-          <p className="font-medium mb-1">Features comparison not available on mobile</p>
-          <p className="text-muted-foreground text-xs">
-            View on larger screen or see individual plan details below
-          </p>
-        </div>
-      </div>
-
-      {/* Responsive Plans Grid */}
-      <motion.div
-        variants={container}
-        initial="hidden"
-        animate="show"
-        className={`grid gap-4 md:gap-6 mt-4 ${
-          activeTab === 'subscription' 
-            ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4' 
-            : 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3'
-        }`}
-      >
+      {/* Plans Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 px-4 pb-6">
         {(activeTab === 'subscription' ? subscriptionPlans : oneTimePlans)
           .map((plan, index) => (
             <motion.div 
-              key={`${activeTab}-${index}`} 
-              variants={item}
-              whileHover={{ y: window.innerWidth > 640 ? -5 : 0 }}
+              key={plan.name}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              className="relative"
             >
-              <Card className={`h-full border-2 ${
-                plan.name === "Free Trial" 
-                  ? "border-red-300" 
-                  : "hover:border-primary"
-              } transition-colors`}>
-                <CardContent className="p-4 sm:p-6 flex flex-col h-full">
-                  <div className="flex items-center justify-center gap-3 mb-2 sm:mb-4">
-                    <div className="p-2 rounded-full bg-primary/10">
+              {plan.popular && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
+                  <span className="bg-yellow-500 text-black text-[10px] font-bold px-4 py-1 rounded-full uppercase tracking-wider shadow-lg">
+                    Best Value
+                  </span>
+                </div>
+              )}
+              
+              <div className={`h-full bg-gradient-to-br ${plan.color} rounded-3xl border border-white/10 overflow-hidden relative`}>
+                {/* Shine effect */}
+                <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
+                
+                <CardContent className="p-6 flex flex-col h-full relative z-10">
+                  {/* Icon */}
+                  <div className="flex justify-center mb-4">
+                    <div className="w-14 h-14 rounded-2xl bg-black/30 backdrop-blur-sm flex items-center justify-center border border-white/10">
                       {plan.icon}
                     </div>
-                    <h3 className="text-lg sm:text-xl font-bold">{plan.name}</h3>
                   </div>
-                  
-                  <p className="text-center text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">
-                    {plan.messages}
-                  </p>
-                  
-                  <div className="flex-1 mb-4 sm:mb-6">
-                    <ul className="space-y-1 sm:space-y-2">
-                      {plan.features.map((feature, fIdx) => (
-                        <li key={fIdx} className="flex items-start">
-                          {feature.included ? (
-                            <Check className="w-4 h-4 text-green-500 mt-0.5 mr-2 flex-shrink-0" />
-                          ) : (
-                            <span className="w-4 h-4 mr-2">-</span>
-                          )}
-                          <span className="text-xs sm:text-sm">
-                            <span className="font-medium">{feature.name}:</span> {feature.value}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
+
+                  {/* Plan Name */}
+                  <h3 className="text-xl font-bold text-white text-center mb-1">{plan.name}</h3>
+                  <p className="text-white/50 text-xs text-center mb-2">{plan.credits}</p>
+                  <p className="text-yellow-300/70 text-[10px] text-center mb-4">{plan.messages}</p>
+
+                  {/* Price */}
+                  <div className="text-center mb-4">
+                    <span className="text-3xl font-bold text-white">{plan.price.split('/')[0]}</span>
+                    {plan.price.includes('/mo') && <span className="text-white/40 text-sm">/mo</span>}
                   </div>
-                  
-                  <motion.div
-                    className="mt-auto"
-                    whileHover={{ scale: window.innerWidth > 640 ? 1.03 : 1 }}
-                    whileTap={{ scale: 0.98 }}
+
+                  {/* Value description */}
+                  <div className="text-center mb-4">
+                    <span className="text-green-400 text-xs font-medium">{plan.value}</span>
+                  </div>
+
+                  {/* CTA Button */}
+                  <Button 
+                    className={`w-full cursor-pointer font-bold text-sm py-6 rounded-2xl transition-all active:scale-95 ${
+                      plan.popular
+                        ? 'bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-black shadow-lg shadow-yellow-500/20'
+                        : 'bg-white/10 hover:bg-white/20 text-white border border-white/10'
+                    }`}
+                    onClick={() => window.location = plan.link}
                   >
-                    <Button 
-                      className={`w-full font-semibold text-xs sm:text-base ${
-                        plan.name === "Free Trial" 
-                          ? "bg-red-500 hover:bg-red-600" 
-                          : ""
-                      }`}
-                      onClick={() => window.location = plan.link}
-                      disabled={plan.name === "Free Trial"}
-                      size="sm"
-                    >
-                      {plan.name === "Free Trial" 
-                        ? "Current Plan" 
-                        : plan.price.replace("/mo", "/m")
-                      }
-                    </Button>
-                  </motion.div>
+                    Get {plan.credits}
+                  </Button>
                 </CardContent>
-              </Card>
+              </div>
             </motion.div>
           ))}
-      </motion.div>
-      
-      {/* Responsive Info Section */}
-      <div className="mt-4 sm:mt-6 text-center relative">
-        {/* Desktop Tooltip */}
-        <div className="hidden sm:block">
-          <button 
-            className="inline-flex items-center text-sm text-muted-foreground hover:text-primary"
-            onMouseEnter={() => setShowTooltip(true)}
-            onMouseLeave={() => setShowTooltip(false)}
-          >
-            <Info className="w-4 h-4 mr-1" />
-            How do messages work?
-          </button>
-          
-          {showTooltip && (
-            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 p-3 bg-popover text-popover-foreground text-sm rounded-lg shadow-lg w-64 z-10">
-              <p className="mb-2">Each message counts when you:</p>
-              <ul className="list-disc pl-4 space-y-1">
-                <li>Send a message to a bot</li>
-                <li>Receive a response from a bot</li>
-                <li>Upload files for analysis</li>
-              </ul>
-              <p className="mt-2">Messages reset monthly for subscription plans</p>
-            </div>
-          )}
+      </div>
+
+      {/* Trust badges */}
+      <div className="flex justify-center gap-8 pb-6 text-white/30 text-xs">
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 bg-green-500 rounded-full" />
+          <span>Secure Payment</span>
         </div>
-        
-        {/* Mobile Info Panel */}
-        <div className="sm:hidden p-3 bg-popover text-popover-foreground text-xs rounded-lg">
-          <p className="font-medium mb-1 flex items-center justify-center">
-            <Info className="w-4 h-4 mr-1" />
-            How messages work:
-          </p>
-          <ul className="list-disc pl-4 space-y-1 mt-1">
-            <li>Each message sent or received counts</li>
-            <li>Subscriptions reset monthly</li>
-          </ul>
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 bg-green-500 rounded-full" />
+          <span>100% Anonymous</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 bg-green-500 rounded-full" />
+          <span>Never Expires</span>
         </div>
       </div>
     </DialogContent>

@@ -1,51 +1,44 @@
 import React, { useState } from 'react';
-import { FaFacebookMessenger } from "react-icons/fa";
+import { Coins } from "lucide-react";
 import {
   Dialog,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import Content from './Content';
-import '../css/Content.css'
-import { AiFillMessage } from 'react-icons/ai';
-export default function DialogPremium({ points }) {
+
+export default function DialogPremium({ credits = 0 }) {
   const [tooltipVisible, setTooltipVisible] = useState(false);
   
-  // Determine button style based on points
-  const buttonStyle = points === 0 
-    ? "from-red-500 via-red-400 to-red-600 text-white animate-pulse"
-    : points < 10
-    ? "from-orange-500 via-orange-400 to-orange-600 text-white"
-    : "from-yellow-400 via-yellow-300 to-yellow-500 text-yellow-900";
-  
-  const buttonText = points === 0 
-    ? "No messages left" 
-    : points === 1
-    ? "1 message left"
-    : `${points} messages left`;
+  // Determine button text based on credits (styled to match website dark theme)
+  const buttonText = credits === 0 
+    ? "No credits left" 
+    : credits < 50
+    ? "Low credits"
+    : `${credits} credits`;
 
   return (
     <Dialog>
       <div className="relative">
         <DialogTrigger asChild>
           <div 
-            className={`flex items-center justify-between px-4 py-3 rounded-xl bg-gradient-to-r ${buttonStyle} shadow-md cursor-pointer duration-300`}
+            className="flex items-center justify-between px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white/80 hover:text-white hover:bg-white/10 hover:border-yellow-500/30 cursor-pointer transition-all duration-200"
             onMouseEnter={() => setTooltipVisible(true)}
             onMouseLeave={() => setTooltipVisible(false)}
           >
             <div className="flex items-center gap-2 font-semibold text-base">
-              <AiFillMessage className="text-lg" />
-              <span>{buttonText}</span>
+              <Coins className="w-5 h-5 text-yellow-400" />
+              <span className={credits === 0 ? "text-red-400 animate-pulse" : credits < 50 ? "text-orange-400" : "text-white"}>{buttonText}</span>
             </div>
-            <span className="text-xl font-bold">{points}</span>
+            <span className={`text-xl font-bold ${credits === 0 ? "text-red-400" : credits < 50 ? "text-orange-400" : "text-yellow-400"}`}>{credits}</span>
           </div>
         </DialogTrigger>
         
         {tooltipVisible && (
           <div className="absolute bottom-full left-0 mb-2 p-3 bg-popover text-popover-foreground text-sm rounded-lg shadow-lg w-72 border border-blue-200">
-            {points === 0 ? (
-              <p className="font-medium">You've used all your messages. Upgrade to continue chatting</p>
+            {credits === 0 ? (
+              <p className="font-medium">You've run out of credits. Upgrade to continue creating AI girls and chatting</p>
             ) : (
-              <p className="font-medium">Messages reset monthly. Upgrade for more capacity</p>
+              <p className="font-medium">350 credits = 1 AI girl. Need more? Upgrade your plan</p>
             )}
           </div>
         )}

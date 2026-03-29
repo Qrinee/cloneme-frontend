@@ -1,22 +1,32 @@
-import { useState } from "react";
-import { FiMenu, FiX, FiHome, FiCompass, FiMessageCircle, FiStar, FiUser, FiGlobe, FiMail, FiSettings, FiLogOut, FiHelpCircle } from "react-icons/fi";
+import { useState, useEffect, useRef } from "react";
+import { FiMenu, FiX, FiHome, FiCompass, FiMessageCircle, FiStar, FiUser, FiGlobe, FiMail, FiSettings, FiLogOut, FiHelpCircle, FiUserPlus } from "react-icons/fi";
 import { FaFemale, FaMale, FaDragon } from "react-icons/fa";
 import logo from '../assets/gpt.png';
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useLayoutContext } from "./LayoutContext";
+import { useAuthFetch } from "../utils/authFetch";
+import { Coins } from "lucide-react";
+import { Dialog, DialogTrigger, DialogContent } from "./ui/dialog";
+import Content from "./Content";
 
 const Layout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [premiumDialogOpen, setPremiumDialogOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { isLoggedIn, user, updateUser } = useLayoutContext();
+  const authFetch = useAuthFetch();
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
   const navItems = [
     { id: "home", label: "Home", icon: <FiHome />, link: "/" },
-    { id: "discover", label: "Discover", icon: <FiCompass />, link: "/discover" },
-    { id: "chat", label: "Chat", icon: <FiMessageCircle />, badge: "3", link: "/chat/123" },
-    { id: "collection", label: "Collection", icon: <FiStar />, link: "/collection" },
-    { id: "create", label: "Create", icon: <FiUser />, link: "/create-girl" },
+    { id: "discover", label: "Meet Girls", icon: <FiCompass />, link: "/discover", tourId: "discover-link" },
+    ...(isLoggedIn ? [
+      { id: "chat", label: "Chat", icon: <FiMessageCircle />, link: "/chat" },
+      { id: "collection", label: "Collection", icon: <FiStar />, link: "/collection" },
+    ] : []),
+    { id: "create", label: "Create", icon: <FiUser />, link: "/create-girl", tourId: "create-link" },
     { id: "how-it-works", label: "How it works", icon: <FiHelpCircle />, link: "/how-it-works" },
   ];
 
@@ -32,9 +42,12 @@ const Layout = ({ children }) => {
     }
   };
 
-  const footerItems = [
-    { id: "settings", label: "Settings", icon: <FiSettings /> },
+  const footerItems = isLoggedIn ? [
+    { id: "profile", label: "Profile", icon: <FiUser />, link: "/profile" },
     { id: "logout", label: "Log Out", icon: <FiLogOut />, onClick: handleLogout },
+  ] : [
+    { id: "login", label: "Log In", icon: <FiUser />, link: "/login" },
+    { id: "register", label: "Sign Up", icon: <FiUserPlus />, link: "/register" },
   ];
 
   const isActive = (path) => {
@@ -53,7 +66,7 @@ const Layout = ({ children }) => {
         </Link>
         <button 
           onClick={toggleSidebar}
-          className="p-2 rounded-xl bg-white/5 border border-white/10 active:scale-95 transition-all outline-none"
+          className="p-2 rounded-xl bg-white/5 border border-white/10 active:scale-95 transition-all outline-none cursor-pointer"
         >
           {sidebarOpen ? <FiX size={20} /> : <FiMenu size={20} />}
         </button>
@@ -92,7 +105,8 @@ const Layout = ({ children }) => {
                   <li key={item.id}>
                     <Link to={item.link || '#'} onClick={() => setSidebarOpen(false)} style={{ textDecoration: 'none' }}>
                       <button
-                        className={`w-full flex items-center px-4 py-3.5 rounded-xl transition-all duration-200 text-base font-bold
+                        data-tour-target={item.tourId}
+                        className={`w-full flex items-center px-4 py-3.5 rounded-xl transition-all duration-200 text-base font-bold cursor-pointer
                           ${isActive(item.link)
                             ? 'bg-[#741818]/10 text-[#741818] border border-[#741818]/20'
                             : 'text-white/40 hover:text-white hover:bg-white/5'
@@ -118,35 +132,83 @@ const Layout = ({ children }) => {
               <ul className="space-y-1.5">
                 {footerItems.map((item) => (
                   <li key={item.id}>
-                    <button
-                      onClick={(e) => {
-                        setSidebarOpen(false);
-                        item.onClick && item.onClick(e);
-                      }}
-                      className="w-full flex items-center px-4 py-3.5 rounded-xl text-white/40 hover:text-white hover:bg-white/5 transition-all duration-200 text-base font-bold"
-                    >
-                      <span className="text-xl mr-4">{item.icon}</span>
-                      <span>{item.label}</span>
-                    </button>
+                    {item.link ? (
+                      <Link to={item.link} onClick={() => setSidebarOpen(false)} style={{ textDecoration: 'none' }}>
+                        <button
+                          className={`w-full flex items-center px-4 py-3.5 rounded-xl transition-all duration-200 text-base font-bold cursor-pointer
+                            ${isActive(item.link)
+                              ? 'bg-[#741818]/10 text-[#741818] border border-[#741818]/20'
+                              : 'text-white/40 hover:text-white hover:bg-white/5'
+                            }`}
+                        >
+                          <span className="text-xl mr-4">{item.icon}</span>
+                          <span>{item.label}</span>
+                        </button>
+                      </Link>
+                    ) : (
+                      <button
+                        onClick={(e) => {
+                          setSidebarOpen(false);
+                          item.onClick && item.onClick(e);
+                        }}
+                        className="w-full flex items-center px-4 py-3.5 rounded-xl text-white/40 hover:text-white hover:bg-white/5 transition-all duration-200 text-base font-bold cursor-pointer"
+                      >
+                        <span className="text-xl mr-4">{item.icon}</span>
+                        <span>{item.label}</span>
+                      </button>
+                    )}
                   </li>
                 ))}
               </ul>
             </div>
           </nav>
 
+
+          
+
           {/* User Profile Section */}
           <div className="p-4 border-t border-white/5">
-            <div className="flex items-center space-x-4 p-3 rounded-2xl hover:bg-white/5 cursor-pointer transition-colors group">
-              <img
-                src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop"
-                alt="Avatar"
-                className="h-9 w-9 rounded-full border border-white/10"
-              />
-              <div className="flex-1 min-w-0">
-                <h4 className="text-sm font-bold text-white truncate group-hover:text-[#741818] transition-colors">Master Qrin</h4>
-                <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest leading-none mt-1">Premium</p>
-              </div>
-            </div>
+
+                <Dialog open={premiumDialogOpen} onOpenChange={setPremiumDialogOpen}>
+                  <DialogTrigger asChild>
+                    <button
+                      data-tour-target="premium-link"
+                      className="w-full flex items-center px-4 py-3 rounded-xl transition-all duration-200 text-base font-bold  text-red-400 hover:bg-white/5 border border-white/5 border-red-500/30 cursor-pointer"
+                    >
+                      <Coins className="w-5 h-5 mr-4" />
+                      <span>Buy Points</span>
+                    </button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-[95vw] sm:max-w-[90vw] md:max-w-[80vw] bg-[#0a0a0f] border-red-900/30 overflow-hidden p-0">
+                    <Content />
+                  </DialogContent>
+                </Dialog>
+
+            {isLoggedIn && user && (
+              <a href="/profile" className="block mt-4">
+                <div className="flex items-center mt-5 space-x-4 p-3 rounded-2xl hover:bg-white/5 cursor-pointer transition-colors group">
+                  <img
+                    alt="Avatar"
+                    src="image.webp"
+                    className="h-9 w-9 rounded-full border border-white/10"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <h4 className="text-sm font-bold text-white truncate group-hover:text-[#741818] transition-colors">{user.username}</h4>
+                    <div className="flex items-center space-x-2 mt-1">
+                      <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest leading-none">{user.subscriptionPlan || 'Free'}</p>
+                    </div>
+                  </div>
+         
+                    <div className="flex items-center bg-red-500/20 border border-red-500/40 px-2 py-1 rounded-lg">
+                      <span className="text-white-400 text-xs font-bold">{user.points.toLocaleString('en-US').replace(/,/g, ' ')}</span>
+                      <span className="text-red-400/60 text-[9px] ml-1">PTS</span>
+                    </div>
+
+                </div>
+                {/* Buy Points Button - Styled to match sidebar */}
+
+              </a>
+            )}
           </div>
         </div>
       </aside>

@@ -4,27 +4,11 @@ import { Send, Heart, Gift, Zap, Crown, Star, MessageCircle, X, MoreHorizontal, 
 import Layout from "../components/Layout";
 import video1 from '../assets/video2.mp4'
 import video2 from '../assets/examplereel.mp4'
-
-const quickChatGirls = [
-  { id: 1, name: "Sophia", age: 22, location: "Paris", tags: [{ label: "Sweet", icon: Heart }, { label: "Dress-up", icon: Star }], video: video1, online: true, response: "< 1 min", mood: "Ready for you" },
-  { id: 2, name: "Emma", age: 24, location: "London", tags: [{ label: "Dominant", icon: Crown }, { label: "Kisser", icon: Heart }], video: video2, online: true, response: "< 2 min", mood: "Waiting for you" },
-  { id: 3, name: "Olivia", age: 21, location: "NYC", tags: [{ label: "Night Queen", icon: Star }, { label: "Hot", icon: Heart }], video: video1, online: true, response: "< 1 min", mood: "Let's have fun" },
-  { id: 4, name: "Isabella", age: 23, location: "Tokyo", tags: [{ label: "Kawaii", icon: Star }, { label: "Shy", icon: Smile }], video: video2, online: true, response: "< 3 min", mood: "Be gentle with me" },
-  { id: 5, name: "Ava", age: 25, location: "LA", tags: [{ label: "Beach", icon: Star }, { label: "Wild", icon: Zap }], video: video1, online: false, response: "< 5 min", mood: "Let's escape" },
-  { id: 6, name: "Mia", age: 20, location: "Berlin", tags: [{ label: "Artist", icon: Star }, { label: "Dreamy", icon: Smile }], video: video2, online: true, response: "< 1 min", mood: "Create memories" },
-  { id: 7, name: "Charlotte", age: 23, location: "Sydney", tags: [{ label: "Adventurer", icon: Star }, { label: "Passion", icon: Heart }], video: video1, online: true, response: "< 2 min", mood: "Thrill me" },
-  { id: 8, name: "Amelia", age: 22, location: "Dubai", tags: [{ label: "Luxury", icon: Crown }, { label: "Royal", icon: Crown }], video: video2, online: true, response: "< 1 min", mood: "Treat me like royalty" },
-];
+import { useAuthFetch } from "@/utils/authFetch";
+import { useLayoutContext } from "../components/LayoutContext";
 
 const actionButtons = [
-  { id: 1, label: "Open Mouth", icon: Mic, messagesNeeded: 0 },
-  { id: 2, label: "Shake Hand", icon: Hand, messagesNeeded: 2 },
-  { id: 3, label: "Lick", icon: Droplets, messagesNeeded: 4 },
-  { id: 4, label: "Touch", icon: Waves, messagesNeeded: 6 },
-  { id: 5, label: "Stroke", icon: Flame, messagesNeeded: 8 },
-  { id: 6, label: "Cum", icon: Droplets, messagesNeeded: 10 },
-  { id: 7, label: "Spank", icon: Hand, messagesNeeded: 12 },
-  { id: 8, label: "Deep Throat", icon: Mic, messagesNeeded: 15 },
+  { id: 1, label: "Open Mouth", icon: Mic, messagesNeeded: 10 },
 ];
 
 const presetMessages = [
@@ -37,19 +21,44 @@ const presetMessages = [
 ];
 
 export default function JerkOffPage() {
-  const { id } = useParams();
+  const { id } = useParams(); // This is chatbotId
   const navigate = useNavigate();
+  const authFetch = useAuthFetch();
+  const { isLoggedIn } = useLayoutContext();
+  const [girls, setGirls] = useState();
+  const [messages, setMessages] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const videoRef = useRef(null);
   const chatContainerRef = useRef(null);
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState([
-    { id: 1, text: "Hi there! I'm so glad you're here 💕", sender: "girl", time: "now" },
-    { id: 2, text: "I've been waiting for someone like you...", sender: "girl", time: "now" },
-  ]);
+  const [currentChat, setCurrentChat] = useState(null);
+  const [likeAnimation, setLikeAnimation] = useState(false);
 
-  const girl = quickChatGirls.find(g => g.id === parseInt(id)) || quickChatGirls[0];
+  useEffect(() => {
+    if (id) {
+      // Fetch girlfriend data
+      fetch(import.meta.env.VITE_API_URL + '/girlfriends/' + id)
+        .then(res => res.json())
+        .then(data => {
+          setGirls(data);
+          // For non-logged in users, show initial message only
+          if (!isLoggedIn && data.girlfriend?.initialMessage) {
+            setMessages([{
+              id: 1,
+              text: data.girlfriend.initialMessage,
+              sender: "girl",
+              time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            }]);
+          }
+        })
+        .catch(err => console.error('Error fetching girlfriend:', err));
 
-
+      // Only fetch chat messages if user is logged in
+      if (isLoggedIn) {
+        fetchChatMessages();
+      }
+    }
+  }, [id, isLoggedIn]);
 
   useEffect(() => {
     // Smooth scroll to bottom when new messages appear
@@ -83,38 +92,82 @@ export default function JerkOffPage() {
     };
   }, []);
 
-  const handleSendMessage = () => {
-    if (!message.trim()) return;
+  const fetchChatMessages = async () => {
+    try {
+      // Get or create chat using chatbotId
+      const res = await authFetch(`${import.meta.env.VITE_URL}/api/chats/${id}`);
+      const data = await res.json();
+      
+      console.log('JerkOffPage - fetchChatMessages:', data);
+      
+      if (data.type === "success") {
+        setCurrentChat(data.chat);
+        // Convert messages to UI format
+        setMessages(
+          data.chat.messages.map((m, index) => ({
+            id: m._id || index,
+            text: m.content,
+            sender: m.role === "user" ? "user" : "girl",
+            time: m.timestamp ? new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'now'
+          }))
+        );
+      } else {
+        console.error('Error fetching chat:', data.message);
+      }
+    } catch (error) {
+      console.error('Error fetching chat:', error);
+    }
+  };
 
-    const newMessage = {
+  const handleSendMessage = async () => {
+    if (!message.trim() || !id) return;
+
+    // For non-logged in users, redirect to login
+    if (!isLoggedIn) {
+      navigate('/login');
+      return;
+    }
+
+    const text = message;
+    const userMessage = {
       id: Date.now(),
-      text: message,
+      text: text,
       sender: "user",
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
 
-    setMessages([...messages, newMessage]);
+    setMessages(prev => [...prev, userMessage]);
     setMessage("");
+    setIsLoading(true);
 
-    // Simulate AI response
-    setTimeout(() => {
-      const responses = [
-        "That feels so good! 💕",
-        "You're making me hot! 🔥",
-        "Tell me more baby...",
-        "I love when you talk to me like that 💋",
-        "Keep going, I'm enjoying this!",
-      ];
-      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+    try {
+      const res = await authFetch(
+        `${import.meta.env.VITE_URL}/api/chats/${id}/messages`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: { content: text } })
+        }
+      );
 
-      const aiMessage = {
-        id: Date.now() + 1,
-        text: randomResponse,
-        sender: "girl",
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      };
-      setMessages(prev => [...prev, aiMessage]);
-    }, 1500);
+      const data = await res.json();
+      console.log('JerkOffPage - sendMessage:', data);
+      
+      if (data.type === "success") {
+        // Add AI response
+        const aiMessage = {
+          id: Date.now() + 1,
+          text: data.chat.messages[data.chat.messages.length - 1].content,
+          sender: "girl",
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+        setMessages(prev => [...prev, aiMessage]);
+      }
+    } catch (error) {
+      console.error('Error sending message:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleQuickMessage = (text) => {
@@ -125,14 +178,15 @@ export default function JerkOffPage() {
 
   return (
     <Layout>
+      {girls ? (
       <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-        <div className="flex flex-col md:flex-row justify-center items-center gap-0 bg-[#0a0a0f]" style={{ height: '85vh' }}>
+        <div className="w-full flex flex-col md:flex-row justify-center items-center gap-0 bg-[#0a0a0f]" style={{ height: '85vh' }}>
           {/* Main Content - Video with Chat Overlay */}
           <div className="max-w-[550px] w-full md:w-auto relative flex flex-col h-full md:h-full order-1 border-x border-white/5">
             <div className="relative flex-1 rounded-none overflow-hidden w-full h-[50vh] md:h-full bg-black">
               <video
                 ref={videoRef}
-                src={girl.video}
+                src={girls && girls.girlfriend.mainVideo}
                 className="h-full object-cover w-full"
                 muted
                 loop
@@ -150,7 +204,7 @@ export default function JerkOffPage() {
                 >
                   {messages.map((msg, index) => {
                     const isNewest = index === messages.length - 1;
-                    const opacity = Math.min(1, 0.4 + (index * 0.1));
+                    const opacity = Math.min(1, 0.6 + (index * 0.1));
 
                     return (
                       <div
@@ -180,6 +234,17 @@ export default function JerkOffPage() {
                       </div>
                     );
                   })}
+                  {isLoading && (
+                    <div className="flex justify-start">
+                      <div className="bg-white/5 backdrop-blur-xl border border-white/5 px-4 py-2.5 rounded-2xl rounded-bl-none">
+                        <div className="flex gap-1">
+                          <div className="w-1.5 h-1.5 bg-white/20 rounded-full animate-bounce" />
+                          <div className="w-1.5 h-1.5 bg-white/20 rounded-full animate-bounce [animation-delay:0.2s]" />
+                          <div className="w-1.5 h-1.5 bg-white/20 rounded-full animate-bounce [animation-delay:0.4s]" />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Chat Input - Subtler Glass Look */}
@@ -189,12 +254,16 @@ export default function JerkOffPage() {
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                    placeholder={`Message ${girl.name}...`}
+                    placeholder={isLoggedIn ? `Message ${girls && girls.girlfriend.name}...` : "Type a message..."}
                     className="flex-1 bg-white/5 backdrop-blur-xl text-white px-5 py-3 rounded-full focus:outline-none border border-white/10 placeholder:text-white/20 transition-colors focus:border-white/20"
                   />
                   <button
                     onClick={handleSendMessage}
-                    className="p-3 bg-white/10 hover:bg-white/20 rounded-full transition-all text-white/80 active:scale-95"
+                    disabled={!message.trim() || isLoading}
+                    className={`cursor-pointer p-3 rounded-full transition-all text-white/80 active:scale-95 ${message.trim() && !isLoading 
+                        ? 'bg-[#741818] hover:bg-[#8d1d1d]' 
+                        : 'bg-white/10 cursor-not-allowed'
+                    }`}
                   >
                     <Send size={18} />
                   </button>
@@ -206,23 +275,38 @@ export default function JerkOffPage() {
                 <div className="flex items-center justify-between bg-black/20 backdrop-blur-md px-4 py-3 rounded-xl border border-white/5">
                   <div className="flex items-center gap-3">
                     <div className="flex flex-col">
-                      <h3 className="text-white text-base font-bold tracking-tight leading-none">{girl.name}</h3>
-                      <span className="text-white/40 text-[10px] uppercase tracking-tighter mt-0.5">{girl.age} Years Old</span>
+                      <h3 className="text-white text-base font-bold tracking-tight leading-none">{girls && girls.girlfriend.name}</h3>
+                      <span className="text-white/40 text-[10px] uppercase tracking-tighter mt-0.5">{girls && girls.girlfriend.age} Years Old</span>
                     </div>
-                    {girl.online && (
                       <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-green-500/10 border border-green-500/10 text-green-400 text-[9px] uppercase tracking-widest font-bold">
                         <span className="w-1 h-1 bg-green-500 rounded-full animate-pulse" />
                         Live
                       </span>
-                    )}
                   </div>
                   <div className="flex items-center gap-2">
-                    <button className="p-2 hover:bg-white/5 rounded-lg transition-colors text-white/40 hover:text-white/80">
-                      <Heart size={16} />
+                    <button 
+                      onClick={async () => {
+                        // Trigger like animation
+                        setLikeAnimation(true);
+                        setTimeout(() => setLikeAnimation(false), 600);
+                        
+                        try {
+                          await authFetch(`${import.meta.env.VITE_API_URL}/users/favorites`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ girlfriendId: girls?.girlfriend?._id })
+                          });
+                        } catch (err) {
+                          console.error("Failed to add favorite:", err);
+                        }
+                      }}
+                      className={`cursor-pointer p-2 rounded-lg transition-all text-white/40 hover:text-white/80 ${likeAnimation ? 'animate-ping' : 'hover:bg-white/5'}`}
+                    >
+                      <Heart size={16} className={likeAnimation ? 'text-red-500 fill-current' : ''} />
                     </button>
-                    <button className="p-2 hover:bg-white/5 rounded-lg transition-colors text-white/40 hover:text-white/80">
+                    {/* <button className="p-2 hover:bg-white/5 rounded-lg transition-colors text-white/40 hover:text-white/80">
                       <MoreHorizontal size={16} />
-                    </button>
+                    </button> */}
                   </div>
                 </div>
               </div>
@@ -274,9 +358,8 @@ export default function JerkOffPage() {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            console.log('Play:', btn.label);
                           }}
-                          className="p-1.5 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
+                          className="cursor-pointer p-1.5 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
                         >
                           <Play className="w-3 h-3 text-white/80 fill-current" />
                         </button>
@@ -303,6 +386,8 @@ export default function JerkOffPage() {
           </div>
         </div>
       </div>
+      ) : null}
+
     </Layout>
   );
 }

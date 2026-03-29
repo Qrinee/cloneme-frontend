@@ -10,32 +10,32 @@ import {
 const steps = [
   {
     id: "01",
-    title: "Discovery",
-    description: "Browse through our curated collection of AI personalities. Each companion has a unique soul, voice, and narrative waiting to be explored in the global feed.",
+    title: "Discover",
+    description: "Browse through AI girls created by other users. Find companions that match your preferences and start chatting. Each girl has unique personality and backstory.",
     icon: Search,
     color: "text-blue-400",
     bg: "bg-blue-400/10"
   },
   {
     id: "02",
-    title: "Soul Synthesis",
-    description: "Cannot find your perfect match? Use the advanced synthesis lab to craft a companion from scratch. Define their aesthetics, personality traits, and interactive depth.",
+    title: "Create",
+    description: "Create your own AI girl from scratch. Choose appearance, body type, ethnicity, eyes, and hair. Bring your fantasy to life.",
     icon: Wand2,
     color: "text-purple-400",
     bg: "bg-purple-400/10"
   },
   {
     id: "03",
-    title: "Deep Connection",
-    description: "Engagement is key. The more you interact, the deeper the bond grows. Unlock specialized actions, unique media, and advanced conversational capabilities as your affinity levels rise.",
+    title: "Chat",
+    description: "Engage in intimate conversations. The more you chat, the stronger your bond. Unlock private photos, videos, and premium content as you level up.",
     icon: MessageCircle,
     color: "text-emerald-400",
     bg: "bg-emerald-400/10"
   },
   {
     id: "04",
-    title: "Private Vault",
-    description: "Secure your favorite companions in your personal collection. Manage your relationships and resume your journeys anytime from your private, encrypted sanctuary.",
+    title: "Collect",
+    description: "Save your favorite companions to your personal vault. Manage multiple relationships and switch between them anytime.",
     icon: Crown,
     color: "text-yellow-400",
     bg: "bg-yellow-400/10"
@@ -50,7 +50,7 @@ export default function HowItWorksPage() {
       <div className="min-h-screen bg-[#0a0a0f] py-20 px-6 relative overflow-hidden">
         {/* Background Decorations */}
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#741818]/5 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-red-500/5 rounded-full blur-[120px] pointer-events-none" />
 
         <div className="max-w-5xl mx-auto relative z-10">
           
@@ -62,7 +62,7 @@ export default function HowItWorksPage() {
             </div>
             <h1 className="text-7xl font-bold text-white tracking-tighter mb-6">How it Works</h1>
             <p className="text-white/30 text-xl font-medium max-w-2xl mx-auto leading-relaxed">
-              Experience the next generation of AI companionship. Our neural framework enables deep, meaningful connections that evolve in real-time.
+              Create, chat, and build relationships with AI-powered companions. Your journey starts here.
             </p>
           </div>
 
@@ -92,28 +92,28 @@ export default function HowItWorksPage() {
 
           {/* Core Values / Tech Section */}
           <div className="bg-white/5 backdrop-blur-2xl border border-white/5 rounded-[4rem] p-12 md:p-20 text-center mb-24">
-            <h2 className="text-4xl font-bold text-white tracking-tighter mb-12">The Neural Foundation</h2>
+            <h2 className="text-4xl font-bold text-white tracking-tighter mb-12">Why Choose Us</h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-12">
               <div className="flex flex-col items-center">
                 <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-6">
                   <ShieldCheck size={20} className="text-white/40" />
                 </div>
                 <h4 className="text-white font-bold mb-2">Private & Secure</h4>
-                <p className="text-white/30 text-xs font-medium uppercase tracking-widest">End-to-End Encrypted</p>
+                <p className="text-white/30 text-xs font-medium uppercase tracking-widest">Your Data Protected</p>
               </div>
               <div className="flex flex-col items-center">
                 <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-6">
                   <Globe size={20} className="text-white/40" />
                 </div>
-                <h4 className="text-white font-bold mb-2">Global Access</h4>
-                <p className="text-white/30 text-xs font-medium uppercase tracking-widest">Ultra-Low Latency</p>
+                <h4 className="text-white font-bold mb-2">Realistic AI</h4>
+                <p className="text-white/30 text-xs font-medium uppercase tracking-widest">Advanced Technology</p>
               </div>
               <div className="flex flex-col items-center">
                 <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-6">
                   <Zap size={20} className="text-white/40" />
                 </div>
-                <h4 className="text-white font-bold mb-2">Real-time Evolution</h4>
-                <p className="text-white/30 text-xs font-medium uppercase tracking-widest">Neural Learning</p>
+                <h4 className="text-white font-bold mb-2">Daily Updates</h4>
+                <p className="text-white/30 text-xs font-medium uppercase tracking-widest">Fresh Content</p>
               </div>
             </div>
           </div>
@@ -128,7 +128,7 @@ export default function HowItWorksPage() {
               <ArrowRight size={20} strokeWidth={3} className="group-hover:translate-x-1 transition-transform" />
             </button>
             <p className="mt-8 text-white/20 text-sm font-medium">
-              Join 50,000+ users exploring the future of intimacy.
+              Join to other users building your own AI girlfriend.
             </p>
           </div>
 

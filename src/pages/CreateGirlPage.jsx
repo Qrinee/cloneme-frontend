@@ -1,6 +1,10 @@
-import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuthFetch } from "../utils/authFetch";
 import Layout from "../components/Layout";
+import DialogPremium from "../components/DialogPremium";
+import { Dialog } from "@/components/ui/dialog";
+import Content from "../components/Content";
+import { useLayoutContext } from "../components/LayoutContext";
 import { 
   ArrowRight, ArrowLeft, Heart, Sparkles, Wand2, 
   Eye, Smile, User, MessageCircle, Play, Lock, Crown,
@@ -8,12 +12,7 @@ import {
   Droplets, Sun, Moon, Flame, Snowflake, Wind
 } from "lucide-react";
 
-// Import images
-import girl1 from "../assets/girls/1.png";
-import girl2 from "../assets/girls/2.png";
-import girl3 from "../assets/girls/3.png";
-import girl4 from "../assets/girls/4.png";
-import girl5 from "../assets/girls/5.png";
+
 
 import africanEthnicity from '../assets/create/ethnicity/african.png';
 import asianEthnicity from '../assets/create/ethnicity/asian.png';
@@ -40,6 +39,7 @@ import curvyBody from '../assets/create/body/curvy.png';
 import petiteBody from '../assets/create/body/petite.png';
 import slimBody from '../assets/create/body/slim.png';
 import thickBody from '../assets/create/body/thick.png';
+import { useEffect, useState } from "react";
 
 
 const steps = [
@@ -63,6 +63,32 @@ const hairColors = [
   { value: "silver", label: "Silver", image: silverHair },
 ];
 
+const actions = [
+  { _id: "kiss", label: "Kiss", messagesNeeded: 5, premium: false },
+  { _id: "hug", label: "Hug", messagesNeeded: 5, premium: false },
+  { _id: "flirt", label: "Flirt", messagesNeeded: 10, premium: false },
+  { _id: "dance", label: "Dance", messagesNeeded: 15, premium: true },
+  { _id: "sing", label: "Sing", messagesNeeded: 20, premium: true },
+  { _id: "joke", label: "Tell a Joke", messagesNeeded: 10, premium: false },
+  { _id: "compliment", label: "Give Compliment", messagesNeeded: 10, premium: false },
+  { _id: "confess", label: "Confess Love", messagesNeeded: 50, premium: true },
+  { _id: "roleplay", label: "Roleplay Scenario", messagesNeeded: 30, premium: true },
+  { _id: "custommessage", label: "Custom Message", messagesNeeded: 20, premium: false },
+];
+
+
+const tags = [
+  { _id: "sensual", label: "Sensual" },
+  { _id: "romantic", label: "Romantic" },
+  { _id: "flirty", label: "Flirty" },
+  { _id: "cute", label: "Cute" },
+  { _id: "shy", label: "Shy" },
+  { _id: "teasing", label: "Teasing" },
+  { _id: "experienced", label: "Experienced" },
+  { _id: "bold", label: "Bold" },
+  { _id: "daring", label: "Daring" },
+]
+
 const eyeColors = [
   { value: "blue", label: "Blue", image: blueEyes },
   { value: "green", label: "Green", image: greenEyes },
@@ -72,6 +98,18 @@ const eyeColors = [
   { value: "black", label: "Black", image: blackEyes },
 ];
 
+const relationshipOptions = [
+  { value: "girlfriend", label: "Girlfriend" },
+  { value: "sexfriend", label: "Sex Friend" },
+  { value: "schoolmate", label: "School Mate" },
+  { value: "workcolleague", label: "Work Colleague" },
+  { value: "wife", label: "Wife" },
+  { value: "stranger", label: "Stranger" },
+  { value: "mistress", label: "Mistress" },
+  { value: "friend", label: "Friend" },
+  { value: "stepsister", label: "Step Sister" },
+  { value: "stepmom", label: "Step Mom" }
+];
 const bodyTypes = [
   { value: "slim", label: "Slim & Toned", image: slimBody },
   { value: "curvy", label: "Curvy & Sexy", image: curvyBody },
@@ -89,29 +127,7 @@ const ethnicities = [
 
 ];
 
-const personalityTags = [
-  { value: "playful", label: "Playful" },
-  { value: "flirty", label: "Flirty" },
-  { value: "sensual", label: "Sensual" },
-  { value: "shy", label: "Shy" },
-  { value: "dominant", label: "Dominant" },
-  { value: "innocent", label: "Innocent" },
-  { value: "adventurous", label: "Adventurous" },
-  { value: "teasing", label: "Teasing" },
-];
 
-const availableActions = [
-  { id: 1, label: "Open Mouth", messagesNeeded: 0, premium: false },
-  { id: 2, label: "Shake Hand", messagesNeeded: 2, premium: false },
-  { id: 3, label: "Lick", messagesNeeded: 4, premium: false },
-  { id: 4, label: "Touch", messagesNeeded: 6, premium: false },
-  { id: 5, label: "Stroke", messagesNeeded: 8, premium: true },
-  { id: 6, label: "Cum", messagesNeeded: 10, premium: false },
-  { id: 7, label: "Spank", messagesNeeded: 12, premium: false },
-  { id: 8, label: "Deep Throat", messagesNeeded: 15, premium: false },
-  { id: 9, label: "Ride", messagesNeeded: 18, premium: true },
-  { id: 10, label: "Anal", messagesNeeded: 20, premium: true },
-];
 
 // Image Tile Component
 function ImageTile({ item, isSelected, onClick }) {
@@ -178,20 +194,26 @@ function AgeSlider({ value, onChange }) {
 
 export default function CreateGirlPage() {
   const navigate = useNavigate();
+  const authFetch = useAuthFetch();
+  const { updateUser } = useLayoutContext();
   const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
-    name: "",
-    age: 22,
-    bio: "",
-    hairColor: "",
-    eyeColor: "",
-    bodyType: "",
-    ethnicity: "",
+    hairColor: null,
+    eyeColor: null,
+    bodyType: null,
+    ethnicity: null,
+    name: '',
+    age: 18,
+    bio: '',
+    relationship: null,
+    initialMessage: '',
     tags: [],
-    mood: "",
-    initialMessage: "",
     actions: [],
   });
+  const [notification, setNotification] = useState(null);
+  const [showPremiumDialog, setShowPremiumDialog] = useState(false);
+
 
   const updateFormData = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -200,7 +222,7 @@ export default function CreateGirlPage() {
   const toggleTag = (tag) => {
     setFormData(prev => ({
       ...prev,
-      tags: prev.tags.includes(tag) 
+      tags: (prev.tags || []).includes(tag) 
         ? prev.tags.filter(t => t !== tag)
         : [...prev.tags, tag]
     }));
@@ -209,7 +231,7 @@ export default function CreateGirlPage() {
   const toggleAction = (actionId) => {
     setFormData(prev => ({
       ...prev,
-      actions: prev.actions.includes(actionId)
+      actions: (prev.actions || []).includes(actionId)
         ? prev.actions.filter(id => id !== actionId)
         : [...prev.actions, actionId]
     }));
@@ -221,7 +243,7 @@ export default function CreateGirlPage() {
       case 2: return formData.eyeColor;
       case 3: return formData.bodyType;
       case 5: return formData.name && formData.age && formData.bio;
-      case 6: return formData.tags.length > 0 && formData.initialMessage;
+      case 6: return formData.relationship && formData.initialMessage;
       case 7: return formData.actions.length > 0;
       default: return true;
     }
@@ -364,17 +386,36 @@ export default function CreateGirlPage() {
               <div className="space-y-4">
                 <label className="text-white/40 text-[10px] font-bold uppercase tracking-widest block ml-1">Core Traits</label>
                 <div className="flex flex-wrap gap-3">
-                  {personalityTags.map((tag) => (
+                  {tags.map((tag) => (
                     <button
-                      key={tag.value}
-                      onClick={() => toggleTag(tag.value)}
+                      key={tag._id}
+                      onClick={() => toggleTag(tag._id)}
                       className={`px-6 py-3.5 rounded-2xl font-bold text-xs tracking-tight transition-all border ${
-                        formData.tags.includes(tag.value)
+                        (formData.tags || []).includes(tag._id)
                           ? 'bg-[#741818] border-[#741818] text-white'
                           : 'bg-white/5 border-white/5 text-white/40 hover:text-white hover:border-white/10'
                       }`}
                     >
                       {tag.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <label className="text-white/40 text-[10px] font-bold uppercase tracking-widest block ml-1">Relationship</label>
+                <div className="flex flex-wrap gap-3">
+                  {relationshipOptions.map((option) => (
+                    <button
+                      key={option.value}
+                      onClick={() => updateFormData("relationship", option.value)}
+                      className={`px-6 py-3.5 rounded-2xl font-bold text-xs tracking-tight transition-all border ${
+                        formData.relationship === option.value
+                          ? 'bg-[#741818] border-[#741818] text-white'
+                          : 'bg-white/5 border-white/5 text-white/40 hover:text-white hover:border-white/10'
+                      }`}
+                    >
+                      {option.label}
                     </button>
                   ))}
                 </div>
@@ -402,19 +443,19 @@ export default function CreateGirlPage() {
               <p className="text-white/30 mt-2 font-medium">Define the interactive depth of her existence.</p>
             </div>
             <div className="space-y-4 max-h-[400px] overflow-y-auto no-scrollbar pr-2">
-              {availableActions.map((action) => (
+              {actions.map((action) => (
                 <button
-                  key={action.id}
-                  onClick={() => toggleAction(action.id)}
+                  key={action._id}
+                  onClick={() => toggleAction(action._id)}
                   className={`w-full p-5 rounded-2xl border transition-all flex items-center justify-between ${
-                    formData.actions.includes(action.id)
+                    (formData.actions || []).includes(action._id)
                       ? 'bg-[#741818] border-[#741818] text-white'
                       : 'bg-white/5 border-white/5 text-white/40 hover:border-white/10 hover:text-white'
                   }`}
                 >
                   <div className="flex items-center gap-4">
                     <div className={`w-6 h-6 rounded-full flex items-center justify-center border ${
-                      formData.actions.includes(action.id)
+                      (formData.actions || []).includes(action._id)
                         ? 'bg-white border-white text-[#741818]'
                         : 'bg-transparent border-white/10 text-transparent'
                     }`}>
@@ -447,7 +488,9 @@ export default function CreateGirlPage() {
                 </div>
                 <div>
                   <h3 className="text-3xl font-bold text-white tracking-tighter">{formData.name || "Nameless Essence"}</h3>
-                  <p className="text-white/40 font-bold text-xs uppercase tracking-widest mt-1">{formData.age} Years Old • {formData.ethnicity || "Unknown origin"}</p>
+                  <p className="text-white/40 font-bold text-xs uppercase tracking-widest mt-1">
+                    {formData.age} Years Old • {formData.ethnicity || "Unknown origin"} • {formData.relationship || "Relationship undefined"}
+                  </p>
                 </div>
               </div>
               
@@ -470,11 +513,14 @@ export default function CreateGirlPage() {
                 </div>
                 
                 <div className="flex flex-wrap gap-2">
-                  {formData.tags.map(tag => (
-                    <span key={tag} className="px-4 py-2 bg-[#741818]/20 border border-[#741818]/20 rounded-xl text-white text-[10px] font-bold uppercase tracking-widest">
-                      {tag}
-                    </span>
-                  ))}
+                  {formData.tags.map(tagId => {
+                    const tag = tags.find(t => t._id === tagId);
+                    return tag ? (
+                      <span key={tagId} className="px-4 py-2 bg-[#741818]/20 border border-[#741818]/20 rounded-xl text-white text-[10px] font-bold uppercase tracking-widest">
+                        {tag.label}
+                      </span>
+                    ) : null;
+                  })}
                 </div>
               </div>
             </div>
@@ -555,10 +601,53 @@ export default function CreateGirlPage() {
               </button>
             ) : (
               <button
-                onClick={() => navigate('/collection')}
-                className="flex items-center gap-3 px-12 py-4 bg-white text-black font-bold rounded-2xl hover:bg-white/90 transition-all active:scale-95"
+                onClick={async () => {
+                  try {
+                    setIsSubmitting(true);
+                    const res = await authFetch(`${import.meta.env.VITE_API_URL}/girlfriends`, {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify(formData)
+                    });
+                    const data = await res.json();
+                    
+                    if (data.type === "success") {
+                      // Update points in Layout
+                      if (data.remainingPoints !== undefined) {
+                        updateUser({ points: data.remainingPoints });
+                      }
+                      // Show success notification
+                      setNotification({
+                        type: 'success',
+                        message: data.message,
+                        points: data.remainingPoints
+                      });
+                      setTimeout(() => navigate('/collection'), 2000);
+                    } else {
+                      // Not enough points - show premium dialog
+                      if (data?.message?.includes("Not enough points") || data?.message?.includes("need")) {
+                        setShowPremiumDialog(true);
+                      } else {
+                        setNotification({
+                          type: 'error',
+                          message: data.message
+                        });
+                      }
+                    }
+                  } catch (err) {
+                    console.error(err);
+                    setNotification({
+                      type: 'error',
+                      message: "An error occurred during synthesis"
+                    });
+                  } finally {
+                    setIsSubmitting(false);
+                  }
+                }}
+                disabled={isSubmitting}
+                className="flex items-center gap-3 px-12 py-4 bg-white text-black font-bold rounded-2xl hover:bg-white/90 transition-all active:scale-95 disabled:opacity-50"
               >
-                Synthesize Soul
+                {isSubmitting ? "Synthesizing..." : "Create Girlfriend (350 credits)"}
                 <Heart size={20} fill="currentColor" />
               </button>
             )}
@@ -566,10 +655,62 @@ export default function CreateGirlPage() {
         </div>
       </div>
 
+      {/* Notification Toast */}
+      {notification && (
+        <div className={`fixed top-6 left-1/2 -translate-x-1/2 z-50 px-6 py-4 rounded-2xl border shadow-2xl animate-in slide-in-from-top-2 ${
+          notification.type === 'success' 
+            ? 'bg-green-900/90 border-green-500/50 text-green-100' 
+            : 'bg-red-900/90 border-red-500/50 text-red-100'
+        }`}>
+          <div className="flex items-center gap-3">
+            {notification.type === 'success' ? (
+              <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center">
+                <svg className="w-5 h-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center">
+                <svg className="w-5 h-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </div>
+            )}
+            <div>
+              <p className="font-bold text-sm">{notification.message}</p>
+              {notification.type === 'success' && notification.points !== undefined && (
+                <p className="text-xs text-green-300/70 mt-1">Remaining points: {notification.points}</p>
+              )}
+              {notification.type === 'error' && notification.current !== undefined && (
+                <p className="text-xs text-red-300/70 mt-1">
+                  You have {notification.current} points, need {notification.required}
+                </p>
+              )}
+            </div>
+            <button 
+              onClick={() => setNotification(null)}
+              className="ml-4 p-1 hover:bg-white/10 rounded"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
+
       <style>{`
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
       `}</style>
+
+      {/* Premium Dialog for insufficient points */}
+      {showPremiumDialog && (
+        <Dialog open={showPremiumDialog} onOpenChange={setShowPremiumDialog}>
+          <Content />
+        </Dialog>
+      )}
     </Layout>
   );
 }

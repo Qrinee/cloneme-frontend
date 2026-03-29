@@ -1,6 +1,6 @@
 import { StrictMode, useEffect, useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import './index.css'
 import { ThemeProvider } from './components/theme-provider'
 import NotFound from './pages/NotFound'
@@ -10,7 +10,6 @@ import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import MainPage from './pages/MainPage'
 import App from './App'
-import { useAuthFetch } from './utils/authFetch'
 import LandingPage from './pages/LandingPage'
 import InteractiveVideoCard from './components/InteractiveVideoTab'
 import DiscoverPage from './pages/DiscoverPage'
@@ -18,24 +17,22 @@ import CollectionPage from './pages/CollectionPage'
 import JerkOffPage from './pages/JerkOffPage'
 import CreateGirlPage from './pages/CreateGirlPage'
 import HowItWorksPage from './pages/HowItWorksPage'
+import TermsPage from './pages/TermsPage'
+import PrivacyPage from './pages/PrivacyPage'
+import ProfilePage from './pages/ProfilePage'
+import { LayoutProvider, useLayoutContext } from './components/LayoutContext'
 
-// Dashboard component for authenticated users
-
-
-// Main App component with routes
 function Application() {
-  const [authChecked, setAuthChecked] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { isLoggedIn, isLoading } = useLayoutContext();
   const [isMobile, setIsMobile] = useState(false);
-  const authFetch = useAuthFetch();
 
-  // Wykrywanie urządzenia mobilnego
+  // Detect mobile device
   useEffect(() => {
     const checkIsMobile = () => {
-      setIsMobile(window.innerWidth <= 768); // 768px - typowy breakpoint dla mobile
+      setIsMobile(window.innerWidth <= 768);
     };
 
-    checkIsMobile(); // sprawdzenie przy pierwszym renderze
+    checkIsMobile();
     window.addEventListener('resize', checkIsMobile);
 
     return () => {
@@ -43,24 +40,7 @@ function Application() {
     };
   }, []);
 
-  // Sprawdzenie autoryzacji
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await authFetch(import.meta.env.VITE_URL + "/mydata");
-        const data = await res.json();
-        setIsLoggedIn(data?.type === "success");
-      } catch (error) {
-        setIsLoggedIn(false);
-      } finally {
-        setAuthChecked(true);
-      }
-    };
-
-    checkAuth();
-  }, []);
-
-  if (!authChecked) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
         <p>Loading...</p>
@@ -92,13 +72,17 @@ function Application() {
 
 
       <Route 
+        path='/chat' 
+        element={<ChatPage />} 
+      />
+      <Route 
         path='/chat/:id' 
         element={<ChatPage />} 
       />
 
       <Route 
         path='/discover' 
-        element={isLoggedIn ? <DiscoverPage /> : <Navigate to="/login" />} 
+        element={<DiscoverPage />} 
       />
       <Route 
         path='/collection' 
@@ -120,6 +104,21 @@ function Application() {
         element={<HowItWorksPage />} 
       />
 
+      <Route 
+        path='/terms' 
+        element={<TermsPage />} 
+      />
+
+      <Route 
+        path='/privacy' 
+        element={<PrivacyPage />} 
+      />
+
+      <Route 
+        path='/profile' 
+        element={isLoggedIn ? <ProfilePage /> : <Navigate to="/login" />} 
+      />
+
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
@@ -130,7 +129,9 @@ createRoot(document.getElementById('root')).render(
   <BrowserRouter>
     <StrictMode>
       <ThemeProvider>
-        <Application />
+        <LayoutProvider>
+          <Application />
+        </LayoutProvider>
       </ThemeProvider>
     </StrictMode>
   </BrowserRouter>

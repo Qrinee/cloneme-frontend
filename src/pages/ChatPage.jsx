@@ -30,8 +30,10 @@ export default function ChatPage() {
   const [newMessage, setNewMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [chats, setChats] = useState([]);
+  const [currentChatbot, setCurrentChatbot] = useState(null);
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [currentChatbotId, setCurrentChatbotId] = useState(null);
   
   // Relationship progression system
   const [relationshipLevel, setRelationshipLevel] = useState(1);
@@ -40,13 +42,14 @@ export default function ChatPage() {
   const [unlockedContent, setUnlockedContent] = useState([]);
   const [showUnlockModal, setShowUnlockModal] = useState(false);
   const [newUnlock, setNewUnlock] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
   
   // XP needed per level (exponential growth)
   const xpPerLevel = (level) => Math.floor(100 * Math.pow(1.5, level - 1));
   
   // Unlockable content
   const unlockables = [
-    { level: 2, name: "Prywatne zdjęcie", icon: "📸", description: "Otrzymaj ekskluzywne zdjęcie" },
+    { level: 2, name: "Private photo", icon: "📸", description: "Otrzymaj ekskluzywne zdjęcie" },
     { level: 3, name: "Filmik 15s", icon: "🎬", description: "Krótki filmik" },
     { level: 5, name: "Rozmowa wideo", icon: "📹", description: "Wideorozmowa" },
     { level: 7, name: "Intymne zdjęcia", icon: "💕", description: "Prywatna galeria" },
@@ -97,20 +100,32 @@ export default function ChatPage() {
     if (data.type === "success") {
       setChats(
         data.chats.map((c) => ({
-          _id: c._id,
-          name: c.chatbotId?.cloneName,
-          avatar: c.chatbotId?.cloneAvatarPhotoUrl,
-          lastMessage: c.messages.at(-1)?.content || "",
+          _id: c.chatbotId?._id || c.chatbotId,
+          chatId: c._id,
+          chatbotId: c.chatbotId?._id || c.chatbotId,
+          name: c.chatbotId?.name,
+          avatar: c.chatbotId?.mainPhoto,
+          age: c.chatbotId?.age,
+          bio: c.chatbotId?.bio,
+          lastMessage: c.messages?.at(-1)?.content || "",
         }))
       );
     }
   };
 
-  const fetchChatMessages = async (chatId) => {
+  const fetchChatMessages = async (chatbotId) => {
+    // Use chatbotId to get or create chat with initial message
+    console.log('=== FETCH MESSAGES DEBUG ===');
+    console.log('Fetching messages for chatbotId:', chatbotId);
+    console.log('URL:', `${import.meta.env.VITE_URL}/api/chats/${chatbotId}`);
+    
     const res = await authFetch(
-      `${import.meta.env.VITE_URL}/api/chats/${chatId}`
+      `${import.meta.env.VITE_URL}/api/chats/${chatbotId}`
     );
+    console.log('Response status:', res.status);
     const data = await res.json();
+    console.log('Response data:', data);
+    
     if (data.type === "success") {
       setMessages(
         data.chat.messages.map((m) => ({
@@ -119,11 +134,31 @@ export default function ChatPage() {
           sender: m.role === "user" ? "me" : "them",
         }))
       );
+      // Store chatbot data for avatar display
+      if (data.chatbot) {
+        setCurrentChatbot({
+          _id: data.chatbot._id,
+          name: data.chatbot.name,
+          avatar: data.chatbot.mainPhoto,
+          age: data.chatbot.age,
+          bio: data.chatbot.bio,
+        });
+      }
+    } else {
+      console.error('Error fetching chat:', data.message);
     }
   };
 
   const handleSend = async () => {
     if (!newMessage.trim()) return;
+
+    // Use id directly as chatbotId
+    const chatbotId = id;
+    
+    if (!chatbotId) {
+      console.error('No chatbotId found');
+      return;
+    }
 
     const text = newMessage;
     setNewMessage("");
@@ -133,11 +168,11 @@ export default function ChatPage() {
 
     try {
       const res = await authFetch(
-        `${import.meta.env.VITE_URL}/api/chats/${id}/messages`,
+        `${import.meta.env.VITE_URL}/api/chats/${chatbotId}/messages`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: { role: "user", content: text } }),
+          body: JSON.stringify({ message: { content: text } }),
         }
       );
 
@@ -166,14 +201,23 @@ export default function ChatPage() {
     if (!id) return;
     if (!confirm("Delete this chat?")) return;
 
+    // Use id directly as chatbotId
     await authFetch(`${import.meta.env.VITE_URL}/api/chats/${id}`, {
       method: "DELETE",
     });
 
-    navigate("/chats");
+    navigate("/chat");
   };
 
-  const activeChat = chats.find((c) => c._id === id);
+  const activeChat = chats.find((c) => c._id === id) || currentChatbot;
+
+  // Handle invalid chatbot ID - redirect to chat list
+  useEffect(() => {
+    if (id && chats.length > 0 && !activeChat) {
+      // ID exists but chatbot not found in user's chat list
+      navigate("/chat", { replace: true });
+    }
+  }, [id, chats, activeChat, navigate]);
 
   // Calculate progress percentage
   const xpNeeded = xpPerLevel(relationshipLevel);
@@ -187,25 +231,31 @@ export default function ChatPage() {
 
       <div className="flex h-screen bg-[#0a0a0f] text-white overflow-hidden">
         {/* LEFT – CHAT LIST - Refined */}
-        <div className="hidden md:flex w-80 border-r border-white/5 flex-col bg-[#0a0a0f]">
+        <div className="hidden md:flex w-80 border-r border-white/5 flex-col bg-[#0a0a0f] h-full overflow-hidden">
           <div className="p-6">
             <h3 className="text-2xl font-bold tracking-tight mb-6">Messages</h3>
             <div className="relative">
               <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" size={14} />
               <input
                 placeholder="Search conversations..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full bg-white/5 border border-white/5 rounded-2xl py-3 pl-10 pr-4 text-sm outline-none focus:border-white/10 transition-colors placeholder:text-white/20"
               />
             </div>
           </div>
 
-          <ScrollArea className="flex-1 px-4">
-            <div className="space-y-2">
-              {chats.map((chat) => (
+          <ScrollArea className="flex-1 h-0 min-h-0">
+            <div className="space-y-2 px-2">
+              {chats.filter(chat => 
+                searchQuery === "" || 
+                chat.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                chat.lastMessage?.toLowerCase().includes(searchQuery.toLowerCase())
+              ).map((chat) => (
                 <div
                   key={chat._id}
                   onClick={() => navigate(`/chat/${chat._id}`)}
-                  className={`flex items-center gap-3 p-4 rounded-[1.5rem] cursor-pointer transition-all ${
+                  className={`flex w-[300px] items-center gap-3 p-4 rounded-[1.5rem] cursor-pointer transition-all ${
                     id === chat._id 
                       ? "bg-white/5 border border-white/10" 
                       : "hover:bg-white/5 border border-transparent"
@@ -213,7 +263,7 @@ export default function ChatPage() {
                 >
                   <div className="relative">
                     <Avatar className="w-12 h-12 border border-white/10">
-                      <AvatarImage src={`${import.meta.env.VITE_URL}${chat.avatar}`} />
+                      <AvatarImage src={chat.avatar} className="object-cover" />
                       <AvatarFallback className="bg-white/5 text-white/40">{chat.name?.[0]}</AvatarFallback>
                     </Avatar>
                     <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-[#0a0a0f]" />
@@ -239,7 +289,7 @@ export default function ChatPage() {
         </div>
 
         {/* CENTER – CHAT AREA */}
-        <div className="flex-1 flex flex-col bg-[#0a0a0f] relative">
+        <div className="flex-1 flex flex-col bg-[#0a0a0f] relative h-full overflow-hidden">
           {!id ? (
             <div className="flex-1 flex flex-col items-center justify-center text-white/20 gap-4">
               <div className="w-16 h-16 rounded-3xl bg-white/5 border border-white/5 flex items-center justify-center">
@@ -261,7 +311,7 @@ export default function ChatPage() {
                     </button>
                     <div className="flex items-center gap-3">
                       <Avatar className="w-10 h-10 border border-white/10">
-                        <AvatarImage src={`${import.meta.env.VITE_URL}${activeChat?.avatar}`} />
+                        <AvatarImage src={activeChat?.avatar} className="object-cover" />
                       </Avatar>
                       <div>
                         <h2 className="font-bold text-base tracking-tight">{activeChat?.name}</h2>
@@ -293,7 +343,7 @@ export default function ChatPage() {
               </div>
 
               {/* Messages Area */}
-              <ScrollArea className="flex-1 px-6 py-8">
+              <ScrollArea className="flex-1 px-6 py-8 overflow-hidden">
                 <div className="space-y-6 max-w-4xl mx-auto">
                   {messages.map((m) => (
                     <div
@@ -327,21 +377,19 @@ export default function ChatPage() {
               </ScrollArea>
 
               {/* Chat Input */}
-              <div className="p-6">
+              <div className="p-6 overflow-hidden">
                 <div className="max-w-4xl mx-auto">
-                  <div className="bg-white/5 border border-white/5 rounded-[2rem] p-1.5 flex items-center gap-2 group transition-all focus-within:border-white/10">
+                  <div className="bg-white/5 border border-white/5 rounded-[2rem] p-1.5 flex items-center gap-2 group transition-all focus-within:bg-white/10 focus-within:border-white/20 focus-within:ring-2 focus-within:ring-white/10">
                     <button className="p-3 text-white/20 hover:text-white/40 transition-colors">
                       <FaSmile size={18} />
                     </button>
-                    <button className="p-3 text-white/20 hover:text-white/40 transition-colors">
-                      <FaImage size={18} />
-                    </button>
+
                     <input
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleSend()}
                       placeholder={`Message ${activeChat?.name}...`}
-                      className="flex-1 bg-transparent border-none outline-none text-sm px-2 text-white placeholder:text-white/20"
+                      className="flex-1 bg-transparent border-none outline-none text-sm px-2 text-white placeholder:text-white/20 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0"
                     />
                     <button
                       onClick={handleSend}
@@ -363,18 +411,19 @@ export default function ChatPage() {
 
         {/* RIGHT – PROFILE SIDEBAR */}
         {activeChat && (
-          <div className="hidden xl:flex w-96 border-l border-white/5 flex-col bg-[#0a0a0f]">
-            <ScrollArea className="flex-1">
+          <div className="hidden xl:flex w-96 border-l border-white/5 flex-col bg-[#0a0a0f] h-full overflow-hidden">
+            <ScrollArea className="flex-1 h-0 overflow-hidden">
               <div className="relative aspect-[4/5]">
                 <img
-                  src={`${import.meta.env.VITE_URL}${activeChat.avatar}`}
-                  className="w-full h-full object-cover opacity-80"
+                  src={activeChat?.avatar}
+                  className="w-full h-full object-cover object-center opacity-80"
+                  alt={activeChat?.name}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f] via-transparent to-transparent" />
                 <div className="absolute bottom-6 left-6">
-                  <h2 className="text-3xl font-bold tracking-tight mb-1">{activeChat.name}</h2>
+                  <h2 className="text-3xl font-bold tracking-tight mb-1">{activeChat?.name}, {activeChat?.age}</h2>
                   <p className="text-white/30 text-xs font-bold uppercase tracking-widest flex items-center gap-2">
-                    <Heart size={14} className="text-[#741818]" /> {activeChat.location}
+                    <Heart size={14} className="text-[#741818]" /> {activeChat?.age ? `${activeChat.age} years old` : 'Online'}
                   </p>
                 </div>
               </div>
@@ -383,31 +432,19 @@ export default function ChatPage() {
                 <div>
                   <h3 className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] mb-4">About Me</h3>
                   <p className="text-sm text-white/60 leading-relaxed font-medium">
-                    Designed to be your perfect adaptive companion. I learn from our conversations to better match your energy and preferences.
+                    {activeChat?.bio || "Designed to be your perfect adaptive companion. I learn from our conversations to better match your energy and preferences."}
                   </p>
                 </div>
 
-                <div className="space-y-3">
-                  <button className="w-full bg-white text-black py-4 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-white/90 transition-all active:scale-95">
-                    Start Video Call
-                  </button>
-                  <button className="w-full bg-white/5 border border-white/10 text-white py-4 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-white/10 transition-all">
-                    Generate Images
-                  </button>
-                </div>
 
-                <div className="grid grid-cols-2 gap-6 p-6 bg-white/5 rounded-[2rem] border border-white/5">
-                  <div><p className="text-[9px] font-bold text-white/20 uppercase tracking-[0.15em] mb-1">Age</p><span className="text-sm font-bold">22</span></div>
-                  <div><p className="text-[9px] font-bold text-white/20 uppercase tracking-[0.15em] mb-1">Status</p><span className="text-sm font-bold">Single</span></div>
-                  <div><p className="text-[9px] font-bold text-white/20 uppercase tracking-[0.15em] mb-1">Mood</p><span className="text-sm font-bold">Playful</span></div>
-                  <div><p className="text-[9px] font-bold text-white/20 uppercase tracking-[0.15em] mb-1">Language</p><span className="text-sm font-bold">English</span></div>
-                </div>
+
+
 
                 {/* Relationship Milestone Section */}
                 <div className="space-y-4">
                   <h3 className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em]">Next Milestone</h3>
                   <div className="space-y-3">
-                    {unlockables.slice(0, relationshipLevel).map((unlock, idx) => (
+                    {unlockables.filter(u => u.level <= relationshipLevel).map((unlock, idx) => (
                       <div 
                         key={idx}
                         className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/10"

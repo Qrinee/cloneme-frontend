@@ -24,7 +24,16 @@ export default function JerkOffPage() {
   const { id } = useParams(); // This is chatbotId
   const navigate = useNavigate();
   const authFetch = useAuthFetch();
-  const { isLoggedIn } = useLayoutContext();
+  const { 
+    isLoggedIn,
+    isGuest: contextIsGuest,
+    setIsGuest: setContextIsGuest,
+    messagesRemaining: contextMessagesRemaining,
+    setMessagesRemaining: setContextMessagesRemaining,
+    updateGuestConversation,
+    addGuestMessage,
+    guestConversations
+  } = useLayoutContext();
   const [girls, setGirls] = useState();
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -33,6 +42,24 @@ export default function JerkOffPage() {
   const [message, setMessage] = useState("");
   const [currentChat, setCurrentChat] = useState(null);
   const [likeAnimation, setLikeAnimation] = useState(false);
+  
+  // Local guest mode state (synced with context)
+  const [messagesRemaining, setMessagesRemaining] = useState(contextMessagesRemaining);
+  const [isGuest, setIsGuest] = useState(contextIsGuest);
+  const [showLimitExceeded, setShowLimitExceeded] = useState(false);
+  
+  // Sync with context
+  useEffect(() => {
+    setIsGuest(contextIsGuest);
+    setMessagesRemaining(contextMessagesRemaining);
+  }, [contextIsGuest, contextMessagesRemaining]);
+  
+  // Load conversation from context when id changes
+  useEffect(() => {
+    if (id && guestConversations[id]) {
+      setMessages(guestConversations[id]);
+    }
+  }, [id, guestConversations]);
 
   useEffect(() => {
     if (id) {
@@ -41,24 +68,27 @@ export default function JerkOffPage() {
         .then(res => res.json())
         .then(data => {
           setGirls(data);
-          // For non-logged in users, show initial message only
-          if (!isLoggedIn && data.girlfriend?.initialMessage) {
-            setMessages([{
-              id: 1,
-              text: data.girlfriend.initialMessage,
-              sender: "girl",
-              time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            }]);
+          // For non-logged in users or guests, show initial message only if not already in conversation
+          if ((!isLoggedIn || contextIsGuest) && data.girlfriend?.initialMessage) {
+            // Only add initial message if conversation is empty
+            if (!guestConversations[id] || guestConversations[id].length === 0) {
+              const initialMsg = {
+                id: 1,
+                text: data.girlfriend.initialMessage,
+                sender: "girl",
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+              };
+              setMessages([initialMsg]);
+              updateGuestConversation(id, [initialMsg], contextMessagesRemaining);
+            }
           }
         })
         .catch(err => console.error('Error fetching girlfriend:', err));
 
-      // Only fetch chat messages if user is logged in
-      if (isLoggedIn) {
-        fetchChatMessages();
-      }
+      // Fetch chat messages for both logged in and guest users
+      fetchChatMessages();
     }
-  }, [id, isLoggedIn]);
+  }, [id]);
 
   useEffect(() => {
     // Smooth scroll to bottom when new messages appear
@@ -96,9 +126,82 @@ export default function JerkOffPage() {
     try {
       // Get or create chat using chatbotId
       const res = await authFetch(`${import.meta.env.VITE_URL}/api/chats/${id}`);
-      const data = await res.json();
       
+      // Handle 401 as guest mode
+      if (res.status === 401) {
+        console.log('JerkOffPage - Guest user - allowing chat access');
+        setIsGuest(true);
+        setContextIsGuest(true);
+        setMessagesRemaining(10);
+        setContextMessagesRemaining(10);
+        try {
+          const data = await res.json();
+          console.log('JerkOffPage - fetchChatMessages (guest):', data);
+          if (data.guest) {
+            setMessagesRemaining(data.messagesRemaining);
+            setContextMessagesRemaining(data.messagesRemaining);
+            
+            // Handle messages array from backend
+            if (data.messages && Array.isArray(data.messages)) {
+              const loadedMessages = data.messages.map((m, index) => ({
+                id: m._id || index,
+                text: m.content,
+                sender: m.role === "user" ? "user" : "girl",
+                time: m.timestamp ? new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'now'
+              }));
+              setMessages(loadedMessages);
+              updateGuestConversation(id, loadedMessages, data.messagesRemaining);
+            } else if (data.chat && data.chat.messages) {
+              // Fallback to chat.messages if messages field not present
+              const loadedMessages = data.chat.messages.map((m, index) => ({
+                id: m._id || index,
+                text: m.content,
+                sender: m.role === "user" ? "user" : "girl",
+                time: m.timestamp ? new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'now'
+              }));
+              setMessages(loadedMessages);
+              updateGuestConversation(id, loadedMessages, data.messagesRemaining);
+            }
+          }
+        } catch (e) {
+          console.log('Could not parse 401 response');
+        }
+        return;
+      }
+      
+      const data = await res.json();
       console.log('JerkOffPage - fetchChatMessages:', data);
+      
+      // Handle guest mode response
+      if (data.guest) {
+        setIsGuest(true);
+        setContextIsGuest(true);
+        setMessagesRemaining(data.messagesRemaining);
+        setContextMessagesRemaining(data.messagesRemaining);
+        
+        // Handle messages array from backend
+        if (data.messages && Array.isArray(data.messages)) {
+          const loadedMessages = data.messages.map((m, index) => ({
+            id: m._id || index,
+            text: m.content,
+            sender: m.role === "user" ? "user" : "girl",
+            time: m.timestamp ? new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'now'
+          }));
+          setMessages(loadedMessages);
+          updateGuestConversation(id, loadedMessages, data.messagesRemaining);
+        } else if (data.chat && data.chat.messages) {
+          // Fallback to chat.messages if messages field not present
+          const loadedMessages = data.chat.messages.map((m, index) => ({
+            id: m._id || index,
+            text: m.content,
+            sender: m.role === "user" ? "user" : "girl",
+            time: m.timestamp ? new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'now'
+          }));
+          setMessages(loadedMessages);
+          updateGuestConversation(id, loadedMessages, data.messagesRemaining);
+        }
+        return;
+      }
       
       if (data.type === "success") {
         setCurrentChat(data.chat);
@@ -122,9 +225,9 @@ export default function JerkOffPage() {
   const handleSendMessage = async () => {
     if (!message.trim() || !id) return;
 
-    // For non-logged in users, redirect to login
-    if (!isLoggedIn) {
-      navigate('/login');
+    // Check if guest (not logged in) and has messages remaining
+    if (isGuest && !isLoggedIn && messagesRemaining <= 0) {
+      setShowLimitExceeded(true);
       return;
     }
 
@@ -150,8 +253,68 @@ export default function JerkOffPage() {
         }
       );
 
+      // Handle 401 as guest mode - allow guests to continue
+      if (res.status === 401) {
+        console.log('JerkOffPage - Guest user sending message - allowing access');
+        setIsGuest(true);
+        setContextIsGuest(true);
+        try {
+          const data = await res.json();
+          console.log('JerkOffPage - sendMessage (401):', data);
+          if (data.guest) {
+            setMessagesRemaining(data.messagesRemaining);
+            setContextMessagesRemaining(data.messagesRemaining);
+            
+            // Handle messages array from backend
+            if (data.messages && Array.isArray(data.messages)) {
+              const newMessages = data.messages.map((m, index) => ({
+                id: m._id || Date.now() + index,
+                text: m.content,
+                sender: m.role === "user" ? "user" : "girl",
+                time: m.timestamp ? new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+              }));
+              setMessages(newMessages);
+              updateGuestConversation(id, newMessages, data.messagesRemaining);
+            }
+          }
+        } catch (e) {
+          console.log('Could not parse 401 response');
+        }
+        setIsLoading(false);
+        return;
+      }
+
       const data = await res.json();
       console.log('JerkOffPage - sendMessage:', data);
+      
+      // Handle error type (e.g., limit exceeded)
+      if (data.type === "error") {
+        console.error('Error sending message:', data.message);
+        setShowLimitExceeded(true);
+        setIsLoading(false);
+        return;
+      }
+      
+      // Handle guest mode response
+      if (data.guest) {
+        setIsGuest(true);
+        setContextIsGuest(true);
+        setMessagesRemaining(data.messagesRemaining);
+        setContextMessagesRemaining(data.messagesRemaining);
+        
+        // Handle messages array from backend
+        if (data.messages && Array.isArray(data.messages)) {
+          const newMessages = data.messages.map((m, index) => ({
+            id: m._id || Date.now() + index,
+            text: m.content,
+            sender: m.role === "user" ? "user" : "girl",
+            time: m.timestamp ? new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          }));
+          setMessages(newMessages);
+          updateGuestConversation(id, newMessages, data.messagesRemaining);
+        }
+        return;
+      }
       
       if (data.type === "success") {
         // Add AI response
@@ -178,6 +341,35 @@ export default function JerkOffPage() {
 
   return (
     <Layout>
+      {/* Limit Exceeded Dialog */}
+      {showLimitExceeded && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-[#0a0a0f] border border-white/10 rounded-[2rem] p-8 max-w-md w-full text-center">
+            <div className="w-16 h-16 bg-[#741818]/20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Lock size={32} className="text-[#741818]" />
+            </div>
+            <h3 className="text-2xl font-bold mb-4">Messages Limit Reached</h3>
+            <p className="text-white/60 mb-6">
+              You've used all your guest messages. Log in to continue chatting without limits.
+            </p>
+            <div className="flex gap-3">
+              <button 
+                onClick={() => setShowLimitExceeded(false)}
+                className="flex-1 px-6 py-3 bg-white/5 border border-white/10 rounded-xl text-white/60 hover:bg-white/10 transition-colors"
+              >
+                Maybe Later
+              </button>
+              <button 
+                onClick={() => navigate('/login')}
+                className="flex-1 px-6 py-3 bg-[#741818] hover:bg-[#8d1d1d] text-white rounded-xl font-bold transition-colors"
+              >
+                Log In
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
       {girls ? (
       <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <div className="w-full flex flex-col md:flex-row justify-center items-center gap-0 bg-[#0a0a0f]" style={{ height: '85vh' }}>
@@ -248,25 +440,29 @@ export default function JerkOffPage() {
                 </div>
 
                 {/* Chat Input - Subtler Glass Look */}
-                <div className="flex items-center gap-3 relative">
-                  <input
-                    type="text"
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                    placeholder={isLoggedIn ? `Message ${girls && girls.girlfriend.name}...` : "Type a message..."}
-                    className="flex-1 bg-white/5 backdrop-blur-xl text-white px-5 py-3 rounded-full focus:outline-none border border-white/10 placeholder:text-white/20 transition-colors focus:border-white/20"
-                  />
-                  <button
-                    onClick={handleSendMessage}
-                    disabled={!message.trim() || isLoading}
-                    className={`cursor-pointer p-3 rounded-full transition-all text-white/80 active:scale-95 ${message.trim() && !isLoading 
-                        ? 'bg-[#741818] hover:bg-[#8d1d1d]' 
-                        : 'bg-white/10 cursor-not-allowed'
-                    }`}
-                  >
-                    <Send size={18} />
-                  </button>
+                <div className="flex flex-col gap-2">
+
+                  <div className="flex items-center gap-3 relative">
+                    <input
+                      type="text"
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                      placeholder={isLoggedIn ? `Message ${girls && girls.girlfriend.name}...` : "Log in to chat..."}
+                      disabled={isGuest && !isLoggedIn && messagesRemaining <= 0}
+                      className={`flex-1 bg-white/5 backdrop-blur-xl text-white px-5 py-3 rounded-full focus:outline-none border border-white/10 placeholder:text-white/20 transition-colors focus:border-white/20 ${isGuest && !isLoggedIn && messagesRemaining <= 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    />
+                    <button
+                      onClick={handleSendMessage}
+                      disabled={!message.trim() || isLoading || (isGuest && !isLoggedIn && messagesRemaining <= 0)}
+                      className={`cursor-pointer p-3 rounded-full transition-all text-white/80 active:scale-95 ${message.trim() && !isLoading && !(isGuest && !isLoggedIn && messagesRemaining <= 0)
+                          ? 'bg-[#741818] hover:bg-[#8d1d1d]' 
+                          : 'bg-white/10 cursor-not-allowed'
+                      }`}
+                    >
+                      <Send size={18} />
+                    </button>
+                  </div>
                 </div>
               </div>
 

@@ -1,0 +1,13 @@
+# Robots.txt for ClonMe
+
+User-agent: *
+Allow: /
+
+# Disallow access to private/admin areas
+Disallow: /admin/
+Disallow: /api/
+Disallow: /private/
+Disallow: /dashboard/
+
+# Sitemap location
+Sitemap: https://clonme.com/sitemap.xml

@@ -49,7 +49,7 @@ export default function FeaturedSection() {
             <p className="text-white/30 text-xs uppercase tracking-widest font-bold mt-1">Voted by the community</p>
           </div>
         </div>
-        <button className="text-white/40 text-[10px] font-bold uppercase tracking-widest hover:text-white transition-colors flex items-center gap-2">
+        <button className="text-white/40 text-[10px] font-bold uppercase tracking-widest hover:text-white transition-colors flex items-center gap-2" aria-label="View all profiles">
           View All <ArrowRight size={14} />
         </button>
       </div>
@@ -57,6 +57,7 @@ export default function FeaturedSection() {
       <div className="relative group/carousel-feed">
         <button
           onClick={() => scrollCarousel(-1)}
+          aria-label="Scroll carousel left"
           className="absolute -left-4 top-1/2 -translate-y-1/2 z-10 bg-white/5 backdrop-blur-xl hover:bg-white/10 p-4 rounded-full text-white border border-white/10 transition-all opacity-0 group-hover/carousel-feed:opacity-100 hidden md:block"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
@@ -120,6 +121,7 @@ export default function FeaturedSection() {
 
         <button
           onClick={() => scrollCarousel(1)}
+          aria-label="Scroll carousel right"
           className="absolute -right-4 top-1/2 -translate-y-1/2 z-10 bg-white/5 backdrop-blur-xl hover:bg-white/10 p-4 rounded-full text-white border border-white/10 transition-all opacity-0 group-hover/carousel-feed:opacity-100 hidden md:block"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>

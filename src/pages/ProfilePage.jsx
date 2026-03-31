@@ -350,6 +350,7 @@ export default function ProfilePage() {
                               <button
                                 type="button"
                                 onClick={() => togglePasswordVisibility('current')}
+                                aria-label={showPasswords.current ? 'Hide current password' : 'Show current password'}
                                 className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/40 transition-colors"
                               >
                                 {showPasswords.current ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -373,6 +374,7 @@ export default function ProfilePage() {
                                 <button
                                   type="button"
                                   onClick={() => togglePasswordVisibility('new')}
+                                  aria-label={showPasswords.new ? 'Hide new password' : 'Show new password'}
                                   className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/40 transition-colors"
                                 >
                                   {showPasswords.new ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -395,6 +397,7 @@ export default function ProfilePage() {
                                 <button
                                   type="button"
                                   onClick={() => togglePasswordVisibility('confirm')}
+                                  aria-label={showPasswords.confirm ? 'Hide confirm password' : 'Show confirm password'}
                                   className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/40 transition-colors"
                                 >
                                   {showPasswords.confirm ? <EyeOff size={18} /> : <Eye size={18} />}

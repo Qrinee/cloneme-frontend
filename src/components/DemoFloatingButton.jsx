@@ -78,6 +78,7 @@ export default function DemoFloatingButton({ onDemoClick }) {
                   e.stopPropagation();
                   handleDismiss();
                 }}
+                aria-label="Close demo popup"
                 className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-white/10 border border-white/20 flex items-center justify-center hover:bg-white/20 transition-colors"
               >
                 <FiX className="text-white/70 text-xs" />

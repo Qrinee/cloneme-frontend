@@ -35,10 +35,10 @@ export default function InteractiveVideoCard() {
         />
         {/* Floating buttons */}
         <div className="absolute top-4 right-4 flex flex-col gap-2">
-          <button className="bg-gray-700 p-2 rounded-full hover:bg-gray-600">
+          <button className="bg-gray-700 p-2 rounded-full hover:bg-gray-600" aria-label="Toggle sound">
             <Speaker className="w-5 h-5" />
           </button>
-          <button className="bg-gray-700 p-2 rounded-full hover:bg-gray-600">
+          <button className="bg-gray-700 p-2 rounded-full hover:bg-gray-600" aria-label="Toggle visibility">
             <Eye className="w-5 h-5" />
           </button>
         </div>

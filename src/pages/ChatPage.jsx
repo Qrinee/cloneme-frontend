@@ -20,12 +20,25 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { Dialog } from "@/components/ui/dialog";
 import Content from "@/components/Content";
 import { useAuthFetch } from "@/utils/authFetch";
+import { useLayoutContext } from "@/components/LayoutContext";
 
 export default function ChatPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const authFetch = useAuthFetch();
   const bottomRef = useRef(null);
+  
+  // Use LayoutContext for guest state management
+  const { 
+    isLoggedIn,
+    isGuest: contextIsGuest, 
+    setIsGuest: setContextIsGuest,
+    messagesRemaining: contextMessagesRemaining, 
+    setMessagesRemaining: setContextMessagesRemaining,
+    updateGuestConversation,
+    addGuestMessage,
+    guestConversations
+  } = useLayoutContext();
 
   const [newMessage, setNewMessage] = useState("");
   const [messages, setMessages] = useState([]);
@@ -34,6 +47,24 @@ export default function ChatPage() {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [currentChatbotId, setCurrentChatbotId] = useState(null);
+  
+  // Local guest mode state (synced with context)
+  const [messagesRemaining, setMessagesRemaining] = useState(contextMessagesRemaining);
+  const [isGuest, setIsGuest] = useState(contextIsGuest);
+  const [showLimitExceeded, setShowLimitExceeded] = useState(false);
+  
+  // Sync with context
+  useEffect(() => {
+    setIsGuest(contextIsGuest);
+    setMessagesRemaining(contextMessagesRemaining);
+  }, [contextIsGuest, contextMessagesRemaining]);
+  
+  // Load conversation from context when id changes
+  useEffect(() => {
+    if (id && guestConversations[id]) {
+      setMessages(guestConversations[id]);
+    }
+  }, [id, guestConversations]);
   
   // Relationship progression system
   const [relationshipLevel, setRelationshipLevel] = useState(1);
@@ -114,27 +145,102 @@ export default function ChatPage() {
   };
 
   const fetchChatMessages = async (chatbotId) => {
-    // Use chatbotId to get or create chat with initial message
-    console.log('=== FETCH MESSAGES DEBUG ===');
-    console.log('Fetching messages for chatbotId:', chatbotId);
-    console.log('URL:', `${import.meta.env.VITE_URL}/api/chats/${chatbotId}`);
+
     
     const res = await authFetch(
       `${import.meta.env.VITE_URL}/api/chats/${chatbotId}`
     );
-    console.log('Response status:', res.status);
-    const data = await res.json();
-    console.log('Response data:', data);
+
     
-    if (data.type === "success") {
-      setMessages(
-        data.chat.messages.map((m) => ({
+    // Handle 401 as guest mode - allow guests to continue
+    if (res.status === 401) {
+      setIsGuest(true);
+      setContextIsGuest(true);
+      setMessagesRemaining(10);
+      setContextMessagesRemaining(10);
+      // Try to parse the response to get chatbot info if available
+      try {
+        const data = await res.json();
+
+        if (data.chatbot) {
+          setCurrentChatbot({
+            _id: data.chatbot._id,
+            name: data.chatbot.name,
+            avatar: data.chatbot.mainPhoto,
+            age: data.chatbot.age,
+            bio: data.chatbot.bio,
+          });
+        }
+        if (data.guest) {
+          setMessagesRemaining(data.messagesRemaining);
+          setContextMessagesRemaining(data.messagesRemaining);
+          
+          // Handle messages array from backend
+          if (data.messages && Array.isArray(data.messages)) {
+            const loadedMessages = data.messages.map((m) => ({
+              id: m._id,
+              text: m.content,
+              sender: m.role === "user" ? "me" : "them",
+            }));
+            setMessages(loadedMessages);
+            updateGuestConversation(chatbotId, loadedMessages, data.messagesRemaining);
+          } else if (data.chat && data.chat.messages) {
+            // Fallback to chat.messages
+            const loadedMessages = data.chat.messages.map((m) => ({
+              id: m._id,
+              text: m.content,
+              sender: m.role === "user" ? "me" : "them",
+            }));
+            setMessages(loadedMessages);
+            updateGuestConversation(chatbotId, loadedMessages, data.messagesRemaining);
+          }
+        }
+      } catch (e) {
+      }
+      return;
+    }
+    
+    const data = await res.json();
+    
+    if (data.type === "error") {
+      // Check if it's a guest limit exceeded error
+      if (data.message && data.message.includes('Limit exceeded')) {
+        setShowLimitExceeded(true);
+        setIsGuest(true);
+        setContextIsGuest(true);
+        setMessagesRemaining(0);
+        setContextMessagesRemaining(0);
+      }
+      return;
+    }
+    
+    // Handle guest mode
+    if (data.guest) {
+      setIsGuest(true);
+      setContextIsGuest(true);
+      setMessagesRemaining(data.messagesRemaining);
+      setContextMessagesRemaining(data.messagesRemaining);
+      
+      // Handle messages array from backend
+      if (data.messages && Array.isArray(data.messages)) {
+        const loadedMessages = data.messages.map((m) => ({
           id: m._id,
           text: m.content,
           sender: m.role === "user" ? "me" : "them",
-        }))
-      );
-      // Store chatbot data for avatar display
+        }));
+        setMessages(loadedMessages);
+        updateGuestConversation(chatbotId, loadedMessages, data.messagesRemaining);
+      } else if (data.chat && data.chat.messages) {
+        // Fallback to chat.messages
+        const loadedMessages = data.chat.messages.map((m) => ({
+          id: m._id,
+          text: m.content,
+          sender: m.role === "user" ? "me" : "them",
+        }));
+        setMessages(loadedMessages);
+        updateGuestConversation(chatbotId, loadedMessages, data.messagesRemaining);
+      }
+      // Store chatbot data if available
       if (data.chatbot) {
         setCurrentChatbot({
           _id: data.chatbot._id,
@@ -144,21 +250,45 @@ export default function ChatPage() {
           bio: data.chatbot.bio,
         });
       }
-    } else {
-      console.error('Error fetching chat:', data.message);
+      return;
+    }
+    
+    // Authenticated user - normal flow
+    setIsGuest(false);
+    if (data.chat) {
+      setMessages(
+        data.chat.messages.map((m) => ({
+          id: m._id,
+          text: m.content,
+          sender: m.role === "user" ? "me" : "them",
+        }))
+      );
+    }
+    // Store chatbot data for avatar display
+    if (data.chatbot) {
+      setCurrentChatbot({
+        _id: data.chatbot._id,
+        name: data.chatbot.name,
+        avatar: data.chatbot.mainPhoto,
+        age: data.chatbot.age,
+        bio: data.chatbot.bio,
+      });
     }
   };
 
   const handleSend = async () => {
     if (!newMessage.trim()) return;
 
+    // Check if guest (not logged in) and has messages remaining
+    if (isGuest && !isLoggedIn && messagesRemaining <= 0) {
+      setShowLimitExceeded(true);
+      setShowLimitExceeded(true);
+      return;
+    }
+
     // Use id directly as chatbotId
     const chatbotId = id;
     
-    if (!chatbotId) {
-      console.error('No chatbotId found');
-      return;
-    }
 
     const text = newMessage;
     setNewMessage("");
@@ -182,18 +312,91 @@ export default function ChatPage() {
         return;
       }
 
+      // Handle 401 as guest mode - allow guests to continue
+      if (res.status === 401) {
+
+        setIsGuest(true);
+        setContextIsGuest(true);
+        // Try to parse response for reply or remaining messages
+        try {
+          const data = await res.json();
+
+          if (data.guest) {
+            setMessagesRemaining(data.messagesRemaining);
+            setContextMessagesRemaining(data.messagesRemaining);
+            
+            // Handle messages array from backend
+            if (data.messages && Array.isArray(data.messages)) {
+              const newMessages = data.messages.map((m) => ({
+                id: m._id,
+                text: m.content,
+                sender: m.role === "user" ? "me" : "them",
+              }));
+              setMessages(newMessages);
+              updateGuestConversation(chatbotId, newMessages, data.messagesRemaining);
+            }
+          }
+        } catch (e) {
+        }
+        setIsLoading(false);
+        return;
+      }
+
       const data = await res.json();
-      if (data.type === "success") {
+      
+      // Handle error type (e.g., limit exceeded)
+      if (data.type === "error") {
+    setShowLimitExceeded(true);
+        setIsLoading(false);
+        return;
+      }
+      
+      // Handle guest mode
+      if (data.guest) {
+        setIsGuest(true);
+        setContextIsGuest(true);
+        setMessagesRemaining(data.messagesRemaining);
+        setContextMessagesRemaining(data.messagesRemaining);
+        
+        // Handle messages array from backend
+        if (data.messages && Array.isArray(data.messages)) {
+          const newMessages = data.messages.map((m) => ({
+            id: m._id,
+            text: m.content,
+            sender: m.role === "user" ? "me" : "them",
+          }));
+          setMessages(newMessages);
+          updateGuestConversation(chatbotId, newMessages, data.messagesRemaining);
+        } else if (data.chat && data.chat.messages) {
+          // Fallback to chat.messages if messages field not present
+          const newMessages = data.chat.messages.map((m) => ({
+            id: m._id,
+            text: m.content,
+            sender: m.role === "user" ? "me" : "them",
+          }));
+          setMessages(newMessages);
+          updateGuestConversation(chatbotId, newMessages, data.messagesRemaining);
+        }
+        return;
+      }
+      
+      // Authenticated user - normal flow
+      setIsGuest(false);
+      if (data.type === "success" && data.chat) {
         const reply = data.chat.messages.at(-1);
-        setMessages((p) => [
-          ...p,
-          { id: reply._id, text: reply.content, sender: "them" },
-        ]);
+        if (reply) {
+          setMessages((p) => [
+            ...p,
+            { id: reply._id, text: reply.content, sender: "them" },
+          ]);
+        }
       }
     } finally {
       setIsLoading(false);
-      // Add XP for sending a message
-      addXP(10);
+      // Add XP for sending a message (only for authenticated users)
+      if (!isGuest) {
+        addXP(10);
+      }
     }
   };
 
@@ -228,6 +431,8 @@ export default function ChatPage() {
       <Dialog open={open} onOpenChange={setOpen}>
         <Content />
       </Dialog>
+
+
 
       <div className="flex h-screen bg-[#0a0a0f] text-white overflow-hidden">
         {/* LEFT – CHAT LIST - Refined */}
@@ -378,9 +583,26 @@ export default function ChatPage() {
 
               {/* Chat Input */}
               <div className="p-6 overflow-hidden">
+                {/* Guest mode indicator - only show when not logged in */}
+                {isGuest && !isLoggedIn && (
+                  <div className="max-w-4xl mx-auto mb-4">
+                    <div className="bg-[#741818]/10 border border-[#741818]/20 rounded-xl px-4 py-2 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <FaUnlock size={14} className="text-[#741818]" />
+                        <span className="text-xs text-white/60">Chatting as guest</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-white/40">Messages remaining:</span>
+                        <span className={`text-xs font-bold ${messagesRemaining <= 3 ? 'text-[#741818]' : 'text-white/80'}`}>
+                          {messagesRemaining}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
                 <div className="max-w-4xl mx-auto">
                   <div className="bg-white/5 border border-white/5 rounded-[2rem] p-1.5 flex items-center gap-2 group transition-all focus-within:bg-white/10 focus-within:border-white/20 focus-within:ring-2 focus-within:ring-white/10">
-                    <button className="p-3 text-white/20 hover:text-white/40 transition-colors">
+                    <button className="p-3 text-white/20 hover:text-white/40 transition-colors" aria-label="Open emoji picker">
                       <FaSmile size={18} />
                     </button>
 
@@ -389,13 +611,15 @@ export default function ChatPage() {
                       onChange={(e) => setNewMessage(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleSend()}
                       placeholder={`Message ${activeChat?.name}...`}
-                      className="flex-1 bg-transparent border-none outline-none text-sm px-2 text-white placeholder:text-white/20 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0"
+                      disabled={isGuest && !isLoggedIn && messagesRemaining <= 0}
+                      className={`flex-1 bg-transparent border-none outline-none text-sm px-2 text-white placeholder:text-white/20 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 ${isGuest && !isLoggedIn && messagesRemaining <= 0 ? 'cursor-not-allowed opacity-50' : ''}`}
                     />
                     <button
                       onClick={handleSend}
-                      disabled={!newMessage.trim()}
+                      disabled={!newMessage.trim() || (isGuest && !isLoggedIn && messagesRemaining <= 0)}
+                      aria-label="Send message"
                       className={`w-11 h-11 rounded-[1.25rem] flex items-center justify-center transition-all active:scale-90 ${
-                        newMessage.trim() 
+                        newMessage.trim() && !(isGuest && !isLoggedIn && messagesRemaining <= 0)
                           ? "bg-[#741818] text-white hover:bg-[#8d1d1d]" 
                           : "bg-white/5 text-white/10 border border-white/5 cursor-not-allowed"
                       }`}

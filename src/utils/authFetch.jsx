@@ -13,6 +13,16 @@ const refreshToken = async () => {
     }
 };
 
+// Endpoints that should allow guest access (no redirect on 401)
+const guestAllowedEndpoints = [
+    '/api/chats/',
+    '/api/chats',
+];
+
+const isGuestAllowedEndpoint = (url) => {
+    return guestAllowedEndpoints.some(endpoint => url.includes(endpoint));
+};
+
 // Corrected authFetch function
 const authFetch = async (url, options = {}, navigate, isRetry = false) => {
     let response = await fetch(url, {
@@ -20,16 +30,18 @@ const authFetch = async (url, options = {}, navigate, isRetry = false) => {
         credentials: "include",
     });
 
-    // Handle 401 Unauthorized - redirect to login (except for /mydata endpoint)
+    // Handle 401 Unauthorized - redirect to login (except for guest-allowed endpoints)
     if (response.status === 401) {
-        // Skip redirect for /mydata endpoint - used for auth check
-        if (!url.includes('/mydata')) {
+        // Skip redirect for /mydata endpoint and chat endpoints - used for auth check and guest mode
+        if (!url.includes('/mydata') && !isGuestAllowedEndpoint(url)) {
             console.log("Unauthorized (401), redirecting to login...");
             if (navigate) {
                 navigate('/login');
             } else {
                 window.location.href = '/login';
             }
+        } else {
+            console.log("Unauthorized (401) on guest-allowed endpoint, allowing guest access...");
         }
         return response;
     }
@@ -42,12 +54,14 @@ const authFetch = async (url, options = {}, navigate, isRetry = false) => {
             // Retry the original request
             return authFetch(url, options, navigate, true);
         } else {
-            // Refresh failed, redirect to login
-            console.log("Refresh failed, redirecting to login...");
-            if (navigate) {
-                navigate('/login');
-            } else {
-                window.location.href = '/login';
+            // Refresh failed, redirect to login (unless it's a guest-allowed endpoint)
+            if (!isGuestAllowedEndpoint(url)) {
+                console.log("Refresh failed, redirecting to login...");
+                if (navigate) {
+                    navigate('/login');
+                } else {
+                    window.location.href = '/login';
+                }
             }
         }
     }

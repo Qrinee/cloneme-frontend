@@ -8,6 +8,10 @@ const LayoutContext = createContext({
   // Guest mode state
   isGuest: false,
   messagesRemaining: 10,
+  messagesUsed: 0,
+  premium: { isActive: false, expiresAt: null },
+  canCreateGirlfriend: true,
+  lastGirlfriendCreated: null,
   guestConversations: {},
   updateGuestConversation: () => {},
   clearGuestConversation: () => {}
@@ -20,9 +24,17 @@ export function LayoutProvider({ children }) {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState(null);
   
+  // Premium and messaging state
+  // premium is { isActive: bool, expiresAt: string | null }
+  const [premium, setPremium] = useState({ isActive: false, expiresAt: null });
+  const [messagesUsed, setMessagesUsed] = useState(0);
+  // messagesRemaining is number or "unlimited"
+  const [messagesRemaining, setMessagesRemaining] = useState(10);
+  const [canCreateGirlfriend, setCanCreateGirlfriend] = useState(true);
+  const [lastGirlfriendCreated, setLastGirlfriendCreated] = useState(null);
+  
   // Guest mode state
   const [isGuest, setIsGuest] = useState(false);
-  const [messagesRemaining, setMessagesRemaining] = useState(10);
   const [guestConversations, setGuestConversations] = useState({}); // { chatbotId: messages[] }
 
   useEffect(() => {
@@ -36,13 +48,37 @@ export function LayoutProvider({ children }) {
         if (data?.type === "success") {
           setIsLoggedIn(true);
           setUser(data.user);
+          // Update premium and messaging state from user data
+          // premium: { isActive: bool, expiresAt: string | null }
+          // messagesRemaining: number | "unlimited"
+          if (data.user) {
+            setPremium(data.user.premium || { isActive: false, expiresAt: null });
+            setMessagesUsed(data.user.messagesUsed || 0);
+            setMessagesRemaining(data.user.messagesRemaining !== undefined 
+              ? data.user.messagesRemaining 
+              : 10);
+            setCanCreateGirlfriend(data.user.canCreateGirlfriend !== undefined 
+              ? data.user.canCreateGirlfriend 
+              : true);
+            setLastGirlfriendCreated(data.user.lastGirlfriendCreated || null);
+          }
         } else {
           setIsLoggedIn(false);
           setUser(null);
+          setPremium({ isActive: false, expiresAt: null });
+          setMessagesUsed(0);
+          setMessagesRemaining(10);
+          setCanCreateGirlfriend(true);
+          setLastGirlfriendCreated(null);
         }
       } catch (error) {
         setIsLoggedIn(false);
         setUser(null);
+        setPremium({ isActive: false, expiresAt: null });
+        setMessagesUsed(0);
+        setMessagesRemaining(10);
+        setCanCreateGirlfriend(true);
+        setLastGirlfriendCreated(null);
       } finally {
         setIsLoading(false);
       }
@@ -90,11 +126,20 @@ export function LayoutProvider({ children }) {
       isLoading, 
       user, 
       updateUser,
+      // Premium state - { isActive: bool, expiresAt: string | null }
+      premium,
+      setPremium,
+      messagesUsed,
+      setMessagesUsed,
+      messagesRemaining, 
+      setMessagesRemaining,
+      canCreateGirlfriend,
+      setCanCreateGirlfriend,
+      lastGirlfriendCreated,
+      setLastGirlfriendCreated,
       // Guest mode
       isGuest,
       setIsGuest,
-      messagesRemaining, 
-      setMessagesRemaining,
       guestConversations,
       updateGuestConversation,
       clearGuestConversation,

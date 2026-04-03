@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiUser, FiX, FiMessageCircle } from "react-icons/fi";
+import { FiX } from "react-icons/fi";
 
 const DEMO_GIRL_ID = "demo-girl-001";
 
@@ -54,22 +54,21 @@ export default function DemoFloatingButton({ onDemoClick }) {
             {/* Main button */}
             <button
               onClick={handleDemoClick}
-              className="relative flex items-center gap-3 px-5 py-3.5 bg-[#12121a]/95 backdrop-blur-xl rounded-xl border border-white/10 hover:border-white/20 transition-all duration-300 group-hover:scale-105"
+              className="relative flex items-center gap-3 px-5 py-3.5 bg-[#0a0a0f]/95 backdrop-blur-xl rounded-2xl border border-white/5 hover:border-white/10 transition-all duration-300 group-hover:scale-105"
             >
               {/* Avatar */}
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#741818] to-[#8B5CF6] flex items-center justify-center">
-                <FiUser className="text-white text-lg" />
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#741818]/20 to-transparent border border-white/10 flex items-center justify-center overflow-hidden">
+                <img src="/icon.png" alt="Demo" className="w-full h-full object-cover" />
               </div>
               
               {/* Text */}
               <div className="flex flex-col items-start">
-                <span className="text-xs text-white/50 font-medium">Try with</span>
-                <span className="text-sm font-bold text-white">Demo Girl</span>
-              </div>
-
-              {/* Icon */}
-              <div className="ml-2 w-8 h-8 rounded-lg bg-[#741818]/20 flex items-center justify-center">
-                <FiMessageCircle className="text-[#741818]" />
+                <span className="text-[10px] text-white/30 font-bold uppercase tracking-widest">Try with</span>
+                <span className="text-base font-bold text-white tracking-tight">Demo Girl</span>
+                <span className="text-[10px] text-green-500/80 font-bold uppercase tracking-widest flex items-center gap-1">
+                  <span className="w-1 h-1 bg-green-500 rounded-full animate-pulse" />
+                  For free
+                </span>
               </div>
 
               {/* Close button */}
@@ -79,9 +78,9 @@ export default function DemoFloatingButton({ onDemoClick }) {
                   handleDismiss();
                 }}
                 aria-label="Close demo popup"
-                className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-white/10 border border-white/20 flex items-center justify-center hover:bg-white/20 transition-colors"
+                className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors"
               >
-                <FiX className="text-white/70 text-xs" />
+                <FiX className="text-white/50 text-xs" />
               </button>
             </button>
           </div>

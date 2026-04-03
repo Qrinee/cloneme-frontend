@@ -195,7 +195,7 @@ function AgeSlider({ value, onChange }) {
 export default function CreateGirlPage() {
   const navigate = useNavigate();
   const authFetch = useAuthFetch();
-  const { updateUser } = useLayoutContext();
+  const { updateUser, premium, canCreateGirlfriend, setCanCreateGirlfriend, lastGirlfriendCreated, setLastGirlfriendCreated } = useLayoutContext();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -616,6 +616,13 @@ export default function CreateGirlPage() {
                       if (data.remainingPoints !== undefined) {
                         updateUser({ points: data.remainingPoints });
                       }
+                      // Update girlfriend creation status for premium
+                      if (data.canCreateGirlfriend !== undefined) {
+                        setCanCreateGirlfriend(data.canCreateGirlfriend);
+                      }
+                      if (data.lastGirlfriendCreated) {
+                        setLastGirlfriendCreated(data.lastGirlfriendCreated);
+                      }
                       // Show success notification
                       setNotification({
                         type: 'success',
@@ -624,9 +631,13 @@ export default function CreateGirlPage() {
                       });
                       setTimeout(() => navigate('/collection'), 2000);
                     } else {
-                      // Not enough points - show premium dialog
-                      if (data?.message?.includes("Not enough points") || data?.message?.includes("need")) {
+                      // Not enough points, limit exceeded, or premium required - show premium dialog
+                      if (data?.message?.includes("Not enough points") || data?.message?.includes("need") || data?.message?.includes("already used") || data?.message?.includes("Premium subscription required")) {
                         setShowPremiumDialog(true);
+                        // Update state if limit reached
+                        if (data.canCreateGirlfriend !== undefined) {
+                          setCanCreateGirlfriend(data.canCreateGirlfriend);
+                        }
                       } else {
                         setNotification({
                           type: 'error',
@@ -644,10 +655,10 @@ export default function CreateGirlPage() {
                     setIsSubmitting(false);
                   }
                 }}
-                disabled={isSubmitting}
-                className="flex items-center gap-3 px-12 py-4 bg-white text-black font-bold rounded-2xl hover:bg-white/90 transition-all active:scale-95 disabled:opacity-50"
+                disabled={isSubmitting || (premium?.isActive && !canCreateGirlfriend)}
+                className="flex items-center gap-3 px-12 py-4 bg-white text-black font-bold rounded-2xl hover:bg-white/90 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isSubmitting ? "Synthesizing..." : "Create Girlfriend (350 credits)"}
+                {isSubmitting ? "Synthesizing..." : (premium?.isActive ? (canCreateGirlfriend ? "Create Girlfriend (FREE)" : "Create Girlfriend (1/month)") : "Create Girlfriend")}
                 <Heart size={20} fill="currentColor" />
               </button>
             )}

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
 import { useAuthFetch } from '../utils/authFetch';
+import { useLayoutContext } from '../components/LayoutContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Mail, Trash2, Save, AlertTriangle, ChevronRight, Shield, Bell, CreditCard, Lock, Eye, EyeOff } from 'lucide-react';
+import { User, Mail, Trash2, Save, AlertTriangle, ChevronRight, Shield, Bell, CreditCard, Lock, Eye, EyeOff, Crown, MessageCircle, Star } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,6 +19,9 @@ export default function ProfilePage() {
   const [success, setSuccess] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [activeTab, setActiveTab] = useState("general");
+  
+  // Get premium state from context
+  const { premium, messagesUsed, messagesRemaining, canCreateGirlfriend } = useLayoutContext();
   
   // General form state
   const [form, setForm] = useState({ name: "", email: "" });
@@ -195,9 +199,21 @@ export default function ProfilePage() {
                   <span>Security</span>
                   <ChevronRight size={14} className={`ml-auto ${activeTab === "security" ? "opacity-40" : "opacity-0"}`} />
                 </button>
+                <button 
+                  onClick={() => setActiveTab("premium")}
+                  className={`flex cursor-pointer items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all border ${
+                    activeTab === "premium" 
+                    ? "bg-[#741818]/10 text-[#741818] border-[#741818]/20" 
+                    : "text-white/40 hover:text-white hover:bg-white/5 border-transparent"
+                  }`}
+                >
+                  <Crown size={18} className={premium?.isActive ? "text-yellow-500" : ""} />
+                  <span>Premium</span>
+                  <ChevronRight size={14} className={`ml-auto ${activeTab === "premium" ? "opacity-40" : "opacity-0"}`} />
+                </button>
 
                 <button 
-                   onClick={() => window.location = 'https://billing.stripe.com/p/login/test_dRmbJ042S4vv6c6cRF6sw00'}
+                   onClick={() => window.location = 'https://buy.stripe.com/bJedR87f4aTTgQK5pd6sw01'}
                   className="flex items-center gap-3 px-4 py-3 rounded-xl text-white/40 cursor-pointer hover:text-white hover:bg-white/5 font-bold transition-all"
                 >
                   <CreditCard size={18} />
@@ -454,6 +470,76 @@ export default function ProfilePage() {
                          <Button variant="outline" className="mt-2 w-fit bg-transparent border-white/10 text-white/40 hover:text-white rounded-xl h-9 text-xs">Coming Soon</Button>
                        </div>
                     </div>
+                  </motion.div>
+                )}
+                {activeTab === "premium" && (
+                  <motion.div
+                    key="premium"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Card className="bg-white/5 border-white/10 backdrop-blur-xl rounded-3xl overflow-hidden">
+                      <CardHeader className="pt-4">
+                        <div className="flex items-center gap-3">
+                          <Crown size={24} className={premium ? "text-yellow-500" : "text-white/20"} />
+                          <CardTitle className="text-xl font-bold text-white">Premium Status</CardTitle>
+                        </div>
+                        <CardDescription className="text-white/40">
+                          {premium?.isActive ? "You are a premium member!" : "Upgrade to premium for unlimited features."}
+                        </CardDescription>
+                      </CardHeader>
+                      <Separator className="bg-white/5" />
+                      <CardContent className="pt-6 space-y-6">
+                        <div className={`p-6 rounded-3xl ${premium?.isActive ? 'bg-yellow-500/10 border border-yellow-500/20' : 'bg-white/5 border border-white/10'}`}>
+                          <div className="flex items-center gap-3 mb-2">
+                            <Crown size={24} className={premium?.isActive ? "text-yellow-500" : "text-white/20"} />
+                            <h4 className={`font-bold text-lg ${premium?.isActive ? 'text-yellow-500' : 'text-white/40'}`}>
+                              {premium?.isActive ? "PREMIUM ACTIVE" : "Premium Not Active"}
+                            </h4>
+                          </div>
+                          <p className="text-white/40 text-sm">
+                            {premium?.isActive ? "Enjoy unlimited messages and 1 free AI Girlfriend creation per month!" : "Upgrade to get unlimited messages and 1 free AI Girlfriend creation per month."}
+                          </p>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="p-6 rounded-3xl bg-white/5 border border-white/10 flex flex-col gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400">
+                              <MessageCircle size={20} />
+                            </div>
+                            <h4 className="font-bold text-white">Messages Used</h4>
+                            <p className="text-white/40 text-sm">{messagesRemaining === "unlimited" ? "Unlimited" : `${messagesUsed || 0} / 20 per month`}</p>
+                          </div>
+                          <div className="p-6 rounded-3xl bg-white/5 border border-white/10 flex flex-col gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center text-green-400">
+                              <Star size={20} />
+                            </div>
+                            <h4 className="font-bold text-white">Girlfriend Creation</h4>
+                            <p className="text-white/40 text-sm">{premium?.isActive ? (canCreateGirlfriend ? "1 free available" : "1/month (used)") : "200 credits"}</p>
+                          </div>
+                        </div>
+                        {user?.points !== undefined && (
+                          <div className="p-6 rounded-3xl bg-white/5 border border-white/10 flex flex-col gap-3">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <h4 className="font-bold text-white">Your Points</h4>
+                                <p className="text-white/40 text-sm">Use points for AI Girlfriend creations</p>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-2xl font-bold text-white">{user.points}</p>
+                                <p className="text-white/40 text-xs">points</p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        {!premium?.isActive && (
+                          <Button onClick={() => window.location = 'https://buy.stripe.com/bJedR87f4aTTgQK5pd6sw01'} className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold rounded-xl py-4 transition-all cursor-pointer">
+                            <Crown size={20} className="mr-2" />Upgrade to Premium
+                          </Button>
+                        )}
+                      </CardContent>
+                    </Card>
                   </motion.div>
                 )}
               </AnimatePresence>

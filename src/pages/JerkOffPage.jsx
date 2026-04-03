@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Send, Heart, Gift, Zap, Crown, Star, MessageCircle, X, MoreHorizontal, Paperclip, Smile, Lock, Play, Check, Hand, Mic, Droplets, Waves, Battery, Flame } from "lucide-react";
+import DialogMessageLimit from "@/components/DialogMessageLimit";
 import Layout from "../components/Layout";
 import video1 from '../assets/video2.mp4'
 import video2 from '../assets/examplereel.mp4'
@@ -30,6 +31,7 @@ export default function JerkOffPage() {
     setIsGuest: setContextIsGuest,
     messagesRemaining: contextMessagesRemaining,
     setMessagesRemaining: setContextMessagesRemaining,
+    messagesUsed,
     updateGuestConversation,
     addGuestMessage,
     guestConversations
@@ -47,6 +49,8 @@ export default function JerkOffPage() {
   const [messagesRemaining, setMessagesRemaining] = useState(contextMessagesRemaining);
   const [isGuest, setIsGuest] = useState(contextIsGuest);
   const [showLimitExceeded, setShowLimitExceeded] = useState(false);
+  const [showLoginDialog, setShowLoginDialog] = useState(false);
+  const [limitErrorMessage, setLimitErrorMessage] = useState("You've used all your guest messages. Log in to continue chatting without limits.");
   
   // Sync with context
   useEffect(() => {
@@ -285,12 +289,18 @@ export default function JerkOffPage() {
       }
 
       const data = await res.json();
-      console.log('JerkOffPage - sendMessage:', data);
       
       // Handle error type (e.g., limit exceeded)
       if (data.type === "error") {
-        console.error('Error sending message:', data.message);
-        setShowLimitExceeded(true);
+        // Use error message from API or fallback to default
+        const errorMsg = data.message || "You've used all your guest messages. Log in to continue chatting without limits.";
+        setLimitErrorMessage(errorMsg);
+        // Show login dialog for "log in" message, DialogMessageLimit for premium upgrade message
+        if (errorMsg.toLowerCase().includes("log in") || errorMsg.toLowerCase().includes("login")) {
+          setShowLoginDialog(true);
+        } else {
+          setShowLimitExceeded(true);
+        }
         setIsLoading(false);
         return;
       }
@@ -341,20 +351,20 @@ export default function JerkOffPage() {
 
   return (
     <Layout>
-      {/* Limit Exceeded Dialog */}
-      {showLimitExceeded && (
+      {/* Limit Exceeded Dialog - login dialog for "log in" message */}
+      {showLoginDialog && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-[#0a0a0f] border border-white/10 rounded-[2rem] p-8 max-w-md w-full text-center">
             <div className="w-16 h-16 bg-[#741818]/20 rounded-full flex items-center justify-center mx-auto mb-6">
               <Lock size={32} className="text-[#741818]" />
             </div>
-            <h3 className="text-2xl font-bold mb-4">Messages Limit Reached</h3>
+            <h3 className="text-2xl font-bold mb-4">Login Required</h3>
             <p className="text-white/60 mb-6">
-              You've used all your guest messages. Log in to continue chatting without limits.
+              {limitErrorMessage}
             </p>
             <div className="flex gap-3">
               <button 
-                onClick={() => setShowLimitExceeded(false)}
+                onClick={() => setShowLoginDialog(false)}
                 className="flex-1 px-6 py-3 bg-white/5 border border-white/10 rounded-xl text-white/60 hover:bg-white/10 transition-colors"
               >
                 Maybe Later
@@ -369,6 +379,16 @@ export default function JerkOffPage() {
           </div>
         </div>
       )}
+
+
+      {/* Premium Upgrade Dialog - for premium upgrade message */}
+      <DialogMessageLimit
+        open={showLimitExceeded}
+        onOpenChange={setShowLimitExceeded}
+        messagesUsed={messagesUsed || 0}
+        messageLimit={20}
+        onUpgrade={() => window.location = 'https://buy.stripe.com/bJedR87f4aTTgQK5pd6sw01'}
+      />
       
       {girls ? (
       <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>

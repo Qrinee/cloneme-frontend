@@ -13,9 +13,6 @@ import { Zap, Sparkles, Gem, Crown, Flame, Infinity, Coins } from "lucide-react"
 export default function Content() {
   const [activeTab, setActiveTab] = useState('subscription');
 
-  // Credit pricing: 
-  // - Creating an AI girl costs 350 credits (5 AI videos + photo + visibility)
-  // - Each message costs ~0.25 credits (1 credit = ~4 messages)
 
   const subscriptionPlans = [
     {
@@ -102,10 +99,10 @@ export default function Content() {
           <Coins className="w-5 h-5 text-red-400" />
         </motion.div>
         <DialogTitle className="text-3xl md:text-4xl font-bold text-white">
-          Get Credits
+          Premium Subscription
         </DialogTitle>
         <p className="text-white/40 mt-2 text-sm max-w-md mx-auto">
-          Credits = AI generation cost. 350 credits = 1 AI girl (5 videos + photo + visibility)
+          Get unlimited messages and 1 free AI Girlfriend creation per month!
         </p>
       </div>
 
@@ -114,16 +111,7 @@ export default function Content() {
       {/* Tab Navigation */}
       <div className="flex justify-center mb-6 px-4">
         <div className="flex bg-white/5 rounded-full p-1 border border-white/10">
-          <button
-            onClick={() => setActiveTab('subscription')}
-            className={`px-6 py-2.5 cursor-pointer rounded-full text-sm font-bold transition-all ${
-              activeTab === 'subscription' 
-                ? 'bg-red-800 text-white shadow-lg' 
-                : 'text-white/40 hover:text-white'
-            }`}
-          >
-            Monthly Plans
-          </button>
+
           <button
             onClick={() => setActiveTab('one-time')}
             className={`px-6 py-2.5 cursor-pointer rounded-full text-sm font-bold transition-all ${
@@ -193,7 +181,7 @@ export default function Content() {
                     }`}
                     onClick={() => window.location = plan.link}
                   >
-                    Get {plan.credits}
+                    Subscribe
                   </Button>
                 </CardContent>
               </div>

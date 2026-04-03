@@ -19,6 +19,7 @@ import { Sparkles, Lock, Star, Heart } from "lucide-react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Dialog } from "@/components/ui/dialog";
 import Content from "@/components/Content";
+import DialogMessageLimit from "@/components/DialogMessageLimit";
 import { useAuthFetch } from "@/utils/authFetch";
 import { useLayoutContext } from "@/components/LayoutContext";
 
@@ -37,7 +38,10 @@ export default function ChatPage() {
     setMessagesRemaining: setContextMessagesRemaining,
     updateGuestConversation,
     addGuestMessage,
-    guestConversations
+    guestConversations,
+    premium,
+    messagesUsed,
+    setMessagesUsed
   } = useLayoutContext();
 
   const [newMessage, setNewMessage] = useState("");
@@ -52,6 +56,7 @@ export default function ChatPage() {
   const [messagesRemaining, setMessagesRemaining] = useState(contextMessagesRemaining);
   const [isGuest, setIsGuest] = useState(contextIsGuest);
   const [showLimitExceeded, setShowLimitExceeded] = useState(false);
+  const [limitErrorMessage, setLimitErrorMessage] = useState("Message limit reached. Upgrade to premium for unlimited messages.");
   
   // Sync with context
   useEffect(() => {
@@ -286,6 +291,18 @@ export default function ChatPage() {
       return;
     }
 
+    // Check if logged-in non-premium user has reached message limit
+    // premium is { isActive: bool, expiresAt: string | null }
+    // messagesRemaining can be number or "unlimited"
+    const isPremiumActive = premium?.isActive;
+    const hasUnlimitedMessages = messagesRemaining === "unlimited";
+    const hasMessagesLeft = typeof messagesRemaining === "number" && messagesRemaining > 0;
+    
+    if (!isPremiumActive && !hasUnlimitedMessages && !hasMessagesLeft && !isGuest && isLoggedIn) {
+      setShowLimitExceeded(true);
+      return;
+    }
+
     // Use id directly as chatbotId
     const chatbotId = id;
     
@@ -307,7 +324,19 @@ export default function ChatPage() {
       );
 
       if (res.status === 403) {
-        setOpen(true);
+        // Check the response to determine if it's message limit or credits limit
+        try {
+          const errorData = await res.json();
+          if (errorData.message?.includes("Message limit") || errorData.message?.includes("message")) {
+            // Show message limit dialog instead of credits dialog
+            setLimitErrorMessage(errorData.message || "Message limit reached. Upgrade to premium for unlimited messages.");
+            setShowLimitExceeded(true);
+          } else {
+            setOpen(true); // Show credits/premium dialog
+          }
+        } catch (e) {
+          setOpen(true); // Default to credits dialog
+        }
         setMessages([]);
         return;
       }
@@ -346,8 +375,18 @@ export default function ChatPage() {
       
       // Handle error type (e.g., limit exceeded)
       if (data.type === "error") {
-    setShowLimitExceeded(true);
+        // Use error message from API or fallback to default
+        setLimitErrorMessage(data.message || "Message limit reached. Upgrade to premium for unlimited messages.");
+        setShowLimitExceeded(true);
         setIsLoading(false);
+        // Update message counts from error response if available
+        if (data.messagesUsed !== undefined) {
+          setMessagesUsed(data.messagesUsed);
+        }
+        if (data.messagesRemaining !== undefined) {
+          setMessagesRemaining(data.messagesRemaining);
+          setContextMessagesRemaining(data.messagesRemaining);
+        }
         return;
       }
       
@@ -390,6 +429,14 @@ export default function ChatPage() {
             { id: reply._id, text: reply.content, sender: "them" },
           ]);
         }
+        // Update message counts from response
+        if (data.messagesUsed !== undefined) {
+          setMessagesUsed(data.messagesUsed);
+        }
+        if (data.messagesRemaining !== undefined) {
+          setMessagesRemaining(data.messagesRemaining);
+          setContextMessagesRemaining(data.messagesRemaining);
+        }
       }
     } finally {
       setIsLoading(false);
@@ -431,6 +478,15 @@ export default function ChatPage() {
       <Dialog open={open} onOpenChange={setOpen}>
         <Content />
       </Dialog>
+
+      {/* Message Limit Dialog - separate from Content dialog which is for credits */}
+      <DialogMessageLimit 
+        open={showLimitExceeded} 
+        onOpenChange={setShowLimitExceeded}
+        messagesUsed={messagesUsed || 0}
+        messageLimit={20}
+        onUpgrade={() => window.location = 'https://buy.stripe.com/bJedR87f4aTTgQK5pd6sw01'}
+      />
 
 
 

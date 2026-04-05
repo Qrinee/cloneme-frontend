@@ -195,7 +195,8 @@ export default function ChatPage() {
     const data = await res.json();
     if (data.type === "error") {
       if (!isLoggedIn && data.message && data.message.includes('Limit exceeded')) {
-        setShowLimitExceeded(true);
+        setLimitErrorMessage(data.message);
+        setShowLoginDialog(true);
         setIsGuest(true);
         setContextIsGuest(true);
         setMessagesRemaining(0);
@@ -209,18 +210,30 @@ export default function ChatPage() {
       setContextIsGuest(true);
       setMessagesRemaining(data.messagesRemaining);
       setContextMessagesRemaining(data.messagesRemaining);
-      if (data.messages && Array.isArray(data.messages)) {
-        const loadedMessages = data.messages.map((m) => ({
-          id: m._id,
-          text: m.content,
-          sender: m.role === "user" ? "me" : "them",
-          type: m.type,
-          isLocked: m.isLocked,
-          price: m.price,
-          mediaUrl: m.mediaUrl
-        }));
-        setMessages(loadedMessages);
-        updateGuestConversation(chatbotId, loadedMessages, data.messagesRemaining);
+      
+      const messagesSource = data.messages || (data.chat && data.chat.messages);
+      
+      if (messagesSource && Array.isArray(messagesSource)) {
+        const uniqueMessages = [];
+        const seenIds = new Set();
+        
+        messagesSource.forEach((m, index) => {
+          const mId = m._id || `remote-${index}`;
+          if (!seenIds.has(mId)) {
+            seenIds.add(mId);
+            uniqueMessages.push({
+              id: mId,
+              text: m.content,
+              sender: m.role === "user" ? "me" : "them",
+              type: m.type,
+              isLocked: m.isLocked,
+              price: m.price,
+              mediaUrl: m.mediaUrl
+            });
+          }
+        });
+        setMessages(uniqueMessages);
+        updateGuestConversation(chatbotId, uniqueMessages, data.messagesRemaining);
       }
       if (data.chatbot) {
         setCurrentChatbot({
@@ -236,17 +249,25 @@ export default function ChatPage() {
     
     setIsGuest(false);
     if (data.chat) {
-      setMessages(
-        data.chat.messages.map((m) => ({
-          id: m._id,
-          text: m.content,
-          sender: m.role === "user" ? "me" : "them",
-          type: m.type,
-          isLocked: m.isLocked,
-          price: m.price,
-          mediaUrl: m.mediaUrl
-        }))
-      );
+      const uniqueMessages = [];
+      const seenIds = new Set();
+      
+      data.chat.messages.forEach((m, index) => {
+        const mId = m._id || `remote-${index}`;
+        if (!seenIds.has(mId)) {
+          seenIds.add(mId);
+          uniqueMessages.push({
+            id: mId,
+            text: m.content,
+            sender: m.role === "user" ? "me" : "them",
+            type: m.type,
+            isLocked: m.isLocked,
+            price: m.price,
+            mediaUrl: m.mediaUrl
+          });
+        }
+      });
+      setMessages(uniqueMessages);
     }
     if (data.chatbot) {
       setCurrentChatbot({
@@ -260,7 +281,8 @@ export default function ChatPage() {
     
     if (chatbotId) {
       try {
-        const progressRes = await authFetch(`${import.meta.env.VITE_URL}/api/chats/${chatbotId}/progress`);
+        const apiUrl = import.meta.env.VITE_API_URL || '/api/v1';
+        const progressRes = await authFetch(`${apiUrl}/girlfriends/${chatbotId}/progress`);
         if (progressRes.ok) {
           const progressData = await progressRes.json();
           if (progressData.type === "success") {
@@ -278,7 +300,8 @@ export default function ChatPage() {
     if (!newMessage.trim()) return;
 
     if (isGuest && !isLoggedIn && messagesRemaining <= 0) {
-      setShowLimitExceeded(true);
+      setLimitErrorMessage("Limit exceeded (5 messages). Please log in to continue chatting.");
+      setShowLoginDialog(true);
       setIsTyping(false);
       return;
     }
@@ -316,7 +339,10 @@ export default function ChatPage() {
       if (res.status === 403) {
         try {
           const errorData = await res.json();
-          if (errorData.message?.includes("Message limit") || errorData.message?.includes("message")) {
+          if (errorData.message?.includes("Limit exceeded") || errorData.message?.toLowerCase().includes("log in") || errorData.message?.toLowerCase().includes("login")) {
+            setLimitErrorMessage(errorData.message);
+            setShowLoginDialog(true);
+          } else if (errorData.message?.includes("Message limit") || errorData.message?.includes("message")) {
             setLimitErrorMessage(errorData.message || "Message limit reached. Upgrade to premium for unlimited messages.");
             setShowLimitExceeded(true);
           } else {
@@ -364,8 +390,13 @@ export default function ChatPage() {
       }
 
       if (data.type === "error" && !isLoggedIn) {
-        setLimitErrorMessage(data.message || "Message limit reached. Upgrade to premium for unlimited messages.");
-        setShowLimitExceeded(true);
+        const errorMsg = data.message || "Message limit reached. Upgrade to premium for unlimited messages.";
+        setLimitErrorMessage(errorMsg);
+        if (errorMsg.toLowerCase().includes("log in") || errorMsg.toLowerCase().includes("login") || errorMsg.includes("Limit exceeded")) {
+          setShowLoginDialog(true);
+        } else {
+          setShowLimitExceeded(true);
+        }
         setIsLoading(false);
         setIsTyping(false);
         if (data.messagesUsed !== undefined) setMessagesUsed(data.messagesUsed);
@@ -381,18 +412,29 @@ export default function ChatPage() {
         setContextIsGuest(true);
         setMessagesRemaining(data.messagesRemaining);
         setContextMessagesRemaining(data.messagesRemaining);
-        if (data.messages && Array.isArray(data.messages)) {
-          const newMessages = data.messages.map((m) => ({
-            id: m._id,
-            text: m.content,
-            sender: m.role === "user" ? "me" : "them",
-            type: m.type,
-            isLocked: m.isLocked,
-            price: m.price,
-            mediaUrl: m.mediaUrl
-          }));
-          setMessages(newMessages);
-          updateGuestConversation(chatbotId, newMessages, data.messagesRemaining);
+        
+        const messagesSource = data.messages || (data.chat && data.chat.messages);
+        if (messagesSource && Array.isArray(messagesSource)) {
+          const uniqueMessages = [];
+          const seenIds = new Set();
+          
+          messagesSource.forEach((m, index) => {
+            const mId = m._id || `remote-${index}`;
+            if (!seenIds.has(mId)) {
+              seenIds.add(mId);
+              uniqueMessages.push({
+                id: mId,
+                text: m.content,
+                sender: m.role === "user" ? "me" : "them",
+                type: m.type,
+                isLocked: m.isLocked,
+                price: m.price,
+                mediaUrl: m.mediaUrl
+              });
+            }
+          });
+          setMessages(uniqueMessages);
+          updateGuestConversation(chatbotId, uniqueMessages, data.messagesRemaining);
         }
         setIsTyping(false);
         return;
@@ -400,7 +442,7 @@ export default function ChatPage() {
       
       setIsGuest(false);
       if (data.type === "success" && data.chat) {
-        const previousMessageCount = messages.filter(m => m.sender === "me").length + messages.filter(m => m.sender === "them").length; 
+
         // Note: this count logic is tricky because of animations, better slice from actual data
         const newAiMessages = data.chat.messages.slice(data.chat.messages.length - (data.newAiMessagesCount || 1)).filter(m => m.role !== "user");
         const newAiMessagesCount = data.newAiMessagesCount || newAiMessages.length;
@@ -427,8 +469,8 @@ export default function ChatPage() {
                 setIsTyping(false);
               }
             }, delay);
-            const typingSpeed = 3 + Math.random() * 2;
-            delay += Math.max(800, (reply.content.length / typingSpeed * 1000));
+            const typingSpeed = 3 + Math.random();
+            delay += Math.max(500, (reply.content.length / typingSpeed * 500));
           });
         } else {
           setIsTyping(false);

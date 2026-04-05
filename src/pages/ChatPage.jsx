@@ -23,7 +23,6 @@ import DialogMessageLimit from "@/components/DialogMessageLimit";
 import { useAuthFetch } from "@/utils/authFetch";
 import { useLayoutContext } from "@/components/LayoutContext";
 import LoginRequiredDialog from "@/components/LoginRequiredDialog";
-import toast from "react-hot-toast";
 
 export default function ChatPage() {
   const { id } = useParams();
@@ -518,17 +517,11 @@ export default function ChatPage() {
           // Scroll to bottom will happen via useEffect
         }, 1500);
       } else {
-        setIsTyping(false);
-        if (data.message?.toLowerCase().includes("credits") || data.message?.toLowerCase().includes("points")) {
-          setOpen(true); // Open credits dialog
-        } else {
-          toast.error(data.message);
-        }
+        console.error("Media error:", data.message);
       }
     } catch (e) {
       console.error("Error requesting media:", e);
       setIsTyping(false);
-      toast.error("Failed to request media");
     } finally {
       setIsLoading(false);
       setRequestingMedia(null);

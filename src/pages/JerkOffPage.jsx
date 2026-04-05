@@ -264,19 +264,23 @@ export default function JerkOffPage() {
         setShowLoginDialog(true);
         setIsLoading(false);
         setIsTyping(false);
+        if (data.messagesUsed !== undefined) setMessagesUsed(data.messagesUsed);
         return;
       }
 
-      if (data.type === "error" && !isLoggedIn) {
-        const errorMsg = data.message || "You've used all your guest messages.";
+      if (data.type === "error") {
+        const errorMsg = data.message || "Message limit reached. Upgrade to premium for unlimited messages.";
         setLimitErrorMessage(errorMsg);
-        if (errorMsg.toLowerCase().includes("log in") || errorMsg.toLowerCase().includes("login")) {
+        
+        if (!isLoggedIn && (errorMsg.toLowerCase().includes("log in") || errorMsg.toLowerCase().includes("login") || errorMsg.includes("Limit exceeded"))) {
           setShowLoginDialog(true);
         } else {
           setShowLimitExceeded(true);
         }
+        
         setIsLoading(false);
         setIsTyping(false);
+        if (data.messagesUsed !== undefined) setMessagesUsed(data.messagesUsed);
         return;
       }
       

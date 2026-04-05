@@ -345,6 +345,7 @@ export default function ChatPage() {
           } else if (errorData.message?.includes("Message limit") || errorData.message?.includes("message")) {
             setLimitErrorMessage(errorData.message || "Message limit reached. Upgrade to premium for unlimited messages.");
             setShowLimitExceeded(true);
+            if (errorData.messagesUsed !== undefined) setMessagesUsed(errorData.messagesUsed);
           } else {
             setOpen(true);
           }
@@ -389,14 +390,16 @@ export default function ChatPage() {
         return;
       }
 
-      if (data.type === "error" && !isLoggedIn) {
+      if (data.type === "error") {
         const errorMsg = data.message || "Message limit reached. Upgrade to premium for unlimited messages.";
         setLimitErrorMessage(errorMsg);
-        if (errorMsg.toLowerCase().includes("log in") || errorMsg.toLowerCase().includes("login") || errorMsg.includes("Limit exceeded")) {
+        
+        if (!isLoggedIn && (errorMsg.toLowerCase().includes("log in") || errorMsg.toLowerCase().includes("login") || errorMsg.includes("Limit exceeded"))) {
           setShowLoginDialog(true);
         } else {
           setShowLimitExceeded(true);
         }
+        
         setIsLoading(false);
         setIsTyping(false);
         if (data.messagesUsed !== undefined) setMessagesUsed(data.messagesUsed);

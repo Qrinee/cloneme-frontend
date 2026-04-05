@@ -4,12 +4,8 @@ import { useAuthFetch } from "@/utils/authFetch";
 import { useLayoutContext } from "@/components/LayoutContext";
 import Layout from "@/components/Layout";
 import DialogMessageLimit from "@/components/DialogMessageLimit";
-import DialogGuestLimit from "@/components/DialogGuestLimit";
-
-import JerkOffVideo from "./jerkoff/JerkOffVideo";
-import ChatOverlay from "./jerkoff/ChatOverlay";
 import ActionPanel from "./jerkoff/ActionPanel";
-import LoginRequiredDialog from "./jerkoff/LoginRequiredDialog";
+import LoginRequiredDialog from "@/components/LoginRequiredDialog";
 import { LevelUpNotification, UnlockModal } from "./jerkoff/Modals";
 
 export default function JerkOffPage() {
@@ -250,7 +246,8 @@ export default function JerkOffPage() {
       const data = await res.json();
       
       if (res.status === 403 && data.message?.includes("Limit exceeded")) {
-        setShowGuestLimit(true);
+        setLimitErrorMessage(data.message);
+        setShowLoginDialog(true);
         setIsLoading(false);
         setIsTyping(false);
         return;
@@ -367,10 +364,10 @@ export default function JerkOffPage() {
         onUpgrade={() => window.location = 'https://buy.stripe.com/bJedR87f4aTTgQK5pd6sw01'}
       />
 
-      <DialogGuestLimit 
-        open={showGuestLimit} 
-        onOpenChange={setShowGuestLimit}
-        onLogin={() => window.location = '/auth'}
+      <LoginRequiredDialog 
+        open={showLoginDialog} 
+        onClose={() => setShowLoginDialog(false)}
+        message={limitErrorMessage}
       />
       
       {girls && (

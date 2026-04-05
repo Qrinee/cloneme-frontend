@@ -22,7 +22,7 @@ import Content from "@/components/Content";
 import DialogMessageLimit from "@/components/DialogMessageLimit";
 import { useAuthFetch } from "@/utils/authFetch";
 import { useLayoutContext } from "@/components/LayoutContext";
-import DialogGuestLimit from "@/components/DialogGuestLimit";
+import LoginRequiredDialog from "@/components/LoginRequiredDialog";
 import toast from "react-hot-toast";
 
 export default function ChatPage() {
@@ -66,7 +66,7 @@ export default function ChatPage() {
   const [showLimitExceeded, setShowLimitExceeded] = useState(false);
   const [limitErrorMessage, setLimitErrorMessage] = useState("Message limit reached. Upgrade to premium for unlimited messages.");
   const [requestingMedia, setRequestingMedia] = useState(null); // 'photo' or 'video'
-  const [showGuestLimit, setShowGuestLimit] = useState(false);
+  const [showLoginDialog, setShowLoginDialog] = useState(false);
   
   // Sync with context
   useEffect(() => {
@@ -357,7 +357,8 @@ export default function ChatPage() {
       const data = await res.json();
       
       if (res.status === 403 && data.message?.includes("Limit exceeded")) {
-        setShowGuestLimit(true);
+        setLimitErrorMessage(data.message);
+        setShowLoginDialog(true);
         setIsLoading(false);
         setIsTyping(false);
         return;
@@ -566,10 +567,10 @@ export default function ChatPage() {
         onUpgrade={() => window.location = 'https://buy.stripe.com/bJedR87f4aTTgQK5pd6sw01'}
       />
 
-      <DialogGuestLimit 
-        open={showGuestLimit} 
-        onOpenChange={setShowGuestLimit}
-        onLogin={() => navigate('/auth')}
+      <LoginRequiredDialog 
+        open={showLoginDialog} 
+        onClose={() => setShowLoginDialog(false)}
+        message={limitErrorMessage}
       />
 
       <div className="flex flex-1 bg-[#0a0a0f] text-white overflow-hidden h-[calc(100dvh-64px-80px)] md:h-full">

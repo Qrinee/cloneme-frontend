@@ -1,6 +1,7 @@
 import { Lock } from "lucide-react";
 
 export default function LoginRequiredDialog({ open, onClose, message }) {
+  if (!open) return null;
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-[#0a0a0f] border border-white/10 rounded-[2rem] p-8 max-w-md w-full text-center">

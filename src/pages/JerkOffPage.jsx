@@ -7,6 +7,8 @@ import DialogMessageLimit from "@/components/DialogMessageLimit";
 import ActionPanel from "./jerkoff/ActionPanel";
 import LoginRequiredDialog from "@/components/LoginRequiredDialog";
 import { LevelUpNotification, UnlockModal } from "./jerkoff/Modals";
+import JerkOffVideo from "./jerkoff/JerkOffVideo";
+import ChatOverlay from "./jerkoff/ChatOverlay";
 
 export default function JerkOffPage() {
   const { id } = useParams();
@@ -160,17 +162,29 @@ export default function JerkOffPage() {
       }
       
       if (data.type === "success") {
-        setMessages(data.chat.messages.map((m, index) => ({
-          id: m._id || index,
-          text: m.content,
-          sender: m.role === "user" ? "user" : "girl",
-          time: m.timestamp ? new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'now'
-        })));
+        const rawMessages = data.chat.messages || [];
+        const uniqueMessages = [];
+        const seenIds = new Set();
+        
+        rawMessages.forEach((m, index) => {
+          const id = m._id || `remote-${index}`;
+          if (!seenIds.has(id)) {
+            seenIds.add(id);
+            uniqueMessages.push({
+              id: id,
+              text: m.content,
+              sender: m.role === "user" ? "user" : "girl",
+              time: m.timestamp ? new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'now'
+            });
+          }
+        });
+        setMessages(uniqueMessages);
       }
       
       // Fetch relationship progress
       try {
-        const progressRes = await authFetch(`${apiUrl}/api/chats/${id}/progress`);
+        const apiUrl = import.meta.env.VITE_API_URL || '/api/v1';
+        const progressRes = await authFetch(`${apiUrl}/girlfriends/${id}/progress`);
         if (progressRes.ok) {
           const progressData = await progressRes.json();
           if (progressData.type === "success") {

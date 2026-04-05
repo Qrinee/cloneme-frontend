@@ -13,9 +13,8 @@ export default function ActionButtons({ messages }) {
         const isUnlocked = userMessageCount >= btn.messagesNeeded;
 
         return (
-          <button
+          <div
             key={btn.id}
-            disabled={!isUnlocked}
             className={`w-full p-4 rounded-xl flex items-center justify-between transition-all duration-200 ${!isUnlocked
                 ? 'bg-transparent text-white/10 border border-white/5'
                 : 'bg-white/5 hover:bg-white/[0.08] text-white/90 border border-white/10'
@@ -41,14 +40,17 @@ export default function ActionButtons({ messages }) {
                 </div>
               ) : (
                 <button
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={(e) => {
+                    // Action logic here
+                    console.log("Playing action:", btn.label);
+                  }}
                   className="cursor-pointer p-1.5 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
                 >
                   <Play className="w-3 h-3 text-white/80 fill-current" />
                 </button>
               )}
             </div>
-          </button>
+          </div>
         );
       })}
     </div>

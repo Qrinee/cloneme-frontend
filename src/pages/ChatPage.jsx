@@ -559,7 +559,12 @@ export default function ChatPage() {
           // Scroll to bottom will happen via useEffect
         }, 1500);
       } else {
-        console.error("Media error:", data.message);
+        if (data.message?.toLowerCase().includes("credits") || data.message?.toLowerCase().includes("points")) {
+          setOpen(true);
+        } else {
+          alert(data.message);
+        }
+        setIsTyping(false);
       }
     } catch (e) {
       console.error("Error requesting media:", e);

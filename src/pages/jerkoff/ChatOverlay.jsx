@@ -15,9 +15,9 @@ export default function ChatOverlay({
   chatContainerRef 
 }) {
   return (
-    <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-[#0a0a0f] via-[#0a0a0f]/40 to-transparent">
+    <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-[#0a0a0f] via-[#0a0a0f]/40 to-transparent">
       <div
-        className="relative max-h-[320px] overflow-y-auto custom-scrollbar space-y-3 mb-6 pr-2"
+        className="relative max-h-[180px] md:max-h-[320px] overflow-y-auto custom-scrollbar space-y-3 mb-4 md:mb-6 pr-2"
         ref={chatContainerRef}
       >
         {messages.map((msg, index) => {

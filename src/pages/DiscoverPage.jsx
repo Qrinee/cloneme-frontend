@@ -128,7 +128,7 @@ export default function DiscoverPage() {
   };
 
   // Container height based on device
-  const containerHeight = isMobile ? 'h-[calc(100vh-64px)]' : 'h-[85vh]';
+  const containerHeight = isMobile ? 'h-[100dvh]' : 'h-[85vh]';
 
   if (isLoading) {
     return (
@@ -221,8 +221,8 @@ export default function DiscoverPage() {
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f] via-transparent to-[#0a0a0f]/20"></div>
                   </div>
 
-                  <div className="relative h-full flex flex-col justify-end p-6 ">
-                    <div className="bg-white/5 backdrop-blur-2xl rounded-[2.5rem] p-6 border border-white/5 mb-4">
+                  <div className={`relative h-full flex flex-col justify-end ${isMobile ? 'p-4 pb-32' : 'p-6'}`}>
+                    <div className={`bg-white/5 backdrop-blur-2xl border border-white/5 mb-4 ${isMobile ? 'rounded-[1.5rem] p-4' : 'rounded-[2.5rem] p-6'}`}>
                       {/* Profile info */}
                       <div className="flex items-center gap-4 mb-4">
                         <div className="relative">
@@ -233,7 +233,7 @@ export default function DiscoverPage() {
                           <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-[#0a0a0f]" />
                         </div>
                         <div className="flex-1">
-                          <h3 className="text-white font-bold text-2xl tracking-tight">
+                          <h3 className={`text-white font-bold tracking-tight ${isMobile ? 'text-xl' : 'text-2xl'}`}>
                             {profile.name}, {profile.age}
                           </h3>
                           <p className="text-[#c7c7c7] text-[10px] font-bold uppercase tracking-widest">{profile.relationship || "Stranger"}</p>
@@ -297,13 +297,13 @@ export default function DiscoverPage() {
                     )}
                   </div>
 
-                  {/* Vertical Progress Bar */}
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-2">
+                  {/* Vertical Progress Bar - Hide on mobile if it overlaps too much or make smaller */}
+                  <div className={`absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-2 ${isMobile ? 'scale-75' : ''}`}>
                     {girlfriends.map((_, idx) => (
                       <div
                         key={idx}
                         className={`w-1 rounded-full transition-all duration-500 ${idx === currentIndex
-                          ? 'h-8 bg-white'
+                          ? (isMobile ? 'h-6 bg-white' : 'h-8 bg-white')
                           : 'h-1.5 bg-white/10'
                           }`}
                       />

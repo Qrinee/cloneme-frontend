@@ -360,10 +360,10 @@ export default function JerkOffPage() {
       />
       
       {girls && (
-        <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <div className="flex-row-reverse w-full flex  md:flex-row justify-center items-center gap-0 bg-[#0a0a0f]" style={{ height: '85vh' }}>
+        <div className="min-h-[100dvh] flex flex-col items-center bg-[#0a0a0f]">
+          <div className="flex flex-col md:flex-row w-full max-w-[1400px] h-full md:h-[85vh] justify-center items-stretch gap-0">
             {/* Main Content - Video with Chat */}
-            <div className="max-w-[550px] w-full md:w-auto relative flex flex-col h-full md:h-full order-1 border-x border-white/5">
+            <div className="flex-1 relative flex flex-col h-[60dvh] md:h-full order-1 border-x border-white/5">
               <JerkOffVideo
                 girlfriend={girls.girlfriend}
                 videoRef={videoRef}

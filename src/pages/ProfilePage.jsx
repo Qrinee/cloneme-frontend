@@ -226,7 +226,7 @@ export default function ProfilePage() {
             {/* Main Content Area */}
             <div className="md:col-span-2 space-y-6">
               <AnimatePresence mode="wait">
-                {activeTab === "general" ? (
+                {activeTab === "general" && (
                   <motion.div
                     key="general"
                     initial={{ opacity: 0, x: 20 }}
@@ -335,7 +335,9 @@ export default function ProfilePage() {
                       </CardContent>
                     </Card>
                   </motion.div>
-                ) : (
+                )}
+                
+                {activeTab === "security" && (
                   <motion.div
                     key="security"
                     initial={{ opacity: 0, x: 20 }}

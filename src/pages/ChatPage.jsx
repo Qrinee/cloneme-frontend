@@ -552,7 +552,7 @@ export default function ChatPage() {
         onUpgrade={() => window.location = 'https://buy.stripe.com/bJedR87f4aTTgQK5pd6sw01'}
       />
 
-      <div className="flex h-screen bg-[#0a0a0f] text-white overflow-hidden">
+      <div className="flex flex-1 bg-[#0a0a0f] text-white overflow-hidden h-[calc(100dvh-64px-80px)] md:h-full">
         {/* LEFT – CHAT LIST */}
         <div className="hidden md:flex w-80 border-r border-white/5 flex-col bg-[#0a0a0f] h-full overflow-hidden">
           <div className="p-6">
@@ -619,7 +619,7 @@ export default function ChatPage() {
             </div>
           ) : (
             <>
-              <div className="px-6 py-4 border-b border-white/5 flex flex-col gap-4">
+              <div className="px-4 md:px-6 py-3 md:py-4 border-b border-white/5 flex flex-col gap-2 md:gap-4 bg-[#0a0a0f]/80 backdrop-blur-md sticky top-0 z-20">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <button className="md:hidden p-2 hover:bg-white/5 rounded-xl" onClick={() => navigate("/")}><FaArrowLeft size={18} /></button>

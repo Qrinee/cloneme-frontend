@@ -2,7 +2,7 @@ import ActionButtons from "./ActionButtons";
 
 export default function ActionPanel({ messages, relationshipLevel, relationshipXP, xpPerLevel, progressPercent }) {
   return (
-    <div className="w-full md:w-[320px] flex flex-col bg-[#0a0a0f] border-l border-white/5 flex-1 md:h-full">
+    <div className="w-full md:w-[320px] flex flex-col bg-[#0a0a0f] border-l border-white/5 flex-1 md:flex-none md:h-full">
       {/* Header */}
       <div className="p-6">
         <h3 className="text-white/90 font-bold text-lg tracking-tight">Interactions</h3>

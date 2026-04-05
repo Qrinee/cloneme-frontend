@@ -15,7 +15,7 @@ export default function ChatOverlay({
   chatContainerRef 
 }) {
   return (
-    <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-[#0a0a0f] via-[#0a0a0f]/40 to-transparent">
+    <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-[#0a0a0f] via-[#0a0a0f]/40 to-transparent z-20">
       <div
         className="relative max-h-[180px] md:max-h-[320px] overflow-y-auto custom-scrollbar space-y-3 mb-4 md:mb-6 pr-2"
         ref={chatContainerRef}
@@ -55,15 +55,11 @@ export default function ChatOverlay({
         {isTyping && (
           <div className="flex justify-start">
             <div className="bg-white/5 backdrop-blur-xl border border-white/5 px-4 py-2.5 rounded-2xl rounded-bl-none">
-              {incomingAiMessages > 1 ? (
-                <span className="text-xs text-white/40">AI pisze... ({incomingAiMessages} wiadomości)</span>
-              ) : (
-                <div className="flex gap-1">
-                  <div className="w-1.5 h-1.5 bg-white/20 rounded-full animate-bounce" />
-                  <div className="w-1.5 h-1.5 bg-white/20 rounded-full animate-bounce [animation-delay:0.2s]" />
-                  <div className="w-1.5 h-1.5 bg-white/20 rounded-full animate-bounce [animation-delay:0.4s]" />
-                </div>
-              )}
+              <div className="flex gap-1.5 px-1 py-1">
+                <div className="w-1.5 h-1.5 bg-white/40 rounded-full animate-bounce [animation-duration:1s]" />
+                <div className="w-1.5 h-1.5 bg-white/40 rounded-full animate-bounce [animation-duration:1s] [animation-delay:0.2s]" />
+                <div className="w-1.5 h-1.5 bg-white/40 rounded-full animate-bounce [animation-duration:1s] [animation-delay:0.4s]" />
+              </div>
             </div>
           </div>
         )}

@@ -65,7 +65,7 @@ export default function JerkOffPage() {
 
   useEffect(() => {
     if (id) {
-      // Use VITE_API_URL consistently
+      // Direct use of VITE_API_URL for girlfriend info
       const apiUrl = import.meta.env.VITE_API_URL || '/api/v1';
       fetch(`${apiUrl}/girlfriends/${id}`)
         .then(res => res.json())
@@ -111,8 +111,8 @@ export default function JerkOffPage() {
 
   const fetchChatMessages = async () => {
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || '/api/v1';
-      const res = await authFetch(`${apiUrl}/chats/${id}`);
+      const baseUrl = import.meta.env.VITE_URL || '';
+      const res = await authFetch(`${baseUrl}/api/chats/${id}`);
       
       if (res.status === 401) {
         if (!isLoggedIn) {
@@ -172,8 +172,7 @@ export default function JerkOffPage() {
       
       // Fetch relationship progress
       try {
-        const apiUrl = import.meta.env.VITE_API_URL || '/api/v1';
-        const progressRes = await authFetch(`${apiUrl}/chats/${id}/progress`);
+        const progressRes = await authFetch(`${apiUrl}/api/chats/${id}/progress`);
         if (progressRes.ok) {
           const progressData = await progressRes.json();
           if (progressData.type === "success") {
@@ -209,9 +208,9 @@ export default function JerkOffPage() {
     setIncomingAiMessages(0);
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || '/api/v1';
+      const baseUrl = import.meta.env.VITE_URL || '';
       const res = await authFetch(
-        `${apiUrl}/chats/${id}/messages`,
+        `${baseUrl}/api/chats/${id}/messages`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -360,10 +359,10 @@ export default function JerkOffPage() {
       />
       
       {girls && (
-        <div className="min-h-[100dvh] flex flex-col items-center bg-[#0a0a0f]">
-          <div className="flex flex-col md:flex-row w-full max-w-[1400px] h-full md:h-[85vh] justify-center items-stretch gap-0">
+        <div className="min-h-[100dvh] flex flex-col items-center justify-center bg-[#0a0a0f]">
+          <div className="flex flex-col md:flex-row w-full max-w-[1400px] h-full md:h-[85vh] justify-center items-center md:items-stretch gap-0">
             {/* Main Content - Video with Chat */}
-            <div className="flex-1 relative flex flex-col h-[60dvh] md:h-full order-1 border-x border-white/5">
+            <div className="w-full md:w-[550px] relative flex flex-col h-[60dvh] md:h-full border-x border-white/5">
               <JerkOffVideo
                 girlfriend={girls.girlfriend}
                 videoRef={videoRef}

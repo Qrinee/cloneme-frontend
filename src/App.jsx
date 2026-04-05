@@ -11,16 +11,14 @@ export default function App() {
   const [showLogin, setShowLogin] = useState(false);
   const { showTour, startTour, endTour } = useOnboardingTour();
 
-  // Handle demo button click
 
-  // Change title when user loses focus
   useEffect(() => {
     const originalTitle = document.title;
-    
+
     const handleBlur = () => {
       document.title = "Come back, sweety! 💕";
     };
-    
+
     const handleFocus = () => {
       document.title = originalTitle;
     };
@@ -42,8 +40,8 @@ export default function App() {
       <LoginModal open={showLogin} onClose={() => setShowLogin(false)} />
       <HomePage />
       <DemoFloatingButton />
-      <OnboardingTour 
-        isOpen={showTour} 
+      <OnboardingTour
+        isOpen={showTour}
         onComplete={endTour}
         targetElements={{
           discover: 'discover-link',

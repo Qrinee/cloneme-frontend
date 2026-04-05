@@ -22,12 +22,11 @@ export default function HomePage() {
             <div className="md:col-span-2">
               <h3 className="text-2xl font-bold text-white mb-4">ClonMe</h3>
               <p className="text-white/30 max-w-sm mb-6">
-Clonme is a AI girlfriend app that lets you design your own personalized virtual companion or instantly connect with lifelike AI characters. It offers immersive, unrestricted fantasy experiences while keeping everything private and secure.
+                Clonme is a AI girlfriend app that lets you design your own personalized virtual companion or instantly connect with lifelike AI characters. It offers immersive, unrestricted fantasy experiences while keeping everything private and secure.
               </p>
 
             </div>
 
-            {/* Links */}
             <div>
               <h4 className="text-white font-bold mb-4">Platform</h4>
               <ul className="space-y-3">

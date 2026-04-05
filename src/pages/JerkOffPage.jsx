@@ -65,7 +65,9 @@ export default function JerkOffPage() {
 
   useEffect(() => {
     if (id) {
-      fetch(import.meta.env.VITE_API_URL + '/girlfriends/' + id)
+      // Use VITE_API_URL consistently
+      const apiUrl = import.meta.env.VITE_API_URL || '/api/v1';
+      fetch(`${apiUrl}/girlfriends/${id}`)
         .then(res => res.json())
         .then(data => {
           setGirls(data);
@@ -109,14 +111,15 @@ export default function JerkOffPage() {
 
   const fetchChatMessages = async () => {
     try {
-      const res = await authFetch(`${import.meta.env.VITE_URL}/api/chats/${id}`);
+      const apiUrl = import.meta.env.VITE_API_URL || '/api/v1';
+      const res = await authFetch(`${apiUrl}/chats/${id}`);
       
       if (res.status === 401) {
         if (!isLoggedIn) {
           setIsGuest(true);
           setContextIsGuest(true);
-          setMessagesRemaining(10);
-          setContextMessagesRemaining(10);
+          setMessagesRemaining(5);
+          setContextMessagesRemaining(5);
         }
         try {
           const data = await res.json();
@@ -169,7 +172,8 @@ export default function JerkOffPage() {
       
       // Fetch relationship progress
       try {
-        const progressRes = await authFetch(`${import.meta.env.VITE_URL}/api/chats/${id}/progress`);
+        const apiUrl = import.meta.env.VITE_API_URL || '/api/v1';
+        const progressRes = await authFetch(`${apiUrl}/chats/${id}/progress`);
         if (progressRes.ok) {
           const progressData = await progressRes.json();
           if (progressData.type === "success") {
@@ -205,8 +209,9 @@ export default function JerkOffPage() {
     setIncomingAiMessages(0);
 
     try {
+      const apiUrl = import.meta.env.VITE_API_URL || '/api/v1';
       const res = await authFetch(
-        `${import.meta.env.VITE_URL}/api/chats/${id}/messages`,
+        `${apiUrl}/chats/${id}/messages`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -330,7 +335,8 @@ export default function JerkOffPage() {
 
   const handleAddFavorite = async () => {
     try {
-      await authFetch(`${import.meta.env.VITE_API_URL}/users/favorites`, {
+      const apiUrl = import.meta.env.VITE_API_URL || '/api/v1';
+      await authFetch(`${apiUrl}/users/favorites`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ girlfriendId: girls?.girlfriend?._id })

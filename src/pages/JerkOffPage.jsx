@@ -4,6 +4,7 @@ import { useAuthFetch } from "@/utils/authFetch";
 import { useLayoutContext } from "@/components/LayoutContext";
 import Layout from "@/components/Layout";
 import DialogMessageLimit from "@/components/DialogMessageLimit";
+import DialogGuestLimit from "@/components/DialogGuestLimit";
 
 import JerkOffVideo from "./jerkoff/JerkOffVideo";
 import ChatOverlay from "./jerkoff/ChatOverlay";
@@ -39,6 +40,7 @@ export default function JerkOffPage() {
   const [messagesRemaining, setMessagesRemaining] = useState(contextMessagesRemaining);
   const [isGuest, setIsGuest] = useState(contextIsGuest);
   const [showLimitExceeded, setShowLimitExceeded] = useState(false);
+  const [showGuestLimit, setShowGuestLimit] = useState(false);
   const [showLoginDialog, setShowLoginDialog] = useState(false);
   const [limitErrorMessage, setLimitErrorMessage] = useState("You've used all your guest messages. Log in to continue chatting without limits.");
   
@@ -247,6 +249,13 @@ export default function JerkOffPage() {
 
       const data = await res.json();
       
+      if (res.status === 403 && data.message?.includes("Limit exceeded")) {
+        setShowGuestLimit(true);
+        setIsLoading(false);
+        setIsTyping(false);
+        return;
+      }
+
       if (data.type === "error" && !isLoggedIn) {
         const errorMsg = data.message || "You've used all your guest messages.";
         setLimitErrorMessage(errorMsg);
@@ -356,6 +365,12 @@ export default function JerkOffPage() {
         messagesUsed={messagesUsed || 0}
         messageLimit={20}
         onUpgrade={() => window.location = 'https://buy.stripe.com/bJedR87f4aTTgQK5pd6sw01'}
+      />
+
+      <DialogGuestLimit 
+        open={showGuestLimit} 
+        onOpenChange={setShowGuestLimit}
+        onLogin={() => window.location = '/auth'}
       />
       
       {girls && (

@@ -22,6 +22,8 @@ import Content from "@/components/Content";
 import DialogMessageLimit from "@/components/DialogMessageLimit";
 import { useAuthFetch } from "@/utils/authFetch";
 import { useLayoutContext } from "@/components/LayoutContext";
+import DialogGuestLimit from "@/components/DialogGuestLimit";
+import toast from "react-hot-toast";
 
 export default function ChatPage() {
   const { id } = useParams();
@@ -63,6 +65,8 @@ export default function ChatPage() {
   const [isGuest, setIsGuest] = useState(contextIsGuest);
   const [showLimitExceeded, setShowLimitExceeded] = useState(false);
   const [limitErrorMessage, setLimitErrorMessage] = useState("Message limit reached. Upgrade to premium for unlimited messages.");
+  const [requestingMedia, setRequestingMedia] = useState(null); // 'photo' or 'video'
+  const [showGuestLimit, setShowGuestLimit] = useState(false);
   
   // Sync with context
   useEffect(() => {
@@ -352,7 +356,14 @@ export default function ChatPage() {
 
       const data = await res.json();
       
-      if (data.type === "error") {
+      if (res.status === 403 && data.message?.includes("Limit exceeded")) {
+        setShowGuestLimit(true);
+        setIsLoading(false);
+        setIsTyping(false);
+        return;
+      }
+
+      if (data.type === "error" && !isLoggedIn) {
         setLimitErrorMessage(data.message || "Message limit reached. Upgrade to premium for unlimited messages.");
         setShowLimitExceeded(true);
         setIsLoading(false);
@@ -479,12 +490,14 @@ export default function ChatPage() {
   };
 
   const handleRequestMedia = async (type = 'random') => {
-    if (isLoading) return;
+    if (isLoading || requestingMedia) return;
     setIsLoading(true);
+    setRequestingMedia(type);
     setIsTyping(true); // Show typing while generating
     try {
+      const baseUrl = import.meta.env.VITE_URL || '';
       const res = await authFetch(
-        `${import.meta.env.VITE_URL}/api/chats/${id}/request-media`,
+        `${baseUrl}/api/chats/${id}/request-media`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -517,6 +530,7 @@ export default function ChatPage() {
       toast.error("Failed to request media");
     } finally {
       setIsLoading(false);
+      setRequestingMedia(null);
     }
   };
 
@@ -550,6 +564,12 @@ export default function ChatPage() {
         messagesUsed={messagesUsed || 0}
         messageLimit={20}
         onUpgrade={() => window.location = 'https://buy.stripe.com/bJedR87f4aTTgQK5pd6sw01'}
+      />
+
+      <DialogGuestLimit 
+        open={showGuestLimit} 
+        onOpenChange={setShowGuestLimit}
+        onLogin={() => navigate('/auth')}
       />
 
       <div className="flex flex-1 bg-[#0a0a0f] text-white overflow-hidden h-[calc(100dvh-64px-80px)] md:h-full">
@@ -711,10 +731,15 @@ export default function ChatPage() {
                   <div className="flex gap-4 mb-4">
                     <button 
                       onClick={() => handleRequestMedia('photo')}
-                      className="flex-1 bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 backdrop-blur-md px-4 py-3 rounded-2xl text-[10px] font-bold text-white/80 transition-all flex flex-col items-center justify-center gap-1 group uppercase tracking-widest"
+                      disabled={isLoading || requestingMedia}
+                      className={`flex-1 bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 backdrop-blur-md px-4 py-3 rounded-2xl text-[10px] font-bold text-white/80 transition-all flex flex-col items-center justify-center gap-1 group uppercase tracking-widest ${isLoading || requestingMedia ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                     >
                       <div className="flex items-center gap-2">
-                        <Camera size={14} className="text-white/40 group-hover:text-pink-500 transition-colors" />
+                        {requestingMedia === 'photo' ? (
+                          <div className="w-3.5 h-3.5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                        ) : (
+                          <Camera size={14} className="text-white/40 group-hover:text-pink-500 transition-colors" />
+                        )}
                         Send a naughty photo 📸
                       </div>
                       <div className="text-[9px] text-white/30 flex items-center gap-1 font-medium">
@@ -723,10 +748,15 @@ export default function ChatPage() {
                     </button>
                     <button 
                       onClick={() => handleRequestMedia('video')}
-                      className="flex-1 bg-white/5 hover:bg-[#741818]/20 border border-white/5 hover:border-[#741818]/40 backdrop-blur-md px-4 py-3 rounded-2xl text-[10px] font-bold text-white/80 transition-all flex flex-col items-center justify-center gap-1 group uppercase tracking-widest"
+                      disabled={isLoading || requestingMedia}
+                      className={`flex-1 bg-white/5 hover:bg-[#741818]/20 border border-white/5 hover:border-[#741818]/40 backdrop-blur-md px-4 py-3 rounded-2xl text-[10px] font-bold text-white/80 transition-all flex flex-col items-center justify-center gap-1 group uppercase tracking-widest ${isLoading || requestingMedia ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                     >
                       <div className="flex items-center gap-2">
-                        <Play size={14} className="text-white/40 group-hover:text-red-500 transition-colors" />
+                        {requestingMedia === 'video' ? (
+                          <div className="w-3.5 h-3.5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                        ) : (
+                          <Play size={14} className="text-white/40 group-hover:text-red-500 transition-colors" />
+                        )}
                         Send a naughty video 🔥
                       </div>
                       <div className="text-[9px] text-white/30 flex items-center gap-1 font-medium">

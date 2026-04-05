@@ -13,6 +13,8 @@ export default function LoginPage() {
   const [form, setForm] = useState({});
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [verifyEmail, setVerifyEmail] = useState("");
+  const [verificationCode, setVerificationCode] = useState("");
 
   const variants = {
     hidden: { opacity: 0, y: 10 },
@@ -51,6 +53,13 @@ export default function LoginPage() {
 
       const data = await response.json();
 
+      if (response.status === 403 && data.requiresVerification) {
+        setVerifyEmail(data.email || form.email);
+        setView("verify");
+        setIsLoading(false);
+        return;
+      }
+
       if (!response.ok) {
         throw new Error(data.message || "Login failed");
       }
@@ -58,6 +67,41 @@ export default function LoginPage() {
       window.location.href = "/";
     } catch (err) {
       setError(err.message || "Login failed. Please try again.");
+      setIsLoading(false);
+    }
+  };
+
+  const handleVerify = async (e) => {
+    e.preventDefault();
+    setError("");
+    setIsLoading(true);
+
+    if (!verificationCode || verificationCode.length < 5) {
+      setError("Please enter a valid verification code");
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_URL}/verify-email`, {
+        method: "POST",
+        credentials: 'include',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: verifyEmail,
+          code: verificationCode.trim()
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Verification failed");
+      }
+
+      window.location.href = "/";
+    } catch (err) {
+      setError(err.message || "Verification failed. Please try again.");
       setIsLoading(false);
     }
   };
@@ -85,6 +129,14 @@ export default function LoginPage() {
       });
 
       const data = await res.json();
+      
+      if (res.status === 201 && data.requiresVerification) {
+        setVerifyEmail(data.email || form.email);
+        setView("verify");
+        setIsLoading(false);
+        return;
+      }
+      
       if (!res.ok) throw new Error(data.message || "Registration failed");
 
       await handleLogin(e);
@@ -109,13 +161,15 @@ export default function LoginPage() {
           {/* Logo section */}
           <div className="text-center mb-6 sm:mb-8">
             <h1 className="text-xl sm:text-2xl font-semibold text-[var(--foreground)]">
-              {view === "register" ? "Create account" : view === "login" ? "Welcome back" : "Sign in"}
+              {view === "register" ? "Create account" : view === "login" ? "Welcome back" : view === "verify" ? "Verify Email" : "Sign in"}
             </h1>
             <p className="text-xs sm:text-sm text-[var(--text-muted)] mt-2">
               {view === "register" 
                 ? "Get started for free" 
                 : view === "login" 
                 ? "Enter your details to continue" 
+                : view === "verify"
+                ? "Check your inbox for the code"
                 : "Choose how you want to sign in"}
             </p>
           </div>
@@ -132,6 +186,7 @@ export default function LoginPage() {
                 className="space-y-2 sm:space-y-3"
               >
                 <Button
+                  type="button"
                   onClick={() => window.location = `${import.meta.env.VITE_URL}/auth/google`}
                   variant="outline"
                   className="w-full h-11 sm:h-12 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] hover:bg-[var(--bg-tertiary)] hover:border-[var(--border-subtle)] text-sm sm:text-base"
@@ -305,6 +360,44 @@ export default function LoginPage() {
                     Sign in
                   </button>
                 </p>
+              </motion.form>
+            )}
+
+            {view === "verify" && (
+              <motion.form
+                key="verify"
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                variants={variants}
+                transition={{ duration: 0.2 }}
+                className="space-y-4 text-left"
+                onSubmit={handleVerify}
+              >
+                <p className="text-sm text-center text-[var(--text-muted)] mb-4">
+                  Verification code sent to:<br/><span className="text-[var(--foreground)] font-medium">{verifyEmail}</span>
+                </p>
+                <div>
+                  <Label htmlFor="verificationCode" className="text-xs sm:text-sm text-[var(--text-muted)] mb-2 block">
+                    6-Digit Code
+                  </Label>
+                  <Input
+                    id="verificationCode"
+                    type="text"
+                    placeholder="123456"
+                    required
+                    value={verificationCode}
+                    onChange={(e) => setVerificationCode(e.target.value)}
+                    className="text-center tracking-widest text-lg h-11 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] focus:border-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
+                    maxLength={6}
+                  />
+                </div>
+
+                {error && <p className="text-xs sm:text-sm text-red-400">{error}</p>}
+
+                <Button type="submit" className="w-full h-10 sm:h-11 bg-[var(--accent-primary)] text-white hover:bg-[var(--accent-primary)]/90 text-sm sm:text-base" disabled={isLoading}>
+                  {isLoading ? "Verifying..." : "Verify Email"}
+                </Button>
               </motion.form>
             )}
           </AnimatePresence>

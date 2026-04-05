@@ -14,9 +14,11 @@ import { HiOutlineMail } from "react-icons/hi";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function LoginModal({ open, onClose }) {
-  const [activeTab, setActiveTab] = useState("register");
+  const [activeTab, setActiveTab] = useState("login");
   const [form, setForm] = useState({});
   const [error, setError] = useState("");
+  const [verifyEmail, setVerifyEmail] = useState("");
+  const [verificationCode, setVerificationCode] = useState("");
 
   const variants = {
     hidden: { opacity: 0, y: 20 },
@@ -55,6 +57,12 @@ export default function LoginModal({ open, onClose }) {
 
       const data = await response.json();
 
+      if (response.status === 403 && data.requiresVerification) {
+        setVerifyEmail(data.email || form.email);
+        setActiveTab("verify");
+        return;
+      }
+
       if (!response.ok) {
         throw new Error(data.message || "Login failed");
       }
@@ -91,6 +99,13 @@ export default function LoginModal({ open, onClose }) {
       });
 
       const data = await res.json();
+      
+      if (res.status === 201 && data.requiresVerification) {
+        setVerifyEmail(data.email || form.email);
+        setActiveTab("verify");
+        return;
+      }
+      
       if (!res.ok) throw new Error(data.message || "Registration failed");
 
       console.log("Registration success:", data);
@@ -98,6 +113,40 @@ export default function LoginModal({ open, onClose }) {
     } catch (err) {
       setError(err.message);
       console.error("Register error:", err.message);
+    }
+  };
+
+  const handleVerify = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    if (!verificationCode || verificationCode.length < 5) {
+      setError("Please enter a valid verification code");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_URL}/verify-email`, {
+        method: "POST",
+        credentials: 'include',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: verifyEmail,
+          code: verificationCode.trim()
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Verification failed");
+      }
+
+      console.log("Verification success:", data);
+      window.location.reload();
+      onClose();
+    } catch (err) {
+      setError(err.message || "Verification failed. Please try again.");
     }
   };
 
@@ -115,6 +164,7 @@ export default function LoginModal({ open, onClose }) {
 
         <div className="space-y-4">
           <Button
+            type="button"
             onClick={() => window.location = `${import.meta.env.VITE_URL}/auth/google`}
             variant="outline"
             className="w-full flex gap-2 justify-center"
@@ -129,10 +179,11 @@ export default function LoginModal({ open, onClose }) {
             <span className="border-t w-full border-muted" />
           </div>
 
-          <Tabs defaultValue="register" value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="register">Register</TabsTrigger>
+          <Tabs defaultValue="login" value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className={`grid w-full ${activeTab === 'verify' ? 'grid-cols-3' : 'grid-cols-2'}`}>
               <TabsTrigger value="login">Login</TabsTrigger>
+              <TabsTrigger value="register">Register</TabsTrigger>
+              {activeTab === 'verify' && <TabsTrigger value="verify">Verify</TabsTrigger>}
             </TabsList>
             
             <TabsContent value="register" className="space-y-4 pt-4">
@@ -244,6 +295,43 @@ export default function LoginModal({ open, onClose }) {
                 </Button>
               </motion.form>
             </TabsContent>
+
+            {activeTab === 'verify' && (
+              <TabsContent value="verify" className="space-y-4 pt-4">
+                <motion.form
+                  initial="hidden"
+                  animate="visible"
+                  variants={variants}
+                  className="space-y-4 text-left"
+                  onSubmit={handleVerify}
+                >
+                  <p className="text-sm text-center text-muted-foreground mb-4">
+                    Verification code sent to:<br/><span className="text-white font-medium">{verifyEmail}</span>
+                  </p>
+                  <div>
+                    <Label htmlFor="verificationCode" className="mb-2">
+                      6-Digit Code
+                    </Label>
+                    <Input
+                      id="verificationCode"
+                      type="text"
+                      placeholder="123456"
+                      required
+                      value={verificationCode}
+                      onChange={(e) => setVerificationCode(e.target.value)}
+                      className="text-center tracking-widest text-lg"
+                      maxLength={6}
+                    />
+                  </div>
+
+                  {error && <p className="text-sm text-red-500">{error}</p>}
+
+                  <Button type="submit" className="w-full">
+                    Verify Email
+                  </Button>
+                </motion.form>
+              </TabsContent>
+            )}
           </Tabs>
 
           <p className="text-xs text-muted-foreground mt-2">

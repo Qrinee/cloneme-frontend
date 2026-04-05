@@ -17,6 +17,9 @@ export default function RegisterPage() {
   });
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [verificationCode, setVerificationCode] = useState("");
+  const [verifyEmail, setVerifyEmail] = useState("");
 
   const variants = {
     hidden: { opacity: 0, y: 20 },
@@ -60,12 +63,55 @@ export default function RegisterPage() {
       });
 
       const data = await res.json();
+      
+      if (res.status === 201 && data.requiresVerification) {
+        setVerifyEmail(data.email || form.email);
+        setIsVerifying(true);
+        setIsLoading(false);
+        return;
+      }
+      
       if (!res.ok) throw new Error(data.message || "Registration failed");
 
       // Redirect to login after successful registration
       window.location.href = "/login";
     } catch (err) {
       setError(err.message || "Registration failed. Please try again.");
+      setIsLoading(false);
+    }
+  };
+
+  const handleVerify = async (e) => {
+    e.preventDefault();
+    setError("");
+    setIsLoading(true);
+
+    if (!verificationCode || verificationCode.length < 5) {
+      setError("Please enter a valid verification code");
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_URL}/verify-email`, {
+        method: "POST",
+        credentials: 'include',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: verifyEmail,
+          code: verificationCode.trim()
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Verification failed");
+      }
+
+      window.location.href = "/";
+    } catch (err) {
+      setError(err.message || "Verification failed. Please try again.");
       setIsLoading(false);
     }
   };
@@ -99,91 +145,119 @@ export default function RegisterPage() {
             </p>
           </div>
 
-          <form onSubmit={handleRegister} className="space-y-4 text-left">
-            <div>
-              <Label htmlFor="username">Username</Label>
-              <Input
-                id="username"
-                placeholder="John Doe"
-                type="text"
-                required
-                onChange={handleChange}
-                value={form.username}
-                className="mt-1"
-              />
-            </div>
+          {isVerifying ? (
+            <form onSubmit={handleVerify} className="space-y-4 text-left">
+              <p className="text-sm text-center text-muted-foreground mb-4">
+                Verification code sent to:<br/><span className="text-white font-medium">{verifyEmail}</span>
+              </p>
+              <div>
+                <Label htmlFor="verificationCode" className="mb-2">6-Digit Code</Label>
+                <Input
+                  id="verificationCode"
+                  type="text"
+                  placeholder="123456"
+                  required
+                  value={verificationCode}
+                  onChange={(e) => setVerificationCode(e.target.value)}
+                  className="text-center tracking-widest text-lg h-11 border-muted text-foreground focus:border-primary"
+                  maxLength={6}
+                />
+              </div>
 
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="john@doe.com"
-                required
-                onChange={handleChange}
-                value={form.email}
-                className="mt-1"
-              />
-            </div>
+              {error && <p className="text-sm text-red-500">{error}</p>}
 
-            <div>
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="********"
-                required
-                onChange={handleChange}
-                value={form.password}
-                className="mt-1"
-              />
-            </div>
+              <Button type="submit" className="w-full mt-4" disabled={isLoading}>
+                {isLoading ? "Verifying..." : "Verify Email"}
+              </Button>
+            </form>
+          ) : (
+            <form onSubmit={handleRegister} className="space-y-4 text-left">
+              <div>
+                <Label htmlFor="username">Username</Label>
+                <Input
+                  id="username"
+                  placeholder="John Doe"
+                  type="text"
+                  required
+                  onChange={handleChange}
+                  value={form.username}
+                  className="mt-1"
+                />
+              </div>
 
-            <div>
-              <Label htmlFor="repeatPassword">Repeat Password</Label>
-              <Input
-                id="repeatPassword"
-                placeholder="********"
-                type="password"
-                required
-                onChange={handleChange}
-                value={form.repeatPassword}
-                className="mt-1"
-              />
-            </div>
+              <div>
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="john@doe.com"
+                  required
+                  onChange={handleChange}
+                  value={form.email}
+                  className="mt-1"
+                />
+              </div>
 
-            {error && <p className="text-sm text-red-500">{error}</p>}
+              <div>
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="********"
+                  required
+                  onChange={handleChange}
+                  value={form.password}
+                  className="mt-1"
+                />
+              </div>
 
-            <Button 
-              type="submit" 
-              className="w-full mt-2"
-              disabled={isLoading}
-            >
-              {isLoading ? "Creating account..." : "Register"}
-            </Button>
+              <div>
+                <Label htmlFor="repeatPassword">Repeat Password</Label>
+                <Input
+                  id="repeatPassword"
+                  placeholder="********"
+                  type="password"
+                  required
+                  onChange={handleChange}
+                  value={form.repeatPassword}
+                  className="mt-1"
+                />
+              </div>
 
-            <div className="flex items-center justify-center mt-4">
-              <span className="border-t w-full border-muted" />
-              <span className="px-3 text-muted-foreground text-sm">Or</span>
-              <span className="border-t w-full border-muted" />
-            </div>
+              {error && <p className="text-sm text-red-500">{error}</p>}
 
-            <Button
-              onClick={() => window.location = `${import.meta.env.VITE_URL}/auth/google`}
-              variant="outline"
-              className="w-full flex gap-2 justify-center"
-            >
-              <FcGoogle size={20} />
-              Register with Google
-            </Button>
+              <Button 
+                type="submit" 
+                className="w-full mt-2"
+                disabled={isLoading}
+              >
+                {isLoading ? "Creating account..." : "Register"}
+              </Button>
 
-            <p className="text-sm text-muted-foreground text-center mt-4">
-              Already have an account?{" "}
-              <Link to="/login" className="text-primary cursor-pointer underline font-medium">
-                Login
-              </Link>
-            </p>
-          </form>
+              <div className="flex items-center justify-center mt-4">
+                <span className="border-t w-full border-muted" />
+                <span className="px-3 text-muted-foreground text-sm">Or</span>
+                <span className="border-t w-full border-muted" />
+              </div>
+
+              <Button
+                type="button"
+                onClick={() => window.location = `${import.meta.env.VITE_URL}/auth/google`}
+                variant="outline"
+                className="w-full flex gap-2 justify-center"
+              >
+                <FcGoogle size={20} />
+                Register with Google
+              </Button>
+
+              <p className="text-sm text-muted-foreground text-center mt-4">
+                Already have an account?{" "}
+                <Link to="/login" className="text-primary cursor-pointer underline font-medium">
+                  Login
+                </Link>
+              </p>
+            </form>
+          )}
         </motion.div>
       </main>
 

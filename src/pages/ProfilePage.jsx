@@ -213,7 +213,7 @@ export default function ProfilePage() {
                 </button>
 
                 <button 
-                   onClick={() => window.location = 'https://buy.stripe.com/bJedR87f4aTTgQK5pd6sw01'}
+                   onClick={() => window.location = 'https://billing.stripe.com/p/login/dRmbJ042S4vv6c6cRF6sw00'}
                   className="flex items-center gap-3 px-4 py-3 rounded-xl text-white/40 cursor-pointer hover:text-white hover:bg-white/5 font-bold transition-all"
                 >
                   <CreditCard size={18} />
@@ -508,8 +508,8 @@ export default function ProfilePage() {
                             <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400">
                               <MessageCircle size={20} />
                             </div>
-                            <h4 className="font-bold text-white">Messages Used</h4>
-                            <p className="text-white/40 text-sm">{messagesRemaining === "unlimited" ? "Unlimited" : `${messagesUsed || 0} / 20 per month`}</p>
+                            <h4 className="font-bold text-white">Messages</h4>
+                            <p className="text-white/40 text-sm">{premium?.isActive ? "Unlimited" : `${messagesUsed || 0} / 20 per month`}</p>
                           </div>
                           <div className="p-6 rounded-3xl bg-white/5 border border-white/10 flex flex-col gap-3">
                             <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center text-green-400">

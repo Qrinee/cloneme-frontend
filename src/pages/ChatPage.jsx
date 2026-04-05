@@ -15,7 +15,7 @@ import {
   FaLock,
   FaUnlock,
 } from "react-icons/fa";
-import { Sparkles, Lock, Star, Heart } from "lucide-react";
+import { Sparkles, Lock, Star, Heart, Coins, Play, Camera } from "lucide-react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Dialog } from "@/components/ui/dialog";
 import Content from "@/components/Content";
@@ -28,6 +28,9 @@ export default function ChatPage() {
   const navigate = useNavigate();
   const authFetch = useAuthFetch();
   const bottomRef = useRef(null);
+  const scrollAreaRef = useRef(null);
+  const [autoScroll, setAutoScroll] = useState(true);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
   
   // Use LayoutContext for guest state management
   const { 
@@ -41,7 +44,8 @@ export default function ChatPage() {
     guestConversations,
     premium,
     messagesUsed,
-    setMessagesUsed
+    setMessagesUsed,
+    updateUser
   } = useLayoutContext();
 
   const [newMessage, setNewMessage] = useState("");
@@ -50,6 +54,8 @@ export default function ChatPage() {
   const [currentChatbot, setCurrentChatbot] = useState(null);
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+  const [incomingAiMessages, setIncomingAiMessages] = useState(0);
   const [currentChatbotId, setCurrentChatbotId] = useState(null);
   
   // Local guest mode state (synced with context)
@@ -91,32 +97,6 @@ export default function ChatPage() {
     { level: 7, name: "Intymne zdjęcia", icon: "💕", description: "Prywatna galeria" },
     { level: 10, name: "Ekskluzywny content", icon: "👑", description: "Dostęp do specjalnych scenariuszy" },
   ];
-  
-  // Add XP after sending message
-  const addXP = (amount) => {
-    const newXP = relationshipXP + amount;
-    const xpNeeded = xpPerLevel(relationshipLevel);
-    
-    if (newXP >= xpNeeded) {
-      // Level up!
-      setRelationshipXP(newXP - xpNeeded);
-      const newLevel = relationshipLevel + 1;
-      setRelationshipLevel(newLevel);
-      setShowLevelUp(true);
-      setTimeout(() => setShowLevelUp(false), 3000);
-      
-      // Check for new unlockables
-      const unlocked = unlockables.find(u => u.level === newLevel);
-      if (unlocked) {
-        setNewUnlock(unlocked);
-        setShowUnlockModal(true);
-        setUnlockedContent(prev => [...prev, unlocked]);
-        setTimeout(() => setShowUnlockModal(false), 4000);
-      }
-    } else {
-      setRelationshipXP(newXP);
-    }
-  };
 
   useEffect(() => {
     fetchMyChats();
@@ -127,8 +107,24 @@ export default function ChatPage() {
   }, [id]);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    if (isInitialLoad && messages.length > 0) {
+      bottomRef.current?.scrollIntoView({ behavior: "auto" });
+      setIsInitialLoad(false);
+    } else if (autoScroll) {
+      bottomRef.current?.scrollIntoView({ 
+        behavior: isInitialLoad ? "auto" : "smooth" 
+      });
+      if (isInitialLoad && messages.length > 0) {
+        setIsInitialLoad(false);
+      }
+    }
+  }, [messages, isTyping]);
+
+  const handleScroll = (e) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+    const isAtBottom = scrollHeight - scrollTop <= clientHeight + 150;
+    setAutoScroll(isAtBottom);
+  };
 
   const fetchMyChats = async () => {
     const res = await authFetch(`${import.meta.env.VITE_URL}/api/chats`);
@@ -150,23 +146,19 @@ export default function ChatPage() {
   };
 
   const fetchChatMessages = async (chatbotId) => {
-
-    
     const res = await authFetch(
       `${import.meta.env.VITE_URL}/api/chats/${chatbotId}`
     );
 
-    
-    // Handle 401 as guest mode - allow guests to continue
     if (res.status === 401) {
-      setIsGuest(true);
-      setContextIsGuest(true);
-      setMessagesRemaining(10);
-      setContextMessagesRemaining(10);
-      // Try to parse the response to get chatbot info if available
+      if (!isLoggedIn) {
+        setIsGuest(true);
+        setContextIsGuest(true);
+        setMessagesRemaining(10);
+        setContextMessagesRemaining(10);
+      }
       try {
         const data = await res.json();
-
         if (data.chatbot) {
           setCurrentChatbot({
             _id: data.chatbot._id,
@@ -179,37 +171,27 @@ export default function ChatPage() {
         if (data.guest) {
           setMessagesRemaining(data.messagesRemaining);
           setContextMessagesRemaining(data.messagesRemaining);
-          
-          // Handle messages array from backend
           if (data.messages && Array.isArray(data.messages)) {
             const loadedMessages = data.messages.map((m) => ({
               id: m._id,
               text: m.content,
               sender: m.role === "user" ? "me" : "them",
-            }));
-            setMessages(loadedMessages);
-            updateGuestConversation(chatbotId, loadedMessages, data.messagesRemaining);
-          } else if (data.chat && data.chat.messages) {
-            // Fallback to chat.messages
-            const loadedMessages = data.chat.messages.map((m) => ({
-              id: m._id,
-              text: m.content,
-              sender: m.role === "user" ? "me" : "them",
+              type: m.type,
+              isLocked: m.isLocked,
+              price: m.price,
+              mediaUrl: m.mediaUrl
             }));
             setMessages(loadedMessages);
             updateGuestConversation(chatbotId, loadedMessages, data.messagesRemaining);
           }
         }
-      } catch (e) {
-      }
+      } catch (e) {}
       return;
     }
     
     const data = await res.json();
-    
     if (data.type === "error") {
-      // Check if it's a guest limit exceeded error
-      if (data.message && data.message.includes('Limit exceeded')) {
+      if (!isLoggedIn && data.message && data.message.includes('Limit exceeded')) {
         setShowLimitExceeded(true);
         setIsGuest(true);
         setContextIsGuest(true);
@@ -219,33 +201,24 @@ export default function ChatPage() {
       return;
     }
     
-    // Handle guest mode
-    if (data.guest) {
+    if (!isLoggedIn && data.guest) {
       setIsGuest(true);
       setContextIsGuest(true);
       setMessagesRemaining(data.messagesRemaining);
       setContextMessagesRemaining(data.messagesRemaining);
-      
-      // Handle messages array from backend
       if (data.messages && Array.isArray(data.messages)) {
         const loadedMessages = data.messages.map((m) => ({
           id: m._id,
           text: m.content,
           sender: m.role === "user" ? "me" : "them",
-        }));
-        setMessages(loadedMessages);
-        updateGuestConversation(chatbotId, loadedMessages, data.messagesRemaining);
-      } else if (data.chat && data.chat.messages) {
-        // Fallback to chat.messages
-        const loadedMessages = data.chat.messages.map((m) => ({
-          id: m._id,
-          text: m.content,
-          sender: m.role === "user" ? "me" : "them",
+          type: m.type,
+          isLocked: m.isLocked,
+          price: m.price,
+          mediaUrl: m.mediaUrl
         }));
         setMessages(loadedMessages);
         updateGuestConversation(chatbotId, loadedMessages, data.messagesRemaining);
       }
-      // Store chatbot data if available
       if (data.chatbot) {
         setCurrentChatbot({
           _id: data.chatbot._id,
@@ -258,7 +231,6 @@ export default function ChatPage() {
       return;
     }
     
-    // Authenticated user - normal flow
     setIsGuest(false);
     if (data.chat) {
       setMessages(
@@ -266,10 +238,13 @@ export default function ChatPage() {
           id: m._id,
           text: m.content,
           sender: m.role === "user" ? "me" : "them",
+          type: m.type,
+          isLocked: m.isLocked,
+          price: m.price,
+          mediaUrl: m.mediaUrl
         }))
       );
     }
-    // Store chatbot data for avatar display
     if (data.chatbot) {
       setCurrentChatbot({
         _id: data.chatbot._id,
@@ -279,39 +254,51 @@ export default function ChatPage() {
         bio: data.chatbot.bio,
       });
     }
+    
+    if (chatbotId) {
+      try {
+        const progressRes = await authFetch(`${import.meta.env.VITE_URL}/api/chats/${chatbotId}/progress`);
+        if (progressRes.ok) {
+          const progressData = await progressRes.json();
+          if (progressData.type === "success") {
+            setRelationshipLevel(progressData.level);
+            setRelationshipXP(progressData.xp);
+          }
+        }
+      } catch (e) {
+        console.error("Error fetching relationship progress:", e);
+      }
+    }
   };
 
   const handleSend = async () => {
     if (!newMessage.trim()) return;
 
-    // Check if guest (not logged in) and has messages remaining
     if (isGuest && !isLoggedIn && messagesRemaining <= 0) {
       setShowLimitExceeded(true);
-      setShowLimitExceeded(true);
+      setIsTyping(false);
       return;
     }
 
-    // Check if logged-in non-premium user has reached message limit
-    // premium is { isActive: bool, expiresAt: string | null }
-    // messagesRemaining can be number or "unlimited"
     const isPremiumActive = premium?.isActive;
     const hasUnlimitedMessages = messagesRemaining === "unlimited";
     const hasMessagesLeft = typeof messagesRemaining === "number" && messagesRemaining > 0;
     
     if (!isPremiumActive && !hasUnlimitedMessages && !hasMessagesLeft && !isGuest && isLoggedIn) {
       setShowLimitExceeded(true);
+      setIsTyping(false);
       return;
     }
 
-    // Use id directly as chatbotId
     const chatbotId = id;
-    
-
     const text = newMessage;
     setNewMessage("");
 
     setMessages((p) => [...p, { id: Date.now(), text, sender: "me" }]);
+    setAutoScroll(true); // Force scroll to bottom on user message
     setIsLoading(true);
+    setIsTyping(true);
+    setIncomingAiMessages(0);
 
     try {
       const res = await authFetch(
@@ -324,65 +311,53 @@ export default function ChatPage() {
       );
 
       if (res.status === 403) {
-        // Check the response to determine if it's message limit or credits limit
         try {
           const errorData = await res.json();
           if (errorData.message?.includes("Message limit") || errorData.message?.includes("message")) {
-            // Show message limit dialog instead of credits dialog
             setLimitErrorMessage(errorData.message || "Message limit reached. Upgrade to premium for unlimited messages.");
             setShowLimitExceeded(true);
           } else {
-            setOpen(true); // Show credits/premium dialog
+            setOpen(true);
           }
         } catch (e) {
-          setOpen(true); // Default to credits dialog
+          setOpen(true);
         }
-        setMessages([]);
+        setIsTyping(false);
         return;
       }
 
-      // Handle 401 as guest mode - allow guests to continue
-      if (res.status === 401) {
-
+      if (res.status === 401 && !isLoggedIn) {
         setIsGuest(true);
         setContextIsGuest(true);
-        // Try to parse response for reply or remaining messages
         try {
           const data = await res.json();
-
-          if (data.guest) {
-            setMessagesRemaining(data.messagesRemaining);
-            setContextMessagesRemaining(data.messagesRemaining);
-            
-            // Handle messages array from backend
-            if (data.messages && Array.isArray(data.messages)) {
-              const newMessages = data.messages.map((m) => ({
-                id: m._id,
-                text: m.content,
-                sender: m.role === "user" ? "me" : "them",
-              }));
-              setMessages(newMessages);
-              updateGuestConversation(chatbotId, newMessages, data.messagesRemaining);
-            }
+          if (data.guest && data.messages) {
+            const newMessages = data.messages.map((m) => ({
+              id: m._id,
+              text: m.content,
+              sender: m.role === "user" ? "me" : "them",
+              type: m.type,
+              isLocked: m.isLocked,
+              price: m.price,
+              mediaUrl: m.mediaUrl
+            }));
+            setMessages(newMessages);
+            updateGuestConversation(chatbotId, newMessages, data.messagesRemaining);
           }
-        } catch (e) {
-        }
+        } catch (e) {}
         setIsLoading(false);
+        setIsTyping(false);
         return;
       }
 
       const data = await res.json();
       
-      // Handle error type (e.g., limit exceeded)
       if (data.type === "error") {
-        // Use error message from API or fallback to default
         setLimitErrorMessage(data.message || "Message limit reached. Upgrade to premium for unlimited messages.");
         setShowLimitExceeded(true);
         setIsLoading(false);
-        // Update message counts from error response if available
-        if (data.messagesUsed !== undefined) {
-          setMessagesUsed(data.messagesUsed);
-        }
+        setIsTyping(false);
+        if (data.messagesUsed !== undefined) setMessagesUsed(data.messagesUsed);
         if (data.messagesRemaining !== undefined) {
           setMessagesRemaining(data.messagesRemaining);
           setContextMessagesRemaining(data.messagesRemaining);
@@ -390,86 +365,176 @@ export default function ChatPage() {
         return;
       }
       
-      // Handle guest mode
-      if (data.guest) {
+      if (!isLoggedIn && data.guest) {
         setIsGuest(true);
         setContextIsGuest(true);
         setMessagesRemaining(data.messagesRemaining);
         setContextMessagesRemaining(data.messagesRemaining);
-        
-        // Handle messages array from backend
         if (data.messages && Array.isArray(data.messages)) {
           const newMessages = data.messages.map((m) => ({
             id: m._id,
             text: m.content,
             sender: m.role === "user" ? "me" : "them",
-          }));
-          setMessages(newMessages);
-          updateGuestConversation(chatbotId, newMessages, data.messagesRemaining);
-        } else if (data.chat && data.chat.messages) {
-          // Fallback to chat.messages if messages field not present
-          const newMessages = data.chat.messages.map((m) => ({
-            id: m._id,
-            text: m.content,
-            sender: m.role === "user" ? "me" : "them",
+            type: m.type,
+            isLocked: m.isLocked,
+            price: m.price,
+            mediaUrl: m.mediaUrl
           }));
           setMessages(newMessages);
           updateGuestConversation(chatbotId, newMessages, data.messagesRemaining);
         }
+        setIsTyping(false);
         return;
       }
       
-      // Authenticated user - normal flow
       setIsGuest(false);
       if (data.type === "success" && data.chat) {
-        const reply = data.chat.messages.at(-1);
-        if (reply) {
-          setMessages((p) => [
-            ...p,
-            { id: reply._id, text: reply.content, sender: "them" },
-          ]);
+        const previousMessageCount = messages.filter(m => m.sender === "me").length + messages.filter(m => m.sender === "them").length; 
+        // Note: this count logic is tricky because of animations, better slice from actual data
+        const newAiMessages = data.chat.messages.slice(data.chat.messages.length - (data.newAiMessagesCount || 1)).filter(m => m.role !== "user");
+        const newAiMessagesCount = data.newAiMessagesCount || newAiMessages.length;
+        setIncomingAiMessages(newAiMessagesCount);
+        
+        if (newAiMessages.length > 0) {
+          let delay = 0;
+          newAiMessages.forEach((reply, index) => {
+            setTimeout(() => {
+              setMessages((p) => [
+                ...p,
+                { 
+                  id: reply._id || Date.now() + Math.random(), 
+                  text: reply.content, 
+                  sender: "them",
+                  type: reply.type,
+                  isLocked: reply.isLocked,
+                  price: reply.price,
+                  mediaUrl: reply.mediaUrl
+                },
+              ]);
+              setIncomingAiMessages(prev => Math.max(0, prev - 1));
+              if (index === newAiMessages.length - 1) {
+                setIsTyping(false);
+              }
+            }, delay);
+            const typingSpeed = 3 + Math.random() * 2;
+            delay += Math.max(800, (reply.content.length / typingSpeed * 1000));
+          });
+        } else {
+          setIsTyping(false);
         }
-        // Update message counts from response
-        if (data.messagesUsed !== undefined) {
-          setMessagesUsed(data.messagesUsed);
-        }
+        
+        if (data.messagesUsed !== undefined) setMessagesUsed(data.messagesUsed);
         if (data.messagesRemaining !== undefined) {
           setMessagesRemaining(data.messagesRemaining);
           setContextMessagesRemaining(data.messagesRemaining);
         }
+        
+        if (data.relationshipProgress) {
+          const { level, xp } = data.relationshipProgress;
+          if (level !== relationshipLevel) {
+            setRelationshipLevel(level);
+            setShowLevelUp(true);
+            setTimeout(() => setShowLevelUp(false), 3000);
+          }
+          setRelationshipXP(xp);
+        }
+        
+        if (data.newUnlocks && data.newUnlocks.length > 0) {
+          setNewUnlock(data.newUnlocks[0]);
+          setShowUnlockModal(true);
+          setUnlockedContent(prev => [...prev, ...data.newUnlocks]);
+          setTimeout(() => setShowUnlockModal(false), 4000);
+        }
       }
     } finally {
       setIsLoading(false);
-      // Add XP for sending a message (only for authenticated users)
-      if (!isGuest) {
-        addXP(10);
+    }
+  };
+
+  const handleUnlockMedia = async (messageId) => {
+    try {
+      const res = await authFetch(
+        `${import.meta.env.VITE_URL}/api/chats/${id}/unlock/${messageId}`,
+        { method: "POST" }
+      );
+      
+      const data = await res.json();
+      if (data.type === "success") {
+        setMessages(prev => prev.map(m => 
+          m.id === messageId ? { ...m, isLocked: false, mediaUrl: data.unlockedMessage.mediaUrl } : m
+        ));
+        if (data.remainingPoints !== undefined) {
+          updateUser({ points: data.remainingPoints });
+        }
+      } else {
+        if (data.message?.toLowerCase().includes("credits") || data.message?.toLowerCase().includes("points")) {
+          setOpen(true);
+        } else {
+          alert(data.message);
+        }
       }
+    } catch (e) {
+      console.error("Error unlocking media:", e);
+    }
+  };
+
+  const handleRequestMedia = async (type = 'random') => {
+    if (isLoading) return;
+    setIsLoading(true);
+    setIsTyping(true); // Show typing while generating
+    try {
+      const res = await authFetch(
+        `${import.meta.env.VITE_URL}/api/chats/${id}/request-media`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type }),
+        }
+      );
+      const data = await res.json();
+      if (data.type === "success") {
+        if (data.remainingPoints !== undefined) {
+          updateUser({ points: data.remainingPoints });
+        }
+        
+        // Add message with small artificial delay for "AI typing" feel
+        setTimeout(() => {
+          setMessages(prev => [...prev, data.mediaMessage]);
+          setIsTyping(false);
+          // Scroll to bottom will happen via useEffect
+        }, 1500);
+      } else {
+        setIsTyping(false);
+        if (data.message?.toLowerCase().includes("credits") || data.message?.toLowerCase().includes("points")) {
+          setOpen(true); // Open credits dialog
+        } else {
+          toast.error(data.message);
+        }
+      }
+    } catch (e) {
+      console.error("Error requesting media:", e);
+      setIsTyping(false);
+      toast.error("Failed to request media");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleDeleteChat = async () => {
     if (!id) return;
     if (!confirm("Delete this chat?")) return;
-
-    // Use id directly as chatbotId
-    await authFetch(`${import.meta.env.VITE_URL}/api/chats/${id}`, {
-      method: "DELETE",
-    });
-
+    await authFetch(`${import.meta.env.VITE_URL}/api/chats/${id}`, { method: "DELETE" });
     navigate("/chat");
   };
 
   const activeChat = chats.find((c) => c._id === id) || currentChatbot;
 
-  // Handle invalid chatbot ID - redirect to chat list
   useEffect(() => {
     if (id && chats.length > 0 && !activeChat) {
-      // ID exists but chatbot not found in user's chat list
       navigate("/chat", { replace: true });
     }
   }, [id, chats, activeChat, navigate]);
 
-  // Calculate progress percentage
   const xpNeeded = xpPerLevel(relationshipLevel);
   const progressPercent = Math.min((relationshipXP / xpNeeded) * 100, 100);
 
@@ -479,7 +544,6 @@ export default function ChatPage() {
         <Content />
       </Dialog>
 
-      {/* Message Limit Dialog - separate from Content dialog which is for credits */}
       <DialogMessageLimit 
         open={showLimitExceeded} 
         onOpenChange={setShowLimitExceeded}
@@ -488,10 +552,8 @@ export default function ChatPage() {
         onUpgrade={() => window.location = 'https://buy.stripe.com/bJedR87f4aTTgQK5pd6sw01'}
       />
 
-
-
       <div className="flex h-screen bg-[#0a0a0f] text-white overflow-hidden">
-        {/* LEFT – CHAT LIST - Refined */}
+        {/* LEFT – CHAT LIST */}
         <div className="hidden md:flex w-80 border-r border-white/5 flex-col bg-[#0a0a0f] h-full overflow-hidden">
           <div className="p-6">
             <h3 className="text-2xl font-bold tracking-tight mb-6">Messages</h3>
@@ -510,21 +572,18 @@ export default function ChatPage() {
             <div className="space-y-2 px-2">
               {chats.filter(chat => 
                 searchQuery === "" || 
-                chat.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                chat.lastMessage?.toLowerCase().includes(searchQuery.toLowerCase())
+                chat.name?.toLowerCase().includes(searchQuery.toLowerCase())
               ).map((chat) => (
                 <div
                   key={chat._id}
                   onClick={() => navigate(`/chat/${chat._id}`)}
-                  className={`flex w-[300px] items-center gap-3 p-4 rounded-[1.5rem] cursor-pointer transition-all ${
-                    id === chat._id 
-                      ? "bg-white/5 border border-white/10" 
-                      : "hover:bg-white/5 border border-transparent"
+                  className={`flex w-full items-center gap-3 p-4 rounded-[1.5rem] cursor-pointer transition-all ${
+                    id === chat._id ? "bg-white/5 border border-white/10" : "hover:bg-white/5 border border-transparent"
                   }`}
                 >
                   <div className="relative">
                     <Avatar className="w-12 h-12 border border-white/10">
-                      <AvatarImage src={chat.avatar} className="object-cover" />
+                      <AvatarImage src={chat.avatar ? `${import.meta.env.VITE_URL}${chat.avatar}` : null} className="object-cover" />
                       <AvatarFallback className="bg-white/5 text-white/40">{chat.name?.[0]}</AvatarFallback>
                     </Avatar>
                     <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-[#0a0a0f]" />
@@ -542,7 +601,7 @@ export default function ChatPage() {
 
           <div className="p-6">
             <Link to="/">
-              <button className="w-full bg-white/5 backdrop-blur-md border border-white/10 text-white py-4 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-white/10 transition-all active:scale-95 flex items-center justify-center gap-2">
+              <button className="w-full bg-white/5 backdrop-blur-md border border-white/10 text-white py-4 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-white/10 transition-all flex items-center justify-center gap-2">
                 <FaPlus size={12} /> New Chat
               </button>
             </Link>
@@ -550,7 +609,7 @@ export default function ChatPage() {
         </div>
 
         {/* CENTER – CHAT AREA */}
-        <div className="flex-1 flex flex-col bg-[#0a0a0f] relative h-full overflow-hidden">
+        <div className="flex-1 flex flex-col bg-[#0a0a0f] relative min-h-0 h-full overflow-hidden">
           {!id ? (
             <div className="flex-1 flex flex-col items-center justify-center text-white/20 gap-4">
               <div className="w-16 h-16 rounded-3xl bg-white/5 border border-white/5 flex items-center justify-center">
@@ -560,19 +619,13 @@ export default function ChatPage() {
             </div>
           ) : (
             <>
-              {/* Header with relationship progress */}
               <div className="px-6 py-4 border-b border-white/5 flex flex-col gap-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <button
-                      className="md:hidden p-2 hover:bg-white/5 rounded-xl transition-colors"
-                      onClick={() => navigate("/")}
-                    >
-                      <FaArrowLeft size={18} />
-                    </button>
+                    <button className="md:hidden p-2 hover:bg-white/5 rounded-xl" onClick={() => navigate("/")}><FaArrowLeft size={18} /></button>
                     <div className="flex items-center gap-3">
                       <Avatar className="w-10 h-10 border border-white/10">
-                        <AvatarImage src={activeChat?.avatar} className="object-cover" />
+                        <AvatarImage src={activeChat?.avatar ? `${import.meta.env.VITE_URL}${activeChat?.avatar}` : null} className="object-cover" />
                       </Avatar>
                       <div>
                         <h2 className="font-bold text-base tracking-tight">{activeChat?.name}</h2>
@@ -588,43 +641,53 @@ export default function ChatPage() {
                       <Star size={12} className="text-yellow-500" />
                       <span className="text-[10px] font-bold uppercase tracking-widest">Level {relationshipLevel}</span>
                     </div>
-                    <button onClick={handleDeleteChat} className="p-3 hover:bg-white/5 text-white/20 hover:text-red-500 rounded-xl transition-all">
-                      <FaTrash size={14} />
-                    </button>
+                    <button onClick={handleDeleteChat} className="p-3 text-white/20 hover:text-red-500"><FaTrash size={14} /></button>
                   </div>
                 </div>
-
-                {/* Affinity Progress Bar - Mini version */}
                 <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden relative">
-                  <div 
-                    className="absolute inset-y-0 left-0 bg-[#741818] transition-all duration-1000 ease-out"
-                    style={{ width: `${progressPercent}%` }}
-                  />
+                  <div className="absolute inset-y-0 left-0 bg-[#741818] transition-all duration-1000 ease-out" style={{ width: `${progressPercent}%` }} />
                 </div>
               </div>
 
-              {/* Messages Area */}
-              <ScrollArea className="flex-1 px-6 py-8 overflow-hidden">
-                <div className="space-y-6 max-w-4xl mx-auto">
+              <ScrollArea 
+                className="flex-1 px-6 py-8 h-0" 
+                onScroll={handleScroll}
+              >
+                <div className="space-y-6 max-w-4xl mx-auto pb-4">
                   {messages.map((m) => (
-                    <div
-                      key={m.id}
-                      className={`flex ${m.sender === "me" ? "justify-end" : "justify-start"}`}
-                    >
-                      <div
-                        className={`max-w-[80%] px-5 py-3.5 rounded-[1.5rem] text-sm leading-relaxed ${
-                          m.sender === "me"
-                            ? "bg-[#741818] text-white rounded-br-none font-medium"
-                            : "bg-white/5 backdrop-blur-xl border border-white/5 text-white/90 rounded-bl-none"
-                        }`}
-                      >
-                        {m.text}
+                    <div key={m.id} className={`flex ${m.sender === "me" ? "justify-end" : "justify-start"}`}>
+                      <div className={`flex flex-col gap-2 max-w-[80%] ${m.sender === "me" ? "items-end" : "items-start"}`}>
+                        {m.text && (
+                          <div className={`px-5 py-3.5 rounded-[1.5rem] text-sm leading-relaxed ${m.sender === "me" ? "bg-[#741818] text-white rounded-br-none font-medium" : "bg-white/5 backdrop-blur-xl border border-white/5 text-white/90 rounded-bl-none"}`}>
+                            {m.text}
+                          </div>
+                        )}
+                        {(m.type === 'photo' || m.type === 'video') && (
+                          <div className="relative rounded-2xl overflow-hidden border border-white/10 aspect-[3/4] w-64 bg-white/5">
+                            {m.isLocked && (
+                              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 z-10 bg-black/40 backdrop-blur-md">
+                                <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center"><Lock size={20} className="text-white/60" /></div>
+                                <button onClick={() => handleUnlockMedia(m.id)} className="bg-white text-black px-4 py-2 rounded-xl text-xs font-bold hover:bg-white/90 flex items-center gap-2">
+                                  <Coins size={14} /> Unlock for {m.price} Credits
+                                </button>
+                              </div>
+                            )}
+                            {m.type === 'photo' ? (
+                              <img src={`${import.meta.env.VITE_URL}${m.mediaUrl}`} className={`w-full h-full object-cover ${m.isLocked ? 'blur-2xl' : ''}`} alt="Shared photo" />
+                            ) : (
+                              <div className="w-full h-full relative">
+                                <video src={`${import.meta.env.VITE_URL}${m.mediaUrl}`} className={`w-full h-full object-cover ${m.isLocked ? 'blur-2xl' : ''}`} controls={!m.isLocked} />
+                                {m.isLocked && <div className="absolute inset-0 flex items-center justify-center pointer-events-none"><Play size={40} className="text-white/20" /></div>}
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}
-                  {isLoading && (
+                  {isTyping && (
                     <div className="flex justify-start">
-                      <div className="bg-white/5 backdrop-blur-xl border border-white/5 px-5 py-3.5 rounded-[1.5rem] rounded-bl-none">
+                      <div className="bg-white/5 border border-white/5 px-5 py-3.5 rounded-[1.5rem] rounded-bl-none">
                         <div className="flex gap-1">
                           <div className="w-1.5 h-1.5 bg-white/20 rounded-full animate-bounce" />
                           <div className="w-1.5 h-1.5 bg-white/20 rounded-full animate-bounce [animation-delay:0.2s]" />
@@ -637,48 +700,54 @@ export default function ChatPage() {
                 </div>
               </ScrollArea>
 
-              {/* Chat Input */}
-              <div className="p-6 overflow-hidden">
-                {/* Guest mode indicator - only show when not logged in */}
+              <div className="p-6">
                 {isGuest && !isLoggedIn && (
-                  <div className="max-w-4xl mx-auto mb-4">
-                    <div className="bg-[#741818]/10 border border-[#741818]/20 rounded-xl px-4 py-2 flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <FaUnlock size={14} className="text-[#741818]" />
-                        <span className="text-xs text-white/60">Chatting as guest</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-white/40">Messages remaining:</span>
-                        <span className={`text-xs font-bold ${messagesRemaining <= 3 ? 'text-[#741818]' : 'text-white/80'}`}>
-                          {messagesRemaining}
-                        </span>
-                      </div>
-                    </div>
+                  <div className="max-w-4xl mx-auto mb-4 bg-[#741818]/10 border border-[#741818]/20 rounded-xl px-4 py-2 flex items-center justify-between">
+                    <div className="flex items-center gap-2"><FaUnlock size={14} className="text-[#741818]" /><span className="text-xs text-white/60">Chatting as guest</span></div>
+                    <div className="flex items-center gap-2"><span className="text-xs text-white/40">Messages remaining:</span><span className={`text-xs font-bold ${messagesRemaining <= 3 ? 'text-[#741818]' : 'text-white/80'}`}>{messagesRemaining}</span></div>
                   </div>
                 )}
                 <div className="max-w-4xl mx-auto">
-                  <div className="bg-white/5 border border-white/5 rounded-[2rem] p-1.5 flex items-center gap-2 group transition-all focus-within:bg-white/10 focus-within:border-white/20 focus-within:ring-2 focus-within:ring-white/10">
-                    <button className="p-3 text-white/20 hover:text-white/40 transition-colors" aria-label="Open emoji picker">
-                      <FaSmile size={18} />
+                  <div className="flex gap-4 mb-4">
+                    <button 
+                      onClick={() => handleRequestMedia('photo')}
+                      className="flex-1 bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 backdrop-blur-md px-4 py-3 rounded-2xl text-[10px] font-bold text-white/80 transition-all flex flex-col items-center justify-center gap-1 group uppercase tracking-widest"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Camera size={14} className="text-white/40 group-hover:text-pink-500 transition-colors" />
+                        Send a naughty photo 📸
+                      </div>
+                      <div className="text-[9px] text-white/30 flex items-center gap-1 font-medium">
+                        <Coins size={10} /> 50 Credits
+                      </div>
                     </button>
-
+                    <button 
+                      onClick={() => handleRequestMedia('video')}
+                      className="flex-1 bg-white/5 hover:bg-[#741818]/20 border border-white/5 hover:border-[#741818]/40 backdrop-blur-md px-4 py-3 rounded-2xl text-[10px] font-bold text-white/80 transition-all flex flex-col items-center justify-center gap-1 group uppercase tracking-widest"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Play size={14} className="text-white/40 group-hover:text-red-500 transition-colors" />
+                        Send a naughty video 🔥
+                      </div>
+                      <div className="text-[9px] text-white/30 flex items-center gap-1 font-medium">
+                        <Coins size={10} /> 200 Credits
+                      </div>
+                    </button>
+                  </div>
+                  <div className="bg-white/5 border border-white/5 rounded-[2rem] p-1.5 flex items-center gap-2 focus-within:ring-2 focus-within:ring-white/10 transition-all">
+                    <button className="p-3 text-white/20 hover:text-white/40 transition-colors"><FaSmile size={18} /></button>
                     <input
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleSend()}
                       placeholder={`Message ${activeChat?.name}...`}
                       disabled={isGuest && !isLoggedIn && messagesRemaining <= 0}
-                      className={`flex-1 bg-transparent border-none outline-none text-sm px-2 text-white placeholder:text-white/20 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 ${isGuest && !isLoggedIn && messagesRemaining <= 0 ? 'cursor-not-allowed opacity-50' : ''}`}
+                      className="flex-1 bg-transparent border-none outline-none text-sm px-2 text-white placeholder:text-white/20 focus:ring-0"
                     />
                     <button
                       onClick={handleSend}
                       disabled={!newMessage.trim() || (isGuest && !isLoggedIn && messagesRemaining <= 0)}
-                      aria-label="Send message"
-                      className={`w-11 h-11 rounded-[1.25rem] flex items-center justify-center transition-all active:scale-90 ${
-                        newMessage.trim() && !(isGuest && !isLoggedIn && messagesRemaining <= 0)
-                          ? "bg-[#741818] text-white hover:bg-[#8d1d1d]" 
-                          : "bg-white/5 text-white/10 border border-white/5 cursor-not-allowed"
-                      }`}
+                      className={`w-11 h-11 rounded-[1.25rem] flex items-center justify-center transition-all ${newMessage.trim() && !(isGuest && !isLoggedIn && messagesRemaining <= 0) ? "bg-[#741818] text-white hover:bg-[#8d1d1d]" : "bg-white/5 text-white/10"}`}
                     >
                       <FaPaperPlane size={14} />
                     </button>
@@ -692,64 +761,33 @@ export default function ChatPage() {
         {/* RIGHT – PROFILE SIDEBAR */}
         {activeChat && (
           <div className="hidden xl:flex w-96 border-l border-white/5 flex-col bg-[#0a0a0f] h-full overflow-hidden">
-            <ScrollArea className="flex-1 h-0 overflow-hidden">
+            <ScrollArea className="flex-1">
               <div className="relative aspect-[4/5]">
-                <img
-                  src={activeChat?.avatar}
-                  className="w-full h-full object-cover object-center opacity-80"
-                  alt={activeChat?.name}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f] via-transparent to-transparent" />
+                <img src={activeChat?.avatar ? `${import.meta.env.VITE_URL}${activeChat?.avatar}` : null} className="w-full h-full object-cover opacity-80" alt={activeChat?.name} />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f] via-transparent" />
                 <div className="absolute bottom-6 left-6">
                   <h2 className="text-3xl font-bold tracking-tight mb-1">{activeChat?.name}, {activeChat?.age}</h2>
-                  <p className="text-white/30 text-xs font-bold uppercase tracking-widest flex items-center gap-2">
-                    <Heart size={14} className="text-[#741818]" /> {activeChat?.age ? `${activeChat.age} years old` : 'Online'}
-                  </p>
+                  <p className="text-white/30 text-xs font-bold uppercase flex items-center gap-2"><Heart size={14} className="text-[#741818]" /> {activeChat?.age ? `${activeChat.age} years old` : 'Online'}</p>
                 </div>
               </div>
-
               <div className="p-8 space-y-8">
                 <div>
                   <h3 className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] mb-4">About Me</h3>
-                  <p className="text-sm text-white/60 leading-relaxed font-medium">
-                    {activeChat?.bio || "Designed to be your perfect adaptive companion. I learn from our conversations to better match your energy and preferences."}
-                  </p>
+                  <p className="text-sm text-white/60 leading-relaxed font-medium">{activeChat?.bio || "Your perfect adaptive companion."}</p>
                 </div>
-
-
-
-
-
-                {/* Relationship Milestone Section */}
                 <div className="space-y-4">
                   <h3 className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em]">Next Milestone</h3>
                   <div className="space-y-3">
                     {unlockables.filter(u => u.level <= relationshipLevel).map((unlock, idx) => (
-                      <div 
-                        key={idx}
-                        className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/10"
-                      >
-                        <div className="w-12 h-12 rounded-xl bg-[#741818]/20 flex items-center justify-center text-xl">
-                          {unlock.icon}
-                        </div>
-                        <div>
-                          <p className="text-xs font-bold text-white/80">{unlock.name}</p>
-                          <p className="text-[10px] text-white/30 uppercase tracking-widest font-bold">Unlocked</p>
-                        </div>
+                      <div key={idx} className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/10">
+                        <div className="w-12 h-12 rounded-xl bg-[#741818]/20 flex items-center justify-center text-xl">{unlock.icon}</div>
+                        <div><p className="text-xs font-bold text-white/80">{unlock.name}</p><p className="text-[10px] text-white/30 uppercase tracking-widest font-bold">Unlocked</p></div>
                       </div>
                     ))}
                     {unlockables.filter(u => u.level > relationshipLevel).slice(0, 1).map((locked, idx) => (
-                      <div 
-                        key={idx}
-                        className="flex items-center gap-4 p-4 bg-transparent rounded-2xl border border-white/5 opacity-40 grayscale"
-                      >
-                        <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-xl">
-                          <Lock size={20} />
-                        </div>
-                        <div>
-                          <p className="text-xs font-bold text-white/60">{locked.name}</p>
-                          <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Level {locked.level} Required</p>
-                        </div>
+                      <div key={idx} className="flex items-center gap-4 p-4 rounded-2xl border border-white/5 opacity-40 grayscale">
+                        <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-xl"><Lock size={20} /></div>
+                        <div><p className="text-xs font-bold text-white/60">{locked.name}</p><p className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Level {locked.level} Required</p></div>
                       </div>
                     ))}
                   </div>
@@ -760,17 +798,36 @@ export default function ChatPage() {
         )}
       </div>
 
-      {/* Level Up Notification - Refined */}
       {showLevelUp && (
         <div className="fixed top-12 left-1/2 -translate-x-1/2 z-50 animate-fade-in-up">
           <div className="bg-[#741818] text-white px-8 py-4 rounded-[2rem] border border-white/20 flex items-center gap-4 shadow-[0_0_40px_rgba(116,24,24,0.4)]">
-            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-              <Sparkles size={20} />
-            </div>
+            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center"><Sparkles size={20} /></div>
             <div>
               <p className="text-xs font-bold uppercase tracking-widest opacity-60">Level Up!</p>
               <p className="font-bold text-lg leading-none">You reached Level {relationshipLevel}</p>
             </div>
+          </div>
+        </div>
+      )}
+
+      {showUnlockModal && newUnlock && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-gradient-to-b from-[#741818] to-[#0a0a0f] border border-yellow-500/30 rounded-[2rem] p-8 max-w-md w-full text-center">
+            <div className="w-20 h-20 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Sparkles size={40} className="text-yellow-500" />
+            </div>
+            <h3 className="text-2xl font-bold text-white mb-2">Content Unlocked!</h3>
+            <p className="text-white/60 mb-6">{newUnlock.name}</p>
+            {newUnlock.content && (
+              <div className="mb-6 rounded-2xl overflow-hidden h-64 bg-black/20">
+                {newUnlock.type === 'photo' ? (
+                  <img src={`${import.meta.env.VITE_URL}${newUnlock.content}`} alt={newUnlock.name} className="w-full h-full object-cover" />
+                ) : (
+                  <video src={`${import.meta.env.VITE_URL}${newUnlock.content}`} className="w-full h-full object-cover" controls autoPlay />
+                )}
+              </div>
+            )}
+            <button onClick={() => setShowUnlockModal(false)} className="w-full py-3 bg-white text-black font-bold rounded-xl active:scale-95 transition-all">Awesome!</button>
           </div>
         </div>
       )}

@@ -36,9 +36,9 @@ export default function DialogPremium({ credits = 0 }) {
         {tooltipVisible && (
           <div className="absolute bottom-full left-0 mb-2 p-3 bg-popover text-popover-foreground text-sm rounded-lg shadow-lg w-72 border border-blue-200">
             {credits === 0 ? (
-              <p className="font-medium">You've run out of credits. Upgrade to continue creating AI girls and chatting</p>
+              <p className="font-medium">You've run out of credits. Buy a pack to continue generating AI content</p>
             ) : (
-              <p className="font-medium">350 credits = 1 AI girl. Need more? Upgrade your plan</p>
+              <p className="font-medium">50 credits = 1 photo | 200 credits = 1 video</p>
             )}
           </div>
         )}

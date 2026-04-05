@@ -1,0 +1,96 @@
+import { Send } from "lucide-react";
+
+export default function ChatOverlay({ 
+  messages, 
+  isTyping, 
+  incomingAiMessages,
+  message, 
+  setMessage,
+  onSend,
+  onKeyPress,
+  isLoggedIn,
+  isGuest,
+  messagesRemaining,
+  isLoading,
+  chatContainerRef 
+}) {
+  return (
+    <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-[#0a0a0f] via-[#0a0a0f]/40 to-transparent">
+      <div
+        className="relative max-h-[320px] overflow-y-auto custom-scrollbar space-y-3 mb-6 pr-2"
+        ref={chatContainerRef}
+      >
+        {messages.map((msg, index) => {
+          const isNewest = index === messages.length - 1;
+          const opacity = Math.min(1, 0.6 + (index * 0.1));
+
+          return (
+            <div
+              key={msg.id}
+              className={`flex ${msg.sender === 'user' ? 'justify-end' : msg.sender === 'system' ? 'justify-center' : 'justify-start'} ${isNewest ? 'animate-fade-in-up' : ''}`}
+            >
+              {msg.sender === 'system' ? (
+                <span className="text-yellow-400 text-[10px] font-bold uppercase tracking-widest bg-yellow-400/5 px-3 py-1 rounded-full border border-yellow-400/10 backdrop-blur-md" style={{ opacity }}>
+                  {msg.text}
+                </span>
+              ) : (
+                <div className={`max-w-[85%] ${msg.sender === 'user' ? 'ml-8' : 'mr-8'}`}>
+                  <div
+                    className={`px-4 py-2.5 rounded-2xl text-sm ${msg.sender === 'user'
+                        ? 'bg-[#741818] text-white border border-white/5'
+                        : 'bg-white/5 backdrop-blur-xl text-white/90 border border-white/10'
+                      }`}
+                    style={{ opacity }}
+                  >
+                    {msg.text}
+                    {msg.time && msg.time !== 'now' && (
+                      <div className="text-[10px] opacity-30 mt-1 text-right">{msg.time}</div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+        {isTyping && (
+          <div className="flex justify-start">
+            <div className="bg-white/5 backdrop-blur-xl border border-white/5 px-4 py-2.5 rounded-2xl rounded-bl-none">
+              {incomingAiMessages > 1 ? (
+                <span className="text-xs text-white/40">AI pisze... ({incomingAiMessages} wiadomości)</span>
+              ) : (
+                <div className="flex gap-1">
+                  <div className="w-1.5 h-1.5 bg-white/20 rounded-full animate-bounce" />
+                  <div className="w-1.5 h-1.5 bg-white/20 rounded-full animate-bounce [animation-delay:0.2s]" />
+                  <div className="w-1.5 h-1.5 bg-white/20 rounded-full animate-bounce [animation-delay:0.4s]" />
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Chat Input */}
+      <div className="flex items-center gap-3 relative">
+        <input
+          type="text"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          onKeyPress={onKeyPress}
+          placeholder={isLoggedIn ? "Message..." : "Log in to chat..."}
+          disabled={isGuest && !isLoggedIn && messagesRemaining <= 0}
+          className={`flex-1 bg-white/5 backdrop-blur-xl text-white px-5 py-3 rounded-full focus:outline-none border border-white/10 placeholder:text-white/20 transition-colors focus:border-white/20 ${isGuest && !isLoggedIn && messagesRemaining <= 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+        />
+        <button
+          onClick={onSend}
+          disabled={!message.trim() || isLoading || (isGuest && !isLoggedIn && messagesRemaining <= 0)}
+          className={`cursor-pointer p-3 rounded-full transition-all text-white/80 active:scale-95 ${message.trim() && !isLoading && !(isGuest && !isLoggedIn && messagesRemaining <= 0)
+              ? 'bg-[#741818] hover:bg-[#8d1d1d]' 
+              : 'bg-white/10 cursor-not-allowed'
+            }`}
+        >
+          <Send size={18} />
+        </button>
+      </div>
+    </div>
+  );
+}

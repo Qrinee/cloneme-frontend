@@ -83,7 +83,7 @@ export default function FeaturedSection() {
             >
               <div className="relative">
                 <video
-                  src={profile.mainVideo}
+                  src={profile.mainVideo ? `${import.meta.env.VITE_URL}${profile.mainVideo}` : null}
                   className="w-full h-96 object-cover opacity-60 group-hover:opacity-80 transition-opacity duration-500"
                   loop
                   muted

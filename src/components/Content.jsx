@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -8,78 +8,36 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
-import { Zap, Sparkles, Gem, Crown, Flame, Infinity, Coins } from "lucide-react";
+import { Flame, Gem, Infinity, Coins } from "lucide-react";
 
 export default function Content() {
-  const [activeTab, setActiveTab] = useState('subscription');
-
-
-  const subscriptionPlans = [
-    {
-      name: "Starter",
-      credits: "500 credits/mo",
-      price: "$9.99/mo",
-      link: "https://buy.stripe.com/4gM7sK56W9PPeICeZN6sw02",
-      icon: <Zap className="w-6 h-6 text-red-400" />,
-      color: "bg-red-900",
-      popular: false,
-      messages: "2,000 messages/mo",
-      value: "Create 1 AI girl + 1,300 messages",
-    },
-    {
-      name: "Premium",
-      credits: "1,500 credits/mo",
-      price: "$19.99/mo",
-      link: "https://buy.stripe.com/bJedR87f4aTTgQK5pd6sw01",
-      icon: <Sparkles className="w-6 h-6 text-pink-400" />,
-      color: "bg-pink-900",
-      popular: true,
-      messages: "6,000 messages/mo",
-      value: "Create 4 AI girls + 2,900 messages",
-    },
-    {
-      name: "Ultimate",
-      credits: "5,000 credits/mo",
-      price: "$39.99/mo",
-      link: "https://buy.stripe.com/dRmbJ042S4vv6c6cRF6sw00",
-      icon: <Crown className="w-6 h-6 text-yellow-400" />,
-      color: "bg-yellow-900",
-      popular: false,
-      messages: "20,000 messages/mo",
-      value: "Create 14 AI girls + 11,400 messages",
-    }
-  ];
-
   const oneTimePlans = [
     {
       name: "Quickie",
-      credits: "100 credits",
+      credits: "50 credits",
       price: "$3.99",
-      link: "https://buy.stripe.com/28E9ASdDs1jjfMGdVJ6sw05",
+      link: "https://buy.stripe.com/dRm4gyczo5zz8kebNB6sw08",
       icon: <Flame className="w-6 h-6 text-red-400" />,
       color: "bg-red-900/50",
-      messages: "400 messages",
-      value: "Create 0.28 AI girl",
+      value: "1 AI photo",
     },
     {
       name: "Session",
       credits: "200 credits",
       price: "$7.99",
-      link: "https://buy.stripe.com/eVqcN4bvkfa90RM04T6sw04",
+      link: "https://buy.stripe.com/9B69ASfLA4vv6c6eZN6sw07",
       icon: <Gem className="w-6 h-6 text-purple-400" />,
       color: "bg-purple-900/50",
-      messages: "800 messages",
-      value: "Create 0.57 AI girl",
+      value: "1 AI video",
     },
     {
       name: "Marathon",
-      credits: "350 credits",
+      credits: "400 credits",
       price: "$14.99",
-      link: "https://buy.stripe.com/fZu3cudDs7HHgQK6th6sw03",
+      link: "https://buy.stripe.com/3cIfZgczo9PPdEyaJx6sw06",
       icon: <Infinity className="w-6 h-6 text-pink-400" />,
       color: "bg-pink-900/50",
-      messages: "1,400 messages",
-      value: "Create 1 AI girl",
+      value: "8 AI photos",
     }
   ];
 
@@ -99,36 +57,16 @@ export default function Content() {
           <Coins className="w-5 h-5 text-red-400" />
         </motion.div>
         <DialogTitle className="text-3xl md:text-4xl font-bold text-white">
-          Premium Subscription
+          One-Time Packs
         </DialogTitle>
         <p className="text-white/40 mt-2 text-sm max-w-md mx-auto">
-          Get unlimited messages and 1 free AI Girlfriend creation per month!
+          Buy credits to generate AI girl photos and videos!
         </p>
-      </div>
-
-
-
-      {/* Tab Navigation */}
-      <div className="flex justify-center mb-6 px-4">
-        <div className="flex bg-white/5 rounded-full p-1 border border-white/10">
-
-          <button
-            onClick={() => setActiveTab('one-time')}
-            className={`px-6 py-2.5 cursor-pointer rounded-full text-sm font-bold transition-all ${
-              activeTab === 'one-time' 
-                ? 'bg-red-800 text-white shadow-lg' 
-                : 'text-white/40 hover:text-white'
-            }`}
-          >
-            One-Time Packs
-          </button>
-        </div>
       </div>
 
       {/* Plans Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 px-4 pb-6">
-        {(activeTab === 'subscription' ? subscriptionPlans : oneTimePlans)
-          .map((plan, index) => (
+        {oneTimePlans.map((plan, index) => (
             <motion.div 
               key={plan.name}
               initial={{ opacity: 0, y: 20 }}
@@ -158,13 +96,11 @@ export default function Content() {
 
                   {/* Plan Name */}
                   <h3 className="text-xl font-bold text-white text-center mb-1">{plan.name}</h3>
-                  <p className="text-white/50 text-xs text-center mb-2">{plan.credits}</p>
-                  <p className="text-yellow-300/70 text-[10px] text-center mb-4">{plan.messages}</p>
+                  <p className="text-white/50 text-xs text-center mb-4">{plan.credits}</p>
 
                   {/* Price */}
                   <div className="text-center mb-4">
-                    <span className="text-3xl font-bold text-white">{plan.price.split('/')[0]}</span>
-                    {plan.price.includes('/mo') && <span className="text-white/40 text-sm">/mo</span>}
+                    <span className="text-3xl font-bold text-white">{plan.price}</span>
                   </div>
 
                   {/* Value description */}
@@ -175,14 +111,15 @@ export default function Content() {
                   {/* CTA Button */}
                   <Button 
                     className={`w-full cursor-pointer font-bold text-sm py-6 rounded-2xl transition-all active:scale-95 ${
-                      plan.popular
+                      plan.name === "Marathon"
                         ? 'bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-black shadow-lg shadow-yellow-500/20'
                         : 'bg-white/10 hover:bg-white/20 text-white border border-white/10'
                     }`}
                     onClick={() => window.location = plan.link}
                   >
-                    Subscribe
+                    Buy Now
                   </Button>
+                  
                 </CardContent>
               </div>
             </motion.div>

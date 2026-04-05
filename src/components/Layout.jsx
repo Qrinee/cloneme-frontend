@@ -14,7 +14,7 @@ const Layout = ({ children }) => {
   const [premiumDialogOpen, setPremiumDialogOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { isLoggedIn, user, updateUser } = useLayoutContext();
+  const { isLoggedIn, user, updateUser, premium } = useLayoutContext();
   const authFetch = useAuthFetch();
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
@@ -169,20 +169,32 @@ const Layout = ({ children }) => {
           {/* User Profile Section */}
           <div className="p-4 border-t border-white/5">
 
-                <Dialog open={premiumDialogOpen} onOpenChange={setPremiumDialogOpen}>
-                  <DialogTrigger asChild>
-                    <button
-                      data-tour-target="premium-link"
-                      className="w-full flex items-center px-4 py-3 rounded-xl transition-all duration-200 text-base font-bold  text-red-400 hover:bg-white/5 border border-white/5 border-red-500/30 cursor-pointer"
-                    >
-                      <Coins className="w-5 h-5 mr-4" />
-                      <span>Buy Points</span>
-                    </button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-[95vw] sm:max-w-[90vw] md:max-w-[80vw] bg-[#0a0a0f] border-red-900/30 overflow-hidden p-0">
-                    <Content />
-                  </DialogContent>
-                </Dialog>
+                {!premium?.isActive ? (
+                  <a
+                    href="https://buy.stripe.com/bJedR87f4aTTgQK5pd6sw01"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full flex items-center px-4 py-3 rounded-xl transition-all duration-200 text-base font-bold text-yellow-400 hover:bg-yellow-500/10 border border-yellow-500/30 cursor-pointer"
+                  >
+                    <Coins className="w-5 h-5 mr-4" />
+                    <span>Upgrade to Premium</span>
+                  </a>
+                ) : (
+                  <Dialog open={premiumDialogOpen} onOpenChange={setPremiumDialogOpen}>
+                    <DialogTrigger asChild>
+                      <button
+                        data-tour-target="premium-link"
+                        className="w-full flex items-center px-4 py-3 rounded-xl transition-all duration-200 text-base font-bold  text-red-400 hover:bg-white/5 border border-white/5 border-red-500/30 cursor-pointer"
+                      >
+                        <Coins className="w-5 h-5 mr-4" />
+                        <span>Buy Points</span>
+                      </button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-[95vw] sm:max-w-[90vw] md:max-w-[80vw] bg-[#0a0a0f] border-red-900/30 overflow-hidden p-0">
+                      <Content />
+                    </DialogContent>
+                  </Dialog>
+                )}
 
             {isLoggedIn && user && (
               <a href="/profile" className="block mt-4">

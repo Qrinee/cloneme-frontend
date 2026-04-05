@@ -83,7 +83,7 @@ export default function QuickChatSection() {
             >
               <div className="relative aspect-[3/4.2]">
                 <video
-                  src={girl.mainVideo}
+                  src={girl.mainVideo ? `${import.meta.env.VITE_URL}${girl.mainVideo}` : null}
                   className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500"
                   loop
                   muted

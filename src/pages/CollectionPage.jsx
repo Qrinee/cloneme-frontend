@@ -155,7 +155,7 @@ export default function CollectionPage() {
                       }}
                     >
                       <video
-                        src={girl.mainVideo}
+                        src={girl.mainVideo ? `${import.meta.env.VITE_URL}${girl.mainVideo}` : null}
                         className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500"
                         loop
                         muted
@@ -252,7 +252,7 @@ export default function CollectionPage() {
                       >
                         {girl.mainVideo ? (
                           <video
-                            src={girl.mainVideo}
+                            src={`${import.meta.env.VITE_URL}${girl.mainVideo}`}
                             className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500"
                             loop
                             muted
@@ -260,7 +260,7 @@ export default function CollectionPage() {
                           />
                         ) : girl.mainPhoto ? (
                           <img
-                            src={girl.mainPhoto}
+                            src={girl.mainPhoto ? `${import.meta.env.VITE_URL}${girl.mainPhoto}` : null}
                             alt={girl.name}
                             className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500"
                           />

@@ -203,7 +203,7 @@ export default function DiscoverPage() {
                   <div className="absolute inset-0">
                     {profile.mainVideo ? (
                       <video
-                        src={profile.mainVideo}
+                        src={`${import.meta.env.VITE_URL}${profile.mainVideo}`}
                         className="w-full h-full object-cover opacity-80"
                         autoPlay
                         loop
@@ -212,7 +212,7 @@ export default function DiscoverPage() {
                       />
                     ) : (
                       <img
-                        src={profile.mainVideo || profile.cloneAvatarPhotoUrl}
+                        src={profile.mainVideo ? `${import.meta.env.VITE_URL}${profile.mainVideo}` : (profile.cloneAvatarPhotoUrl ? `${import.meta.env.VITE_URL}${profile.cloneAvatarPhotoUrl}` : null)}
                         alt={profile.name}
                         className="w-full h-full object-cover opacity-80"
                       />
@@ -227,7 +227,7 @@ export default function DiscoverPage() {
                       <div className="flex items-center gap-4 mb-4">
                         <div className="relative">
                           <Avatar className="w-16 h-16 border border-white/10 object-contain">
-                            <AvatarImage src={profile.mainPhoto || profile.cloneAvatarPhotoUrl} className="object-cover" />
+                            <AvatarImage src={profile.mainPhoto ? `${import.meta.env.VITE_URL}${profile.mainPhoto}` : profile.cloneAvatarPhotoUrl} className="object-cover" />
                             <AvatarFallback>{profile.name?.[0]}</AvatarFallback>
                           </Avatar>
                           <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-[#0a0a0f]" />

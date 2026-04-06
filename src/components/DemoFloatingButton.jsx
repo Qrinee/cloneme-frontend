@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiX } from "react-icons/fi";
 
-const DEMO_GIRL_ID = "demo-girl-001";
+const DEMO_GIRL_ID = "69c7bb50d531ee949be6a444";
 
 export default function DemoFloatingButton({ onDemoClick }) {
   const [isVisible, setIsVisible] = useState(false);
@@ -26,7 +26,7 @@ export default function DemoFloatingButton({ onDemoClick }) {
     if (onDemoClick) {
       onDemoClick(DEMO_GIRL_ID);
     } else {
-      window.location.href = `/chat/${DEMO_GIRL_ID}`;
+      window.location.href = `/jerk-off/69c7bb50d531ee949be6a444`;
     }
   };
 

@@ -4,16 +4,6 @@ import { Flame } from "lucide-react";
 import { useAuthFetch } from "@/utils/authFetch";
 import { Heart, Shirt, Crown, Moon, Star, Sparkles, Flame as FlameIcon, Sun, Skull, Palette, Plane, Diamond } from "lucide-react";
 
-const quickChatGirls = [
-  { id: 1, name: "Sophia", age: 22, location: "Paris", tags: [{ label: "Sweet", icon: Heart }, { label: "Dress-up", icon: Shirt }], online: true },
-  { id: 2, name: "Emma", age: 24, location: "London", tags: [{ label: "Dominant", icon: Crown }, { label: "Kisser", icon: Heart }], online: true },
-  { id: 3, name: "Olivia", age: 21, location: "NYC", tags: [{ label: "Night Queen", icon: Moon }, { label: "Hot", icon: FlameIcon }], online: true },
-  { id: 4, name: "Isabella", age: 23, location: "Tokyo", tags: [{ label: "Kawaii", icon: Star }, { label: "Shy", icon: Sparkles }], online: true },
-  { id: 5, name: "Ava", age: 25, location: "LA", tags: [{ label: "Beach", icon: Sun }, { label: "Wild", icon: Skull }], online: false },
-  { id: 6, name: "Mia", age: 20, location: "Berlin", tags: [{ label: "Artist", icon: Palette }, { label: "Dreamy", icon: Sparkles }], online: true },
-  { id: 7, name: "Charlotte", age: 23, location: "Sydney", tags: [{ label: "Adventurer", icon: Plane }, { label: "Passion", icon: FlameIcon }], online: true },
-  { id: 8, name: "Amelia", age: 22, location: "Dubai", tags: [{ label: "Luxury", icon: Diamond }, { label: "Royal", icon: Crown }], online: true },
-];
 
 export default function QuickChatSection() {
   const navigate = useNavigate();

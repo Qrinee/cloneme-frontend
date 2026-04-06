@@ -446,7 +446,7 @@ export default function MainPage() {
                   type="button"
                   onClick={() => window.location = `${import.meta.env.VITE_URL}/auth/google`}
                   variant="outline"
-                  className="w-full h-11 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] hover:bg-[var(--bg-tertiary)]"
+                  className="w-full h-11 bg-transparent border-[var(--border-subtle)] text-white hover:bg-[var(--bg-tertiary)]"
                 >
                   <FcGoogle size={18} className="mr-2" />
                   Continue with Google
@@ -466,7 +466,7 @@ export default function MainPage() {
                     placeholder="name@example.com"
                     required
                     onChange={handleChange}
-                    className="h-10 bg-transparent border-[var(--border-subtle)] text-white placeholder:text-gray-300 focus:border-[var(--accent-primary)]"
+                    className="h-10 bg-transparent border-[var(--border-subtle)] text-white placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)]"
                   />
                 </div>
 
@@ -478,7 +478,7 @@ export default function MainPage() {
                     placeholder="••••••••"
                     required
                     onChange={handleChange}
-                    className="h-10 bg-transparent border-[var(--border-subtle)] text-white placeholder:text-gray-300 focus:border-[var(--accent-primary)]"
+                    className="h-10 bg-transparent border-[var(--border-subtle)] text-white placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)]"
                   />
                 </div>
 
@@ -516,7 +516,7 @@ export default function MainPage() {
                   type="button"
                   onClick={() => window.location = `${import.meta.env.VITE_URL}/auth/google`}
                   variant="outline"
-                  className="w-full h-11 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] hover:bg-[var(--bg-tertiary)]"
+                  className="w-full h-11 bg-transparent border-[var(--border-subtle)] text-white hover:bg-[var(--bg-tertiary)]"
                 >
                   <FcGoogle size={18} className="mr-2" />
                   Continue with Google
@@ -536,7 +536,7 @@ export default function MainPage() {
                     placeholder="johndoe"
                     required
                     onChange={handleChange}
-                    className="h-10 bg-transparent border-[var(--border-subtle)] text-white placeholder:text-gray-300 focus:border-[var(--accent-primary)]"
+                    className="h-10 bg-transparent border-[var(--border-subtle)] text-white placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)]"
                   />
                 </div>
 
@@ -548,7 +548,7 @@ export default function MainPage() {
                     placeholder="name@example.com"
                     required
                     onChange={handleChange}
-                    className="h-10 bg-transparent border-[var(--border-subtle)] text-white placeholder:text-gray-300 focus:border-[var(--accent-primary)]"
+                    className="h-10 bg-transparent border-[var(--border-subtle)] text-white placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)]"
                   />
                 </div>
 
@@ -560,7 +560,7 @@ export default function MainPage() {
                     placeholder="••••••••"
                     required
                     onChange={handleChange}
-                    className="h-10 bg-transparent border-[var(--border-subtle)] text-white placeholder:text-gray-300 focus:border-[var(--accent-primary)]"
+                    className="h-10 bg-transparent border-[var(--border-subtle)] text-white placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)]"
                   />
                 </div>
 
@@ -572,7 +572,7 @@ export default function MainPage() {
                     placeholder="••••••••"
                     required
                     onChange={handleChange}
-                    className="h-10 bg-transparent border-[var(--border-subtle)] text-white placeholder:text-gray-300 focus:border-[var(--accent-primary)]"
+                    className="h-10 bg-transparent border-[var(--border-subtle)] text-white placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)]"
                   />
                 </div>
 
@@ -620,7 +620,7 @@ export default function MainPage() {
                     required
                     value={verificationCode}
                     onChange={(e) => setVerificationCode(e.target.value)}
-                    className="text-center tracking-widest text-lg h-11 bg-transparent border-[var(--border-subtle)] text-white placeholder:text-gray-300 focus:border-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
+                    className="text-center tracking-widest text-lg h-11 bg-transparent border-[var(--border-subtle)] text-white placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
                     maxLength={6}
                   />
                 </div>

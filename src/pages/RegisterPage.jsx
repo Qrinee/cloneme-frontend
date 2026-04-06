@@ -139,7 +139,7 @@ export default function RegisterPage() {
           className="w-full max-w-md rounded-2xl border bg-card text-card-foreground shadow-lg px-6 py-8"
         >
           <div className="text-center mb-6">
-            <h1 className="text-3xl font-bold">Create Account</h1>
+            <h1 className="text-3xl font-bold text-white">Create Account</h1>
             <p className="text-muted-foreground mt-2">
               Create your account to get started
             </p>
@@ -151,7 +151,7 @@ export default function RegisterPage() {
                 Verification code sent to:<br/><span className="text-white font-medium">{verifyEmail}</span>
               </p>
               <div>
-                <Label htmlFor="verificationCode" className="mb-2">6-Digit Code</Label>
+                <Label htmlFor="verificationCode" className="mb-2 text-white">6-Digit Code</Label>
                 <Input
                   id="verificationCode"
                   type="text"
@@ -159,7 +159,7 @@ export default function RegisterPage() {
                   required
                   value={verificationCode}
                   onChange={(e) => setVerificationCode(e.target.value)}
-                  className="text-center tracking-widest text-lg h-11 border-muted text-foreground focus:border-primary"
+                  className="text-center tracking-widest text-lg h-11 border-muted text-white placeholder:text-gray-300 focus:border-primary"
                   maxLength={6}
                 />
               </div>
@@ -173,7 +173,7 @@ export default function RegisterPage() {
           ) : (
             <form onSubmit={handleRegister} className="space-y-4 text-left">
               <div>
-                <Label htmlFor="username">Username</Label>
+                <Label htmlFor="username" className="text-white">Username</Label>
                 <Input
                   id="username"
                   placeholder="John Doe"
@@ -181,12 +181,12 @@ export default function RegisterPage() {
                   required
                   onChange={handleChange}
                   value={form.username}
-                  className="mt-1"
+                  className="mt-1 text-white placeholder:text-gray-300"
                 />
               </div>
 
               <div>
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email" className="text-white">Email</Label>
                 <Input
                   id="email"
                   type="email"
@@ -194,12 +194,12 @@ export default function RegisterPage() {
                   required
                   onChange={handleChange}
                   value={form.email}
-                  className="mt-1"
+                  className="mt-1 text-white placeholder:text-gray-300"
                 />
               </div>
 
               <div>
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password" className="text-white">Password</Label>
                 <Input
                   id="password"
                   type="password"
@@ -207,12 +207,12 @@ export default function RegisterPage() {
                   required
                   onChange={handleChange}
                   value={form.password}
-                  className="mt-1"
+                  className="mt-1 text-white placeholder:text-gray-300"
                 />
               </div>
 
               <div>
-                <Label htmlFor="repeatPassword">Repeat Password</Label>
+                <Label htmlFor="repeatPassword" className="text-white">Repeat Password</Label>
                 <Input
                   id="repeatPassword"
                   placeholder="********"
@@ -220,7 +220,7 @@ export default function RegisterPage() {
                   required
                   onChange={handleChange}
                   value={form.repeatPassword}
-                  className="mt-1"
+                  className="mt-1 text-white placeholder:text-gray-300"
                 />
               </div>
 

@@ -141,7 +141,7 @@ export default function MainPage() {
   };
 
   return (
-    <div className="min-h-screen w-full flex bg-[var(--bg-primary)]">
+    <div className="min-h-screen w-full flex bg-[var(--bg-primary)] text-white">
       {/* Desktop: Left side - Form */}
       <div className="hidden lg:flex lg:w-1/2 items-center justify-center p-8">
         <div className="w-full max-w-sm">
@@ -454,31 +454,31 @@ export default function MainPage() {
 
                 <div className="flex items-center gap-3 my-4">
                   <div className="flex-1 h-px bg-[var(--border-subtle)]" />
-                  <span className="text-xs text-[var(--text-muted)]">or</span>
+                  <span className="text-xs text-white">or</span>
                   <div className="flex-1 h-px bg-[var(--border-subtle)]" />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-xs text-[var(--text-muted)]">Email</Label>
+                  <Label htmlFor="email" className="text-xs text-white">Email</Label>
                   <Input
                     id="email"
                     type="email"
                     placeholder="name@example.com"
                     required
                     onChange={handleChange}
-                    className="h-10 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)]"
+                    className="h-10 bg-transparent border-[var(--border-subtle)] text-white placeholder:text-gray-300 focus:border-[var(--accent-primary)]"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="password" className="text-xs text-[var(--text-muted)]">Password</Label>
+                  <Label htmlFor="password" className="text-xs text-white">Password</Label>
                   <Input
                     id="password"
                     type="password"
                     placeholder="••••••••"
                     required
                     onChange={handleChange}
-                    className="h-10 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)]"
+                    className="h-10 bg-transparent border-[var(--border-subtle)] text-white placeholder:text-gray-300 focus:border-[var(--accent-primary)]"
                   />
                 </div>
 
@@ -495,7 +495,7 @@ export default function MainPage() {
                 <div className="flex justify-center">
                   <button
                     type="button"
-                    className="text-md text-[var(--text-muted)] hover:text-[var(--foreground)] cursor-pointer"
+                    className="text-md text-white hover:text-white/80 cursor-pointer"
                     onClick={() => setView("register")}
                   >
                     Don't have an account? Create one
@@ -524,55 +524,55 @@ export default function MainPage() {
 
                 <div className="flex items-center gap-3 my-4">
                   <div className="flex-1 h-px bg-[var(--border-subtle)]" />
-                  <span className="text-xs text-[var(--text-muted)]">or</span>
+                  <span className="text-xs text-white">or</span>
                   <div className="flex-1 h-px bg-[var(--border-subtle)]" />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="username" className="text-xs text-[var(--text-muted)]">Username</Label>
+                  <Label htmlFor="username" className="text-xs text-white">Username</Label>
                   <Input
                     id="username"
                     type="text"
                     placeholder="johndoe"
                     required
                     onChange={handleChange}
-                    className="h-10 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)]"
+                    className="h-10 bg-transparent border-[var(--border-subtle)] text-white placeholder:text-gray-300 focus:border-[var(--accent-primary)]"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-xs text-[var(--text-muted)]">Email</Label>
+                  <Label htmlFor="email" className="text-xs text-white">Email</Label>
                   <Input
                     id="email"
                     type="email"
                     placeholder="name@example.com"
                     required
                     onChange={handleChange}
-                    className="h-10 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)]"
+                    className="h-10 bg-transparent border-[var(--border-subtle)] text-white placeholder:text-gray-300 focus:border-[var(--accent-primary)]"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="password" className="text-xs text-[var(--text-muted)]">Password</Label>
+                  <Label htmlFor="password" className="text-xs text-white">Password</Label>
                   <Input
                     id="password"
                     type="password"
                     placeholder="••••••••"
                     required
                     onChange={handleChange}
-                    className="h-10 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)]"
+                    className="h-10 bg-transparent border-[var(--border-subtle)] text-white placeholder:text-gray-300 focus:border-[var(--accent-primary)]"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="repeat-password" className="text-xs text-[var(--text-muted)]">Confirm password</Label>
+                  <Label htmlFor="repeat-password" className="text-xs text-white">Confirm password</Label>
                   <Input
                     id="repeat-password"
                     type="password"
                     placeholder="••••••••"
                     required
                     onChange={handleChange}
-                    className="h-10 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)]"
+                    className="h-10 bg-transparent border-[var(--border-subtle)] text-white placeholder:text-gray-300 focus:border-[var(--accent-primary)]"
                   />
                 </div>
 
@@ -589,7 +589,7 @@ export default function MainPage() {
                 <div className="flex justify-center">
                   <button
                     type="button"
-                    className="text-xs text-[var(--text-muted)] hover:text-[var(--foreground)]"
+                    className="text-xs text-white hover:text-white/80"
                     onClick={() => setView("login")}
                   >
                     Already have an account? Sign in
@@ -606,11 +606,11 @@ export default function MainPage() {
                 onSubmit={handleVerify}
                 className="space-y-4"
               >
-                <p className="text-sm text-center text-[var(--text-muted)] mb-4">
-                  Verification code sent to:<br/><span className="text-[var(--foreground)] font-medium">{verifyEmail}</span>
+                <p className="text-sm text-center text-white mb-4">
+                  Verification code sent to:<br/><span className="text-white font-medium">{verifyEmail}</span>
                 </p>
                 <div className="space-y-3">
-                  <Label htmlFor="verificationCode" className="text-xs text-[var(--text-muted)] mb-2 block">
+                  <Label htmlFor="verificationCode" className="text-xs text-white mb-2 block">
                     6-Digit Code
                   </Label>
                   <Input
@@ -620,7 +620,7 @@ export default function MainPage() {
                     required
                     value={verificationCode}
                     onChange={(e) => setVerificationCode(e.target.value)}
-                    className="text-center tracking-widest text-lg h-11 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] focus:border-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
+                    className="text-center tracking-widest text-lg h-11 bg-transparent border-[var(--border-subtle)] text-white placeholder:text-gray-300 focus:border-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
                     maxLength={6}
                   />
                 </div>

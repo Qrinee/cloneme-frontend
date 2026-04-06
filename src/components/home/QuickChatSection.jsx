@@ -74,11 +74,16 @@ export default function QuickChatSection() {
               <div className="relative aspect-[3/4.2]">
                 <video
                   src={girl.mainVideo ? `${import.meta.env.VITE_URL}${girl.mainVideo}` : null}
-                  className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500"
+                  className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500 md:block hidden"
                   loop
                   muted
                   playsInline
                   preload="auto"
+                />
+                <img
+                  src={girl.mainImage ? `${import.meta.env.VITE_URL}${girl.mainImage}` : null}
+                  alt={girl.name}
+                  className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500 md:hidden"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f] via-[#0a0a0f]/20 to-transparent" />
 

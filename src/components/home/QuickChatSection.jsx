@@ -81,7 +81,7 @@ export default function QuickChatSection() {
                   preload="auto"
                 />
                 <img
-                  src={girl.mainImage ? `${import.meta.env.VITE_URL}${girl.mainImage}` : null}
+                  src={girl.mainPhoto ? `${import.meta.env.VITE_URL}${girl.mainPhoto}` : null}
                   alt={girl.name}
                   className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500 md:hidden"
                 />

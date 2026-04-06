@@ -73,12 +73,10 @@ export default function ChatOverlay({
           onChange={(e) => setMessage(e.target.value)}
           onKeyPress={onKeyPress}
           placeholder={isLoggedIn ? "Message..." : "Log in to chat..."}
-          disabled={isGuest && !isLoggedIn && messagesRemaining <= 0}
           className={`flex-1 bg-white/5 backdrop-blur-xl text-white px-5 py-3 rounded-full focus:outline-none border border-white/10 placeholder:text-white/20 transition-colors focus:border-white/20 ${isGuest && !isLoggedIn && messagesRemaining <= 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
         />
         <button
           onClick={onSend}
-          disabled={!message.trim() || isLoading || (isGuest && !isLoggedIn && messagesRemaining <= 0)}
           className={`cursor-pointer p-3 rounded-full transition-all text-white/80 active:scale-95 ${message.trim() && !isLoading && !(isGuest && !isLoggedIn && messagesRemaining <= 0)
               ? 'bg-[#741818] hover:bg-[#8d1d1d]' 
               : 'bg-white/10 cursor-not-allowed'

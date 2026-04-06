@@ -564,8 +564,12 @@ export default function ChatPage() {
       } else {
         if (data.message?.toLowerCase().includes("credits") || data.message?.toLowerCase().includes("points")) {
           setOpen(true);
+        } else if (data.message?.toLowerCase().includes("authentication") || data.message?.toLowerCase().includes("login") || data.message?.toLowerCase().includes("log in") || data.message?.toLowerCase().includes("required")) {
+          setLimitErrorMessage(data.message || "Login required to continue.");
+          setShowLoginDialog(true);
         } else {
-          alert(data.message);
+          setLimitErrorMessage(data.message || "An error occurred.");
+          setShowLoginDialog(true);
         }
         setIsTyping(false);
       }

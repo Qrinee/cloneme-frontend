@@ -91,7 +91,7 @@ export default function FeaturedSection() {
                   preload="auto"
                 />
                 <img
-                  src={profile.mainImage ? `${import.meta.env.VITE_URL}${profile.mainImage}` : null}
+                  src={profile.mainPhoto ? `${import.meta.env.VITE_URL}${profile.mainPhoto}` : null}
                   alt={profile.name}
                   className="w-full h-96 object-cover opacity-60 group-hover:opacity-80 transition-opacity duration-500 md:hidden"
                 />

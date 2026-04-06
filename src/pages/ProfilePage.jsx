@@ -511,14 +511,14 @@ export default function ProfilePage() {
                               <MessageCircle size={20} />
                             </div>
                             <h4 className="font-bold text-white">Messages</h4>
-                            <p className="text-white/40 text-sm">{premium?.isActive ? "Unlimited" : `${messagesUsed || 0} / 20 per month`}</p>
+                            <p className="text-white/40 text-sm">{premium?.isActive ? "Unlimited" : `5 per day (free)`}</p>
                           </div>
                           <div className="p-6 rounded-3xl bg-white/5 border border-white/10 flex flex-col gap-3">
                             <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center text-green-400">
                               <Star size={20} />
                             </div>
                             <h4 className="font-bold text-white">Girlfriend Creation</h4>
-                            <p className="text-white/40 text-sm">{premium?.isActive ? (canCreateGirlfriend ? "1 free available" : "1/month (used)") : "200 credits"}</p>
+                            <p className="text-white/40 text-sm">{premium?.isActive ? "1st free (verified) · 200 credits after" : ''}</p>
                           </div>
                         </div>
                         {user?.points !== undefined && (
@@ -537,8 +537,8 @@ export default function ProfilePage() {
                         )}
                         {!premium?.isActive && (
                           <Button onClick={() => window.location = 'https://buy.stripe.com/bJedR87f4aTTgQK5pd6sw01'} className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold rounded-xl py-4 transition-all cursor-pointer">
-                            <Crown size={20} className="mr-2" />Upgrade to Premium
-                          </Button>
+                              <Crown size={20} className="mr-2" />Upgrade to Premium
+                            </Button>
                         )}
                       </CardContent>
                     </Card>

@@ -9,7 +9,7 @@ export default function JerkOffVideo({
   onAddFavorite 
 }) {
   return (
-    <div className="relative flex-1 rounded-none overflow-hidden w-full h-full bg-black">
+    <div className="fixed inset-0 rounded-none overflow-hidden bg-black md:absolute md:inset-0" style={{ top: 'calc(64px + env(safe-area-inset-top))', bottom: 'env(safe-area-inset-bottom)' }}>
       <video
         ref={videoRef}
         src={girlfriend?.mainVideo ? `${import.meta.env.VITE_URL}${girlfriend.mainVideo}` : null}

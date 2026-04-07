@@ -256,7 +256,7 @@ const Layout = ({ children }) => {
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Page content */}
-        <main className="flex-1 overflow-auto no-scrollbar" style={{ paddingTop: 'calc(64px + env(safe-area-inset-top))', paddingBottom: 'env(safe-area-inset-bottom)' }}>
+        <main className="flex-1 overflow-auto no-scrollbar" style={{ paddingTop: 'calc(64px + env(safe-area-inset-top))' }}>
           {children}
         </main>
       </div>

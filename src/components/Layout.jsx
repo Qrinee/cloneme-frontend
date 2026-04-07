@@ -8,6 +8,7 @@ import { useAuthFetch } from "../utils/authFetch";
 import { Coins } from "lucide-react";
 import { Dialog, DialogTrigger, DialogContent } from "./ui/dialog";
 import Content from "./Content";
+import DialogPremiumPromo from "./DialogPremiumPromo";
 import DialogLoginPrompt from "./DialogLoginPrompt";
 
 const Layout = ({ children }) => {
@@ -198,15 +199,23 @@ const Layout = ({ children }) => {
           <div className="p-4 border-t border-white/5">
 
                 {!premium?.isActive ? (
-                  <a
-                    href="https://buy.stripe.com/bJedR87f4aTTgQK5pd6sw01"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full flex items-center px-4 py-3 rounded-xl transition-all duration-200 text-base font-bold text-yellow-400 hover:bg-yellow-500/10 border border-yellow-500/30 cursor-pointer"
-                  >
-                    <Coins className="w-5 h-5 mr-4" />
-                    <span>Upgrade to Premium</span>
-                  </a>
+                  <Dialog open={premiumDialogOpen} onOpenChange={setPremiumDialogOpen}>
+                    <DialogTrigger asChild>
+                      <button
+                        className="w-full flex items-center px-4 py-3 rounded-xl transition-all duration-200 text-base font-bold text-yellow-400 hover:bg-yellow-500/10 border border-yellow-500/30 cursor-pointer"
+                      >
+                        <Coins className="w-5 h-5 mr-4" />
+                        <span>Upgrade to Premium</span>
+                      </button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-md bg-[#0a0a0f] border-yellow-500/30 text-white overflow-hidden p-0">
+                      <DialogPremiumPromo 
+                        open={premiumDialogOpen}
+                        onOpenChange={setPremiumDialogOpen}
+                        onMaybeLater={() => setPremiumDialogOpen(false)}
+                      />
+                    </DialogContent>
+                  </Dialog>
                 ) : (
                   <Dialog open={premiumDialogOpen} onOpenChange={setPremiumDialogOpen}>
                     <DialogTrigger asChild>

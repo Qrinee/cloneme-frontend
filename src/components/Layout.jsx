@@ -136,7 +136,7 @@ const Layout = ({ children }) => {
                           data-tour-target={item.tourId}
                           className={`w-full flex items-center px-4 py-3.5 rounded-xl transition-all duration-200 text-base font-bold cursor-pointer
                             ${isActive(item.link)
-                              ? 'bg-[#741818]/10 text-[#741818] border border-[#741818]/20'
+                              ? 'bg-[#ff3333]/20 text-[#ff4444] border border-[#ff4444]/30'
                               : 'text-white/40 hover:text-white hover:bg-white/5'
                             }`}
                         >
@@ -166,7 +166,7 @@ const Layout = ({ children }) => {
                         <button
                           className={`w-full flex items-center px-4 py-3.5 rounded-xl transition-all duration-200 text-base font-bold cursor-pointer
                             ${isActive(item.link)
-                              ? 'bg-[#741818]/10 text-[#741818] border border-[#741818]/20'
+                              ? 'bg-[#ff3333]/20 text-[#ff4444] border border-[#ff4444]/30'
                               : 'text-white/40 hover:text-white hover:bg-white/5'
                             }`}
                         >

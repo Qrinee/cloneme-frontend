@@ -3,7 +3,6 @@ import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTitle,
 } from "@/components/ui/dialog";
 import img1 from '../assets/task_01kmwzbe1tfvp912tg8rwe5hay_1774793926_img_1.webp';
 import img2 from '../assets/task_01kmwzmaxbfbtrtm45b78g5cv6_1774794217_img_0.webp';
@@ -13,14 +12,14 @@ export default function DialogPremiumPromo({ open, onOpenChange, onMaybeLater })
   const premiumImages = [img1, img2, img3];
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md max-h-[90dvh] bg-[#0a0a0f] border-yellow-500/30 text-white overflow-hidden">
-        <DialogHeader className="text-center shrink-0">
+      <DialogContent className="max-w-md max-h-[90dvh] bg-[#0a0a0f] border-yellow-500/30 text-white overflow-hidden p-0">
+        <DialogHeader className="text-center shrink-0" style={{ margin: 0 }}>
           <div className="w-12 h-12 md:w-16 md:h-16 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
             <Crown size={24} md:size={32} className="text-yellow-500" />
           </div>
-          <DialogTitle className="text-xl md:text-2xl font-bold text-center">
+          <h2 className="text-xl md:text-2xl font-bold text-center">
             Unlock Premium
-          </DialogTitle>
+          </h2>
         </DialogHeader>
         
         <div className="space-y-3 md:space-y-4 py-3 md:py-4 overflow-y-auto max-h-[60vh] pr-2">

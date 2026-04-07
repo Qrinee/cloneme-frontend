@@ -208,7 +208,7 @@ const Layout = ({ children }) => {
                         <span>Upgrade to Premium</span>
                       </button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-md bg-[#0a0a0f] border-yellow-500/30 text-white overflow-hidden p-0">
+                    <DialogContent className="max-w-md max-h-[90dvh] bg-[#0a0a0f] border-yellow-500/30 text-white overflow-hidden p-0">
                       <DialogPremiumPromo 
                         open={premiumDialogOpen}
                         onOpenChange={setPremiumDialogOpen}

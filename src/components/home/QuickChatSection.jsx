@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Flame } from "lucide-react";
 import { useAuthFetch } from "@/utils/authFetch";
+import { useLayoutContext } from "../LayoutContext";
 import { Heart, Shirt, Crown, Moon, Star, Sparkles, Flame as FlameIcon, Sun, Skull, Palette, Plane, Diamond } from "lucide-react";
 
 
@@ -10,6 +11,7 @@ export default function QuickChatSection() {
   const carouselRef = useRef(null);
   const [girls, setGirls] = useState();
   const authFetch = useAuthFetch();
+  const { isLoggedIn } = useLayoutContext();
 
   useEffect(() => {
     authFetch(`${import.meta.env.VITE_API_URL}/girlfriends`)
@@ -60,8 +62,8 @@ export default function QuickChatSection() {
           {girls && girls.girlfriends && girls.girlfriends.map((girl) => (
             <div
               key={girl._id || girl.id}
-              className="flex-shrink-0 w-72 rounded-3xl overflow-hidden bg-white/5 border border-white/5 transition-all duration-300 hover:border-white/10"
-              onClick={() => {}}
+              className="flex-shrink-0 w-72 rounded-3xl overflow-hidden bg-white/5 border border-white/5 transition-all duration-300 hover:border-white/10 cursor-pointer"
+              onClick={() => navigate(`/jerk-off/${girl._id || girl.id}`)}
               onMouseEnter={e => {
                 const vid = e.currentTarget.querySelector('video');
                 if (vid) vid.play().catch(() => { });
@@ -113,7 +115,7 @@ export default function QuickChatSection() {
                     }}
                     className="cursor-pointer w-full bg-[#741818] hover:bg-[#8d1d1d] text-white py-3 rounded-2xl font-bold text-xs uppercase tracking-widest transition-all active:scale-95 border border-white/5"
                   >
-                    Start Session
+                    {isLoggedIn ? "Start Session" : "Continue as Guest"}
                   </button>
                 </div>
               </div>

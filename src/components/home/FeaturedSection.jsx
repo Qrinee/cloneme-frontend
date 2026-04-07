@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Crown, ArrowRight, MessageCircle } from "lucide-react";
+import { useLayoutContext } from "../LayoutContext";
 import video1 from '../../assets/video2.mp4'
 import video2 from '../../assets/examplereel.mp4'
 
@@ -16,6 +17,7 @@ const feedProfiles = [
 
 export default function FeaturedSection() {
     const [girls, setGirls] = useState();
+    const { isLoggedIn } = useLayoutContext();
     useEffect(() => {
         fetch(import.meta.env.VITE_API_URL + '/girlfriends')
             .then(response => response.json())
@@ -117,7 +119,7 @@ export default function FeaturedSection() {
                 </div>
 
                 <button className="cursor-pointer w-full bg-white/5 hover:bg-white/10 text-white/80 py-3 rounded-2xl font-bold text-[10px] uppercase tracking-widest transition-all border border-white/10 flex items-center justify-center gap-2">
-                  <MessageCircle size={14} className="opacity-40" /> Open Chat
+                  <MessageCircle size={14} className="opacity-40" /> {isLoggedIn ? "Open Chat" : "Chat as Guest"}
                 </button>
               </div>
             </article>

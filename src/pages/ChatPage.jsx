@@ -66,6 +66,7 @@ export default function ChatPage() {
   const [limitErrorMessage, setLimitErrorMessage] = useState("Message limit reached. Upgrade to premium for unlimited messages.");
   const [requestingMedia, setRequestingMedia] = useState(null); // 'photo' or 'video'
   const [showLoginDialog, setShowLoginDialog] = useState(false);
+  const [showChatList, setShowChatList] = useState(false);
   
   // Sync with context
   useEffect(() => {
@@ -602,6 +603,15 @@ export default function ChatPage() {
 
   return (
     <Layout>
+      <style>{`
+        @keyframes slideInLeft {
+          from { transform: translateX(-100%); }
+          to { transform: translateX(0); }
+        }
+        .animate-slide-in-left {
+          animation: slideInLeft 0.2s ease-out forwards;
+        }
+      `}</style>
       <Dialog open={open} onOpenChange={setOpen}>
         <Content onClose={() => setOpen(false)} />
       </Dialog>
@@ -690,7 +700,7 @@ export default function ChatPage() {
               <div className="px-3 md:px-6 py-2 md:py-4 border-b border-white/5 flex flex-col gap-1 md:gap-4 bg-[#0a0a0f]/80 backdrop-blur-md sticky top-0 z-20">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 md:gap-4">
-                    <button className="md:hidden p-2 hover:bg-white/5 rounded-xl" onClick={() => navigate("/")}><FaArrowLeft size={18} /></button>
+                    <button className="md:hidden p-2 hover:bg-white/5 rounded-xl" onClick={() => setShowChatList(true)}><FaArrowLeft size={18} /></button>
                     <div className="flex items-center gap-2 md:gap-3">
                       <Avatar className="w-8 h-8 md:w-10 md:h-10 border border-white/10">
                         <AvatarImage src={activeChat?.avatar ? `${import.meta.env.VITE_URL}${activeChat?.avatar}` : null} className="object-cover" />
@@ -855,6 +865,70 @@ export default function ChatPage() {
             </>
           )}
         </div>
+
+        {/* MOBILE CHAT LIST DRAWER */}
+        {showChatList && (
+          <div className="fixed inset-0 z-50 md:hidden">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowChatList(false)} />
+            <div className="absolute left-0 top-0 bottom-0 w-full max-w-[300px] bg-[#0a0a0f] border-r border-white/5 animate-slide-in-left">
+              <div className="p-4 border-b border-white/5">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-lg font-bold tracking-tight">Messages</h3>
+                  <button onClick={() => setShowChatList(false)} className="p-2 hover:bg-white/5 rounded-xl">
+                    <FaArrowLeft size={18} />
+                  </button>
+                </div>
+                <div className="relative">
+                  <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-white/20" size={12} />
+                  <input
+                    placeholder="Search..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-white/5 border border-white/5 rounded-xl py-2 pl-9 pr-3 text-xs outline-none focus:border-white/10 placeholder:text-white/20"
+                  />
+                </div>
+              </div>
+              <div className="overflow-y-auto h-[calc(100dvh-140px-env(safe-area-inset-top)-env(safe-area-inset-bottom))]">
+                <div className="space-y-1 p-2">
+                  {chats.filter(chat => 
+                    searchQuery === "" || 
+                    chat.name?.toLowerCase().includes(searchQuery.toLowerCase())
+                  ).map((chat) => (
+                    <div
+                      key={chat._id}
+                      onClick={() => {
+                        navigate(`/chat/${chat._id}`);
+                        setShowChatList(false);
+                      }}
+                      className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all ${
+                        id === chat._id ? "bg-white/10 border border-white/10" : "hover:bg-white/5 border border-transparent"
+                      }`}
+                    >
+                      <div className="relative">
+                        <Avatar className="w-10 h-10 border border-white/10">
+                          <AvatarImage src={chat.avatar ? `${import.meta.env.VITE_URL}${chat.avatar}` : null} className="object-cover" />
+                          <AvatarFallback className="bg-white/5 text-white/40 text-xs">{chat.name?.[0]}</AvatarFallback>
+                        </Avatar>
+                        <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-[#0a0a0f]" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-sm tracking-tight truncate">{chat.name}</p>
+                        <p className="text-[9px] text-white/30 truncate font-medium uppercase tracking-widest">
+                          {chat.lastMessage || "Start chat"}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                  {chats.length === 0 && (
+                    <div className="text-center py-8 text-white/30 text-xs">
+                      No chats yet
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* RIGHT – PROFILE SIDEBAR */}
         {activeChat && (

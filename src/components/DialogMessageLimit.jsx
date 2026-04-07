@@ -27,16 +27,16 @@ export default function DialogMessageLimit({ open, onOpenChange, messagesUsed = 
           <div className="space-y-2">
             <div className="flex justify-between text-sm text-white/60">
               <span>Messages used</span>
-              <span>{messagesUsed} / {messageLimit}</span>
+              <span>{messagesUsed} / 5</span>
             </div>
             <div className="h-2 bg-white/10 rounded-full overflow-hidden">
               <div 
                 className="h-full bg-red-500 rounded-full"
-                style={{ width: `${Math.min((messagesUsed / messageLimit) * 100, 100)}%` }}
+                style={{ width: `${Math.min((messagesUsed / 5) * 100, 100)}%` }}
               />
             </div>
             <p className="text-white/40 text-sm text-center">
-              You've used {messagesUsed} of {messageLimit} free messages this month
+              You've used {messagesUsed} of 6 free messages this month
             </p>
           </div>
           

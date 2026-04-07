@@ -620,7 +620,7 @@ export default function ChatPage() {
         open={showLimitExceeded} 
         onOpenChange={setShowLimitExceeded}
         messagesUsed={messagesUsed || 0}
-        messageLimit={20}
+        messageLimit={5}
         onUpgrade={() => window.location = import.meta.env.VITE_STRIPE_URL}
       />
 

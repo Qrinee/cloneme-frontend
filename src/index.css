@@ -526,3 +526,8 @@ html {
     margin: 5px;
   }
 }
+
+/* Safe area padding for iOS mobile */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 16px);
+}

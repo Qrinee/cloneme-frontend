@@ -620,7 +620,7 @@ export default function ChatPage() {
         message={limitErrorMessage}
       />
 
-      <div className="flex flex-1 bg-[#0a0a0f] text-white overflow-hidden h-[calc(100dvh-64px-80px)] md:h-full">
+      <div className="flex flex-1 bg-[#0a0a0f] text-white overflow-hidden h-[calc(100dvh-64px)] md:h-full">
         {/* LEFT – CHAT LIST */}
         <div className="hidden md:flex w-80 border-r border-white/5 flex-col bg-[#0a0a0f] h-full overflow-hidden">
           <div className="p-6">
@@ -687,46 +687,46 @@ export default function ChatPage() {
             </div>
           ) : (
             <>
-              <div className="px-4 md:px-6 py-3 md:py-4 border-b border-white/5 flex flex-col gap-2 md:gap-4 bg-[#0a0a0f]/80 backdrop-blur-md sticky top-0 z-20">
+              <div className="px-3 md:px-6 py-2 md:py-4 border-b border-white/5 flex flex-col gap-1 md:gap-4 bg-[#0a0a0f]/80 backdrop-blur-md sticky top-0 z-20">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <button className="md:hidden p-2 hover:bg-white/5 rounded-xl" onClick={() => navigate("/")}><FaArrowLeft size={18} /></button>
-                    <div className="flex items-center gap-3">
-                      <Avatar className="w-10 h-10 border border-white/10">
+                  <div className="flex items-center gap-2 md:gap-4">
+                    <button className="md:hidden p-2 hover:bg-white/5 rounded-xl" onClick={() => navigate("/chat")}><FaArrowLeft size={18} /></button>
+                    <div className="flex items-center gap-2 md:gap-3">
+                      <Avatar className="w-8 h-8 md:w-10 md:h-10 border border-white/10">
                         <AvatarImage src={activeChat?.avatar ? `${import.meta.env.VITE_URL}${activeChat?.avatar}` : null} className="object-cover" />
                       </Avatar>
                       <div>
-                        <h2 className="font-bold text-base tracking-tight">{activeChat?.name}</h2>
-                        <div className="flex items-center gap-2">
+                        <h2 className="font-bold text-sm md:text-base tracking-tight">{activeChat?.name}</h2>
+                        <div className="flex items-center gap-1 md:gap-2">
                           <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
-                          <span className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Online Now</span>
+                          <span className="text-[8px] md:text-[10px] font-bold text-white/30 uppercase tracking-widest hidden md:inline">Online Now</span>
                         </div>
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <div className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-xl flex items-center gap-2">
-                      <Star size={12} className="text-yellow-500" />
-                      <span className="text-[10px] font-bold uppercase tracking-widest">Level {relationshipLevel}</span>
+                  <div className="flex items-center gap-1 md:gap-2">
+                    <div className="px-2 md:px-3 py-1 md:py-1.5 bg-white/5 border border-white/10 rounded-lg md:rounded-xl flex items-center gap-1 md:gap-2">
+                      <Star size={10} md:size={12} className="text-yellow-500" />
+                      <span className="text-[8px] md:text-[10px] font-bold uppercase tracking-widest">LVL {relationshipLevel}</span>
                     </div>
-                    <button onClick={handleDeleteChat} className="p-3 text-white/20 hover:text-red-500"><FaTrash size={14} /></button>
+                    <button onClick={handleDeleteChat} className="p-2 md:p-3 text-white/20 hover:text-red-500"><FaTrash size={12} md:size={14} /></button>
                   </div>
                 </div>
-                <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden relative">
+                <div className="w-full h-0.5 md:h-1 bg-white/5 rounded-full overflow-hidden relative">
                   <div className="absolute inset-y-0 left-0 bg-[#741818] transition-all duration-1000 ease-out" style={{ width: `${progressPercent}%` }} />
                 </div>
               </div>
 
               <ScrollArea 
-                className="flex-1 px-6 py-8 h-0" 
+                className="flex-1 px-3 md:px-6 py-4 md:py-8 h-0" 
                 onScroll={handleScroll}
               >
-                <div className="space-y-6 max-w-4xl mx-auto pb-4">
+                <div className="space-y-4 md:space-y-6 max-w-4xl mx-auto pb-4">
                   {messages.map((m) => (
                     <div key={m.id} className={`flex ${m.sender === "me" ? "justify-end" : "justify-start"}`}>
-                      <div className={`flex flex-col gap-2 max-w-[80%] ${m.sender === "me" ? "items-end" : "items-start"}`}>
+                      <div className={`flex flex-col gap-1 md:gap-2 max-w-[80%] ${m.sender === "me" ? "items-end" : "items-start"}`}>
                         {m.text && (
-                          <div className={`px-5 py-3.5 rounded-[1.5rem] text-sm leading-relaxed ${m.sender === "me" ? "bg-[#741818] text-white rounded-br-none font-medium" : "bg-white/5 backdrop-blur-xl border border-white/5 text-white/90 rounded-bl-none"}`}>
+                          <div className={`px-3 md:px-5 py-2 md:py-3.5 rounded-[1rem] md:rounded-[1.5rem] text-xs md:text-sm leading-relaxed ${m.sender === "me" ? "bg-[#741818] text-white rounded-br-none font-medium" : "bg-white/5 backdrop-blur-xl border border-white/5 text-white/90 rounded-bl-none"}`}>
                             {m.text}
                           </div>
                         )}
@@ -768,15 +768,16 @@ export default function ChatPage() {
                 </div>
               </ScrollArea>
 
-              <div className="p-6">
+              <div className="p-3 md:p-6 pb-safe">
                 {isGuest && !isLoggedIn && (
-                  <div className="max-w-4xl mx-auto mb-4 bg-[#741818]/10 border border-[#741818]/20 rounded-xl px-4 py-2 flex items-center justify-between">
-                    <div className="flex items-center gap-2"><FaUnlock size={14} className="text-[#741818]" /><span className="text-xs text-white/60">Chatting as guest</span></div>
-                    <div className="flex items-center gap-2"><span className="text-xs text-white/40">Messages remaining:</span><span className={`text-xs font-bold ${messagesRemaining <= 3 ? 'text-[#741818]' : 'text-white/80'}`}>{messagesRemaining}</span></div>
+                  <div className="max-w-4xl mx-auto mb-2 md:mb-4 bg-[#741818]/10 border border-[#741818]/20 rounded-lg md:rounded-xl px-3 md:px-4 py-2 flex items-center justify-between">
+                    <div className="flex items-center gap-2"><FaUnlock size={12} md:size={14} className="text-[#741818]" /><span className="text-[10px] md:text-xs text-white/60">Guest</span></div>
+                    <div className="flex items-center gap-2"><span className="text-[10px] md:text-xs text-white/40">Left:</span><span className={`text-[10px] md:text-xs font-bold ${messagesRemaining <= 3 ? 'text-[#741818]' : 'text-white/80'}`}>{messagesRemaining}</span></div>
                   </div>
                 )}
-                <div className="max-w-4xl mx-auto">
-                  <div className="flex gap-4 mb-4">
+                <div className="max-w-4xl mx-auto pb-5">
+                  {/* Desktop media buttons */}
+                  <div className="hidden md:flex gap-4 mb-4">
                     <button 
                       onClick={() => handleRequestMedia('photo')}
                       disabled={isLoading || requestingMedia}
@@ -812,22 +813,41 @@ export default function ChatPage() {
                       </div>
                     </button>
                   </div>
+                  
+                  {/* Mobile media buttons - simplified row */}
+                  <div className="md:hidden flex gap-2 mb-3">
+                    <button 
+                      onClick={() => handleRequestMedia('photo')}
+                      disabled={isLoading || requestingMedia}
+                      className={`flex-1 bg-white/5 border border-white/5 backdrop-blur-md px-3 py-2 rounded-xl text-[9px] font-bold text-white/80 transition-all flex items-center justify-center gap-1 ${isLoading || requestingMedia ? 'opacity-50' : ''}`}
+                    >
+                      <Camera size={12} /> 📸 50
+                    </button>
+                    <button 
+                      onClick={() => handleRequestMedia('video')}
+                      disabled={isLoading || requestingMedia}
+                      className={`flex-1 bg-white/5 border border-white/5 backdrop-blur-md px-3 py-2 rounded-xl text-[9px] font-bold text-white/80 transition-all flex items-center justify-center gap-1 ${isLoading || requestingMedia ? 'opacity-50' : ''}`}
+                    >
+                      <Play size={12} /> 🔥 200
+                    </button>
+                  </div>
+                  
                   <div className="bg-white/5 border border-white/5 rounded-[2rem] p-1.5 flex items-center gap-2 focus-within:ring-2 focus-within:ring-white/10 transition-all">
-                    <button className="p-3 text-white/20 hover:text-white/40 transition-colors"><FaSmile size={18} /></button>
+                    <button className="p-2 md:p-3 text-white/20 hover:text-white/40 transition-colors"><FaSmile size={16} md:size={18} /></button>
                     <input
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleSend()}
-                      placeholder={`Message ${activeChat?.name}...`}
+                      placeholder={`Message...`}
                       disabled={isGuest && !isLoggedIn && messagesRemaining <= 0}
-                      className="flex-1 bg-transparent border-none outline-none text-sm px-2 text-white placeholder:text-white/20 focus:ring-0"
+                      className="flex-1 bg-transparent border-none outline-none text-xs md:text-sm px-1 md:px-2 text-white placeholder:text-white/20 focus:ring-0"
                     />
                     <button
                       onClick={handleSend}
                       disabled={!newMessage.trim() || (isGuest && !isLoggedIn && messagesRemaining <= 0)}
-                      className={`w-11 h-11 rounded-[1.25rem] flex items-center justify-center transition-all ${newMessage.trim() && !(isGuest && !isLoggedIn && messagesRemaining <= 0) ? "bg-[#741818] text-white hover:bg-[#8d1d1d]" : "bg-white/5 text-white/10"}`}
+                      className={`w-9 h-9 md:w-11 md:h-11 rounded-[1rem] md:rounded-[1.25rem] flex items-center justify-center transition-all ${newMessage.trim() && !(isGuest && !isLoggedIn && messagesRemaining <= 0) ? "bg-[#741818] text-white hover:bg-[#8d1d1d]" : "bg-white/5 text-white/10"}`}
                     >
-                      <FaPaperPlane size={14} />
+                      <FaPaperPlane size={12} md:size={14} />
                     </button>
                   </div>
                 </div>

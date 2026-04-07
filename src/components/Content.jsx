@@ -7,13 +7,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { X } from "lucide-react";
 import { motion } from "framer-motion";
 import { Flame, Gem, Infinity, Coins } from "lucide-react";
 import img1 from '../assets/task_01kmwzbe1tfvp912tg8rwe5hay_1774793926_img_1.webp';
 import img2 from '../assets/task_01kmwzmaxbfbtrtm45b78g5cv6_1774794217_img_0.webp';
 import img3 from '../assets/task_01kmx0114jf4n8czx2xbegyq4b_1774794633_img_1.webp';
 
-export default function Content() {
+export default function Content({ onClose }) {
   const oneTimePlans = [
     {
       name: "Quickie",
@@ -48,10 +49,19 @@ export default function Content() {
   ];
 
   return (
-    <DialogContent
-      className="max-w-[95vw] sm:max-w-[90vw] md:max-w-[80vw] bg-[#0a0a0f] border-red-900/30 p-0 overflow-hidden max-h-[95dvh] flex flex-col"
-    >
-      {/* Scrollable Content Area */}
+      <DialogContent
+        showClose={false}
+        className="max-w-[95vw] sm:max-w-[90vw] md:max-w-[80vw] bg-[#0a0a0f] border-red-900/30 p-0 overflow-hidden max-h-[95dvh] flex flex-col"
+      >
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 z-50 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white/60 hover:text-white transition-colors md:hidden"
+        >
+          <X size={20} />
+        </button>
+        
+        {/* Scrollable Content Area */}
       <div className="flex-1 overflow-y-auto custom-scrollbar">
         {/* Premium Header */}
         <div className="text-center py-4 md:py-6 px-4">

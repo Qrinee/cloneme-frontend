@@ -603,7 +603,7 @@ export default function ChatPage() {
   return (
     <Layout>
       <Dialog open={open} onOpenChange={setOpen}>
-        <Content />
+        <Content onClose={() => setOpen(false)} />
       </Dialog>
 
       <DialogMessageLimit 

@@ -7,7 +7,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-export default function DialogMessageLimit({ open, onOpenChange, messagesUsed = 0, messageLimit = 20, onUpgrade }) {
+export default function DialogMessageLimit({ open, onOpenChange, messagesUsed = 0, messageLimit = 6, onUpgrade }) {
   const remaining = messageLimit - messagesUsed;
   
   return (

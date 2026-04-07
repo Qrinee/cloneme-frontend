@@ -262,7 +262,7 @@ const Layout = ({ children }) => {
       </div>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-20 bg-black/20 backdrop-blur-3xl border-t border-white/5 flex items-center justify-around px-6 z-40">
+      {/* <nav className="md:hidden fixed bottom-0 left-0 right-0 h-20 bg-black/20 backdrop-blur-3xl border-t border-white/5 flex items-center justify-around px-6 z-40">
         {navItems.slice(0, 4).map((item) => (
           item.onClick ? (
             <button 
@@ -292,7 +292,7 @@ const Layout = ({ children }) => {
             </Link>
           )
         ))}
-      </nav>
+      </nav> */}
 
       <style>{`
         .no-scrollbar::-webkit-scrollbar { display: none; }

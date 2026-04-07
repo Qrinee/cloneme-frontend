@@ -485,48 +485,48 @@ export default function CreateGirlPage() {
 
       case 8:
         return (
-          <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="space-y-6 md:space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="text-center">
-              <h2 className="text-4xl font-bold text-white tracking-tighter">Synthesis Complete</h2>
-              <p className="text-white/30 mt-2 font-medium">Review the essence of your creation.</p>
+              <h2 className="text-2xl md:text-4xl font-bold text-white tracking-tighter">Synthesis Complete</h2>
+              <p className="text-white/30 mt-2 font-medium text-sm md:text-base">Review the essence of your creation.</p>
             </div>
 
-            <div className="bg-white/5 rounded-[2.5rem] p-8 border border-white/5">
-              <div className="flex items-center gap-6 mb-8">
-                <div className="w-24 h-24 rounded-full bg-white/5 border border-white/10 flex items-center justify-center relative overflow-hidden">
-                  <User className="w-10 h-10 text-white/20" />
+            <div className="bg-white/5 rounded-[2rem] md:rounded-[2.5rem] p-4 md:p-8 border border-white/5">
+              <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6 mb-6 md:mb-8">
+                <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-white/5 border border-white/10 flex items-center justify-center relative overflow-hidden flex-shrink-0">
+                  <User className="w-8 h-8 md:w-10 md:h-10 text-white/20" />
                 </div>
-                <div>
-                  <h3 className="text-3xl font-bold text-white tracking-tighter">{formData.name || "Nameless Essence"}</h3>
+                <div className="text-center md:text-left">
+                  <h3 className="text-xl md:text-3xl font-bold text-white tracking-tighter">{formData.name || "Nameless Essence"}</h3>
                   <p className="text-white/40 font-bold text-xs uppercase tracking-widest mt-1">
                     {formData.age} Years Old • {formData.ethnicity || "Unknown origin"} • {formData.relationship || "Relationship undefined"}
                   </p>
                 </div>
               </div>
               
-              <div className="grid grid-cols-3 gap-4 mb-8">
+              <div className="grid grid-cols-3 gap-2 md:gap-4 mb-6 md:mb-8">
                 {[
                   { label: "Visual", val: formData.hairColor },
                   { label: "Gaze", val: formData.eyeColor },
                   { label: "Physique", val: formData.bodyType }
                 ].map((stat, i) => (
-                  <div key={i} className="bg-white/5 rounded-2xl p-4 border border-white/5 text-center">
-                    <span className="text-[10px] font-bold text-white/20 uppercase tracking-widest block mb-1">{stat.label}</span>
-                    <p className="text-white font-bold tracking-tight capitalize">{stat.val || "—"}</p>
+                  <div key={i} className="bg-white/5 rounded-xl md:rounded-2xl p-2 md:p-4 border border-white/5 text-center">
+                    <span className="text-[8px] md:text-[10px] font-bold text-white/20 uppercase tracking-widest block mb-1">{stat.label}</span>
+                    <p className="text-white text-sm md:text-base font-bold tracking-tight capitalize">{stat.val || "—"}</p>
                   </div>
                 ))}
               </div>
               
-              <div className="space-y-6">
-                <div className="p-6 bg-white/5 rounded-2xl border border-white/5 italic text-white/70 leading-relaxed font-medium">
+              <div className="space-y-4 md:space-y-6">
+                <div className="p-4 md:p-6 bg-white/5 rounded-xl md:rounded-2xl border border-white/5 italic text-white/70 leading-relaxed font-medium text-sm md:text-base">
                   "{formData.bio || "Her story remains unwritten..."}"
                 </div>
                 
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 justify-center md:justify-start">
                   {formData.tags.map(tagId => {
                     const tag = tags.find(t => t._id === tagId);
                     return tag ? (
-                      <span key={tagId} className="px-4 py-2 bg-[#741818]/20 border border-[#741818]/20 rounded-xl text-white text-[10px] font-bold uppercase tracking-widest">
+                      <span key={tagId} className="px-3 py-1.5 md:px-4 md:py-2 bg-[#741818]/20 border border-[#741818]/20 rounded-lg md:rounded-xl text-white text-[9px] md:text-[10px] font-bold uppercase tracking-widest">
                         {tag.label}
                       </span>
                     ) : null;
@@ -547,24 +547,24 @@ export default function CreateGirlPage() {
       <div className="min-h-screen bg-[#0a0a0f] py-12 px-6 overflow-hidden">
         <div className="max-w-3xl mx-auto">
           {/* Progress Tracker - Modern Glass */}
-          <div className="bg-white/5 backdrop-blur-2xl border border-white/5 p-4 rounded-[2.5rem] mb-12 overflow-x-auto no-scrollbar">
-            <div className="flex items-center justify-between min-w-max px-2">
+          <div className="bg-white/5 backdrop-blur-2xl border border-white/5 p-2 md:p-4 rounded-[2rem] md:rounded-[2.5rem] mb-8 md:mb-12 overflow-x-auto no-scrollbar">
+            <div className="flex items-center justify-between min-w-max px-1 md:px-2">
               {steps.map((step, index) => (
                 <div key={step.id} className="flex items-center">
-                  <div className="flex flex-col items-center gap-3">
+                  <div className="flex flex-col items-center gap-2 md:gap-3">
                     <div className={`
-                      w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500
+                      w-8 h-8 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-500
                       ${currentStep === step.id 
                         ? 'bg-[#741818] text-white' 
                         : currentStep > step.id 
                           ? 'bg-white/10 text-white' 
                           : 'bg-white/5 text-white/20'}
                     `}>
-                      <step.icon size={18} strokeWidth={currentStep === step.id ? 2.5 : 2} />
+                      <step.icon size={14} md:size={18} strokeWidth={currentStep === step.id ? 2.5 : 2} />
                     </div>
                   </div>
                   {index < steps.length - 1 && (
-                    <div className={`w-8 h-px mx-4 ${currentStep > step.id ? 'bg-[#741818]' : 'bg-white/5'}`} />
+                    <div className={`w-4 md:w-8 h-px mx-1 md:mx-4 ${currentStep > step.id ? 'bg-[#741818]' : 'bg-white/5'}`} />
                   )}
                 </div>
               ))}
@@ -572,7 +572,7 @@ export default function CreateGirlPage() {
           </div>
 
           {/* Form Content Area */}
-          <div className="bg-white/5 backdrop-blur-3xl rounded-[3rem] p-10 md:p-14 border border-white/5 relative overflow-hidden mb-10">
+          <div className="bg-white/5 backdrop-blur-3xl rounded-[2rem] md:rounded-[3rem] p-6 md:p-14 border border-white/5 relative overflow-hidden mb-8 md:mb-10">
             {/* Subtle light effect inside */}
             <div className="absolute -top-24 -right-24 w-64 h-64 bg-[#741818]/5 rounded-full blur-[80px] pointer-events-none" />
             
@@ -582,32 +582,33 @@ export default function CreateGirlPage() {
           </div>
 
           {/* Nav Buttons */}
-          <div className="flex justify-between items-center bg-white/5 p-3 rounded-[2.5rem] border border-white/5">
+          <div className="flex justify-between items-center bg-white/5 p-2 md:p-3 rounded-[2rem] md:rounded-[2.5rem] border border-white/5">
             <button
               onClick={() => setCurrentStep(prev => Math.max(1, prev - 1))}
               disabled={currentStep === 1}
-              className={`flex items-center gap-3 px-8 py-4 rounded-2xl font-bold transition-all ${
+              className={`flex items-center gap-2 md:gap-3 px-4 md:px-8 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold transition-all text-sm md:text-base ${
                 currentStep === 1 
                   ? 'text-white/10 cursor-not-allowed opacity-50' 
                   : 'text-white/60 hover:text-white hover:bg-white/5'
               }`}
             >
-              <ArrowLeft size={20} strokeWidth={3} />
-              Return
+              <ArrowLeft size={16} md:size={20} strokeWidth={3} />
+              <span className="hidden md:inline">Return</span>
             </button>
 
             {currentStep < 8 ? (
               <button
                 onClick={() => setCurrentStep(prev => prev + 1)}
                 disabled={!canProceed()}
-                className={`flex items-center gap-3 px-10 py-4 rounded-2xl font-bold transition-all ${
+                className={`flex items-center gap-2 md:gap-3 px-6 md:px-10 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold transition-all text-sm md:text-base ${
                   canProceed()
                     ? 'bg-[#741818] text-white hover:bg-[#8d1d1d] active:scale-95'
                     : 'bg-white/5 text-white/10 cursor-not-allowed'
                 }`}
               >
-                Continue
-                <ArrowRight size={20} strokeWidth={3} />
+                <span className="hidden md:inline">Continue</span>
+                <span className="md:hidden text-xs">Next</span>
+                <ArrowRight size={16} md:size={20} strokeWidth={3} />
               </button>
             ) : (
               <button
@@ -668,10 +669,10 @@ export default function CreateGirlPage() {
                   }
                 }}
                 disabled={isSubmitting || (premium?.isActive && !canCreateGirlfriend)}
-                className="flex items-center gap-3 px-12 py-4 bg-white text-black font-bold rounded-2xl hover:bg-white/90 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 md:gap-3 px-6 md:px-12 py-3 md:py-4 bg-white text-black font-bold rounded-xl md:rounded-2xl hover:bg-white/90 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed text-sm md:text-base"
               >
-                {isSubmitting ? "Synthesizing..." : (premium?.isActive ? (canCreateGirlfriend ? "Create Girlfriend (FREE)" : "Create Girlfriend (1/month)") : "Create Girlfriend")}
-                <Heart size={20} fill="currentColor" />
+                {isSubmitting ? "Synthesizing..." : (premium?.isActive ? (canCreateGirlfriend ? "Create (FREE)" : "Create (1/mo)") : "Create Girlfriend")}
+                <Heart size={16} md:size={20} fill="currentColor" />
               </button>
             )}
           </div>

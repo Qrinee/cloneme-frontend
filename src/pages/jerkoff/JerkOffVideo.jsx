@@ -14,6 +14,7 @@ export default function JerkOffVideo({
         ref={videoRef}
         src={girlfriend?.mainVideo ? `${import.meta.env.VITE_URL}${girlfriend.mainVideo}` : null}
         className="h-full object-cover w-full"
+        controls={false}
         muted
         loop
         autoPlay

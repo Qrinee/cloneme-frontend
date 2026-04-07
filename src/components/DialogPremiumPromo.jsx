@@ -5,8 +5,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import img1 from '../assets/task_01kmwzbe1tfvp912tg8rwe5hay_1774793926_img_1.webp';
+import img2 from '../assets/task_01kmwzmaxbfbtrtm45b78g5cv6_1774794217_img_0.webp';
+import img3 from '../assets/task_01kmx0114jf4n8czx2xbegyq4b_1774794633_img_1.webp';
 
 export default function DialogPremiumPromo({ open, onOpenChange, onMaybeLater }) {
+  const premiumImages = [img1, img2, img3];
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md bg-[#0a0a0f] border-yellow-500/30 text-white overflow-hidden">
@@ -23,6 +27,17 @@ export default function DialogPremiumPromo({ open, onOpenChange, onMaybeLater })
           <p className="text-white/60 text-sm text-center">
             Upgrade to Premium to unlock full access to all features!
           </p>
+          
+          {/* AI Girls Gallery */}
+          <div className="grid grid-cols-3 gap-2 p-2">
+            {premiumImages.map((img, index) => (
+              <div key={index} className="relative aspect-[3/4] rounded-xl overflow-hidden">
+                <img src={img} alt={`AI Girl ${index + 1}`} className="w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+              </div>
+            ))}
+          </div>
+          <p className="text-center text-white/30 text-xs">Get exclusive access to AI generated content</p>
           
           {/* Premium benefits */}
           <div className="space-y-3">

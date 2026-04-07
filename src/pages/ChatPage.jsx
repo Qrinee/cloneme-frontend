@@ -690,7 +690,7 @@ export default function ChatPage() {
               <div className="px-3 md:px-6 py-2 md:py-4 border-b border-white/5 flex flex-col gap-1 md:gap-4 bg-[#0a0a0f]/80 backdrop-blur-md sticky top-0 z-20">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 md:gap-4">
-                    <button className="md:hidden p-2 hover:bg-white/5 rounded-xl" onClick={() => navigate("/chat")}><FaArrowLeft size={18} /></button>
+                    <button className="md:hidden p-2 hover:bg-white/5 rounded-xl" onClick={() => navigate("/")}><FaArrowLeft size={18} /></button>
                     <div className="flex items-center gap-2 md:gap-3">
                       <Avatar className="w-8 h-8 md:w-10 md:h-10 border border-white/10">
                         <AvatarImage src={activeChat?.avatar ? `${import.meta.env.VITE_URL}${activeChat?.avatar}` : null} className="object-cover" />

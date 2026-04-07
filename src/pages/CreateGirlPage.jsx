@@ -640,7 +640,7 @@ export default function CreateGirlPage() {
                         message: data.message,
                         points: data.remainingPoints
                       });
-                      setTimeout(() => window.location.href = 'https://buy.stripe.com/bJedR87f4aTTgQK5pd6sw01', 2000);
+                      setTimeout(() => window.location.href = import.meta.env.VITE_STRIPE_URL, 2000);
                     } else {
                       // Not enough points, limit exceeded, or premium required - show appropriate dialog
                       if (data?.message?.includes("Premium subscription required")) {

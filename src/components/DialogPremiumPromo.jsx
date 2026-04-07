@@ -10,6 +10,8 @@ import img3 from '../assets/task_01kmx0114jf4n8czx2xbegyq4b_1774794633_img_1.web
 
 export default function DialogPremiumPromo({ open, onOpenChange, onMaybeLater }) {
   const premiumImages = [img1, img2, img3];
+  const price = import.meta.env.VITE_PREMIUM_PRICE || "$20/month";
+  
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md max-h-[90dvh] bg-[#0a0a0f] border-yellow-500/30 text-white overflow-hidden p-0">
@@ -20,6 +22,9 @@ export default function DialogPremiumPromo({ open, onOpenChange, onMaybeLater })
           <h2 className="text-xl md:text-2xl font-bold text-center">
             Unlock Premium
           </h2>
+          <div className="mt-2 inline-block mx-auto px-3 py-1 bg-yellow-500/20 border border-yellow-500/30 rounded-full">
+            <span className="text-yellow-400 font-bold text-sm">{price}</span>
+          </div>
         </DialogHeader>
         
         <div className="space-y-3 md:space-y-4 py-3 md:py-4 overflow-y-auto max-h-[60vh] pr-2">
@@ -91,7 +96,7 @@ export default function DialogPremiumPromo({ open, onOpenChange, onMaybeLater })
             Maybe Later
           </button>
           <button 
-            onClick={() => window.location.href = 'https://buy.stripe.com/bJedR87f4aTTgQK5pd6sw01'}
+            onClick={() => window.location.href = import.meta.env.VITE_STRIPE_URL}
             className="flex-1 px-4 md:px-6 py-2.5 md:py-3 bg-yellow-500 hover:bg-yellow-600 text-black rounded-xl font-bold transition-colors text-sm"
           >
             <Crown size={14} md:size={18} className="inline mr-1 md:mr-2" />

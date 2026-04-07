@@ -89,7 +89,7 @@ import { Link } from "react-router-dom"
 
                 </DropdownMenuItem>
                 </Link>
-                <div onClick={() => window.location = 'https://buy.stripe.com/bJedR87f4aTTgQK5pd6sw01'}>
+                <div onClick={() => window.location = import.meta.env.VITE_STRIPE_URL}>
                 <DropdownMenuItem>
                   <CreditCardIcon />
                   Billing

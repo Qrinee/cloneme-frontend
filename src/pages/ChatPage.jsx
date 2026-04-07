@@ -611,7 +611,7 @@ export default function ChatPage() {
         onOpenChange={setShowLimitExceeded}
         messagesUsed={messagesUsed || 0}
         messageLimit={20}
-        onUpgrade={() => window.location = 'https://buy.stripe.com/bJedR87f4aTTgQK5pd6sw01'}
+        onUpgrade={() => window.location = import.meta.env.VITE_STRIPE_URL}
       />
 
       <LoginRequiredDialog 

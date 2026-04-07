@@ -148,7 +148,7 @@ export default function HowItWorksPage() {
               ))}
             </div>
             <div className="text-center mt-8">
-              <a href="https://buy.stripe.com/bJedR87f4aTTgQK5pd6sw01">
+              <a href={import.meta.env.VITE_STRIPE_URL}>
                 <button className="px-6 py-3 bg-yellow-500 text-black font-bold rounded-full hover:bg-yellow-600 transition-colors">
                   Upgrade to Premium
                 </button>

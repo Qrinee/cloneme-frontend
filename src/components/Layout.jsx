@@ -8,10 +8,12 @@ import { useAuthFetch } from "../utils/authFetch";
 import { Coins } from "lucide-react";
 import { Dialog, DialogTrigger, DialogContent } from "./ui/dialog";
 import Content from "./Content";
+import DialogLoginPrompt from "./DialogLoginPrompt";
 
 const Layout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [premiumDialogOpen, setPremiumDialogOpen] = useState(false);
+  const [loginPromptOpen, setLoginPromptOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { isLoggedIn, user, updateUser, premium } = useLayoutContext();
@@ -26,7 +28,13 @@ const Layout = ({ children }) => {
       { id: "chat", label: "Chat", icon: <FiMessageCircle />, link: "/chat" },
       { id: "collection", label: "Collection", icon: <FiStar />, link: "/collection" },
     ] : []),
-    { id: "create", label: "Create", icon: <FiUser />, link: "/create-girl", tourId: "create-link" },
+    { 
+      id: "create", 
+      label: "Create", 
+      icon: <FiUser />, 
+      link: "/create-girl",
+      tourId: "create-link"
+    },
     { id: "how-it-works", label: "How it works", icon: <FiHelpCircle />, link: "/how-it-works" },
   ];
 
@@ -103,14 +111,15 @@ const Layout = ({ children }) => {
               <ul className="space-y-1.5">
                 {navItems.map((item) => (
                   <li key={item.id}>
-                    <Link to={item.link || '#'} onClick={() => setSidebarOpen(false)} style={{ textDecoration: 'none' }}>
+                    {item.onClick ? (
                       <button
+                        onClick={() => {
+                          setSidebarOpen(false);
+                          item.onClick();
+                        }}
                         data-tour-target={item.tourId}
                         className={`w-full flex items-center px-4 py-3.5 rounded-xl transition-all duration-200 text-base font-bold cursor-pointer
-                          ${isActive(item.link)
-                            ? 'bg-[#741818]/10 text-[#741818] border border-[#741818]/20'
-                            : 'text-white/40 hover:text-white hover:bg-white/5'
-                          }`}
+                          text-white/40 hover:text-white hover:bg-white/5`}
                       >
                         <span className="text-xl mr-4">{item.icon}</span>
                         <span>{item.label}</span>
@@ -120,7 +129,26 @@ const Layout = ({ children }) => {
                           </span>
                         )}
                       </button>
-                    </Link>
+                    ) : (
+                      <Link to={item.link || '#'} onClick={() => setSidebarOpen(false)} style={{ textDecoration: 'none' }}>
+                        <button
+                          data-tour-target={item.tourId}
+                          className={`w-full flex items-center px-4 py-3.5 rounded-xl transition-all duration-200 text-base font-bold cursor-pointer
+                            ${isActive(item.link)
+                              ? 'bg-[#741818]/10 text-[#741818] border border-[#741818]/20'
+                              : 'text-white/40 hover:text-white hover:bg-white/5'
+                            }`}
+                        >
+                          <span className="text-xl mr-4">{item.icon}</span>
+                          <span>{item.label}</span>
+                          {item.badge && (
+                            <span className="ml-auto bg-[#741818] text-white text-[10px] font-black px-2 py-0.5 rounded-lg">
+                              {item.badge}
+                            </span>
+                          )}
+                        </button>
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -236,18 +264,33 @@ const Layout = ({ children }) => {
       {/* Mobile Bottom Navigation */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 h-20 bg-black/20 backdrop-blur-3xl border-t border-white/5 flex items-center justify-around px-6 z-40">
         {navItems.slice(0, 4).map((item) => (
-          <Link 
-            key={item.id} 
-            to={item.link}
-            className={`flex flex-col items-center justify-center space-y-1.5 transition-all duration-300 ${isActive(item.link) ? 'text-[#741818]' : 'text-white/30'}`}
-          >
-            <span className={`text-2xl transition-transform duration-300 ${isActive(item.link) ? 'scale-110' : ''}`}>
-              {item.icon}
-            </span>
-            <span className="text-[10px] font-black uppercase tracking-widest leading-none">
-              {item.label === "Collection" ? "Vault" : item.label}
-            </span>
-          </Link>
+          item.onClick ? (
+            <button 
+              key={item.id}
+              onClick={item.onClick}
+              className="flex flex-col items-center justify-center space-y-1.5 transition-all duration-300 text-white/30"
+            >
+              <span className="text-2xl transition-transform duration-300">
+                {item.icon}
+              </span>
+              <span className="text-[10px] font-black uppercase tracking-widest leading-none">
+                {item.label === "Collection" ? "Vault" : item.label}
+              </span>
+            </button>
+          ) : (
+            <Link 
+              key={item.id} 
+              to={item.link}
+              className={`flex flex-col items-center justify-center space-y-1.5 transition-all duration-300 ${isActive(item.link) ? 'text-[#741818]' : 'text-white/30'}`}
+            >
+              <span className={`text-2xl transition-transform duration-300 ${isActive(item.link) ? 'scale-110' : ''}`}>
+                {item.icon}
+              </span>
+              <span className="text-[10px] font-black uppercase tracking-widest leading-none">
+                {item.label === "Collection" ? "Vault" : item.label}
+              </span>
+            </Link>
+          )
         ))}
       </nav>
 
@@ -255,6 +298,16 @@ const Layout = ({ children }) => {
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
+
+      <DialogLoginPrompt 
+        open={loginPromptOpen}
+        onOpenChange={setLoginPromptOpen}
+        onLogin={() => {
+          setLoginPromptOpen(false);
+          navigate("/login");
+        }}
+        onMaybeLater={() => setLoginPromptOpen(false)}
+      />
     </div>
   );
 };

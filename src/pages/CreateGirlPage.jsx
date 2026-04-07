@@ -5,6 +5,8 @@ import DialogPremium from "../components/DialogPremium";
 import { Dialog } from "@/components/ui/dialog";
 import Content from "../components/Content";
 import { useLayoutContext } from "../components/LayoutContext";
+import DialogLoginPrompt from "../components/DialogLoginPrompt";
+import DialogPremiumPromo from "../components/DialogPremiumPromo";
 import { 
   ArrowRight, ArrowLeft, Heart, Sparkles, Wand2, 
   Eye, Smile, User, MessageCircle, Play, Lock, Crown,
@@ -195,9 +197,10 @@ function AgeSlider({ value, onChange }) {
 export default function CreateGirlPage() {
   const navigate = useNavigate();
   const authFetch = useAuthFetch();
-  const { updateUser, premium, canCreateGirlfriend, setCanCreateGirlfriend, lastGirlfriendCreated, setLastGirlfriendCreated } = useLayoutContext();
+  const { updateUser, premium, canCreateGirlfriend, setCanCreateGirlfriend, lastGirlfriendCreated, setLastGirlfriendCreated, isLoggedIn } = useLayoutContext();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [formData, setFormData] = useState({
     hairColor: null,
     eyeColor: null,
@@ -213,6 +216,13 @@ export default function CreateGirlPage() {
   });
   const [notification, setNotification] = useState(null);
   const [showPremiumDialog, setShowPremiumDialog] = useState(false);
+  const [showPremiumPromoDialog, setShowPremiumPromoDialog] = useState(false);
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      setShowLoginPrompt(true);
+    }
+  }, [isLoggedIn]);
 
 
   const updateFormData = (field, value) => {
@@ -629,10 +639,12 @@ export default function CreateGirlPage() {
                         message: data.message,
                         points: data.remainingPoints
                       });
-                      setTimeout(() => navigate('/collection'), 2000);
+                      setTimeout(() => window.location.href = 'https://buy.stripe.com/bJedR87f4aTTgQK5pd6sw01', 2000);
                     } else {
-                      // Not enough points, limit exceeded, or premium required - show premium dialog
-                      if (data?.message?.includes("Not enough points") || data?.message?.includes("need") || data?.message?.includes("already used") || data?.message?.includes("Premium subscription required")) {
+                      // Not enough points, limit exceeded, or premium required - show appropriate dialog
+                      if (data?.message?.includes("Premium subscription required")) {
+                        setShowPremiumPromoDialog(true);
+                      } else if (data?.message?.includes("Not enough points") || data?.message?.includes("need") || data?.message?.includes("already used")) {
                         setShowPremiumDialog(true);
                         // Update state if limit reached
                         if (data.canCreateGirlfriend !== undefined) {
@@ -722,6 +734,27 @@ export default function CreateGirlPage() {
           <Content />
         </Dialog>
       )}
+
+      {/* Login Prompt Dialog for non-logged in users */}
+      <DialogLoginPrompt 
+        open={showLoginPrompt}
+        onOpenChange={setShowLoginPrompt}
+        onLogin={() => {
+          setShowLoginPrompt(false);
+          navigate("/login");
+        }}
+        onMaybeLater={() => {
+          setShowLoginPrompt(false);
+          navigate("/");
+        }}
+      />
+
+      {/* Premium Promo Dialog for premium-required errors */}
+      <DialogPremiumPromo 
+        open={showPremiumPromoDialog}
+        onOpenChange={setShowPremiumPromoDialog}
+        onMaybeLater={() => setShowPremiumPromoDialog(false)}
+      />
     </Layout>
   );
 }

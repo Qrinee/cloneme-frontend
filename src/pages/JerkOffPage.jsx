@@ -390,9 +390,9 @@ export default function JerkOffPage() {
       
       {girls && (
         <div className="min-h-[100dvh] flex flex-col items-center justify-center bg-[#0a0a0f]">
-          <div className="flex flex-col md:flex-row w-full max-w-[1400px] h-[100vh] md:h-[85vh] justify-center items-center md:items-stretch gap-0">
+          <div className="flex flex-col md:flex-row w-full max-w-[1400px] h-[100dvh] md:h-[85vh] justify-center items-center md:items-stretch gap-0">
             {/* Main Content - Video with Chat */}
-            <div className="w-full md:w-[550px] relative flex flex-col  border-x border-white/5 h-[100vh]">
+            <div className="w-full md:w-[550px] relative flex flex-col border-x border-white/5 h-[100dvh]">
               <JerkOffVideo
                 girlfriend={girls.girlfriend}
                 videoRef={videoRef}

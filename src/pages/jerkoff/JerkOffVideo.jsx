@@ -18,6 +18,9 @@ export default function JerkOffVideo({
         muted
         loop
         autoPlay
+        playsInline
+        webkit-playsinline="true"
+        preload="auto"
       />
 
       {/* Video Overlay Gradient */}

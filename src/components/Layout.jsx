@@ -65,10 +65,10 @@ const Layout = ({ children }) => {
   };
 
   return (
-    <div className="flex h-screen bg-[#0a0a0f] text-gray-100 font-sans overflow-hidden">
+    <div className="flex h-[100dvh] bg-[#0a0a0f] text-gray-100 font-sans overflow-hidden">
       
       {/* Mobile Top Header */}
-      <header className="md:hidden fixed top-0 left-0 right-0 h-16 bg-black/20 backdrop-blur-3xl border-b border-white/5 flex items-center justify-between px-6 z-40">
+      <header className="md:hidden fixed top-0 left-0 right-0 bg-black/20 backdrop-blur-3xl border-b border-white/5 flex items-center justify-between px-6 z-40" style={{ paddingTop: 'env(safe-area-inset-top)', height: 'calc(64px + env(safe-area-inset-top))' }}>
         <Link to={'/'}>
           <img src={logo} alt="Logo" className="h-7" />
         </Link>
@@ -256,7 +256,7 @@ const Layout = ({ children }) => {
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Page content */}
-        <main className="flex-1 pt-16 md:pt-0 pb-20 md:pb-0 overflow-auto no-scrollbar">
+        <main className="flex-1 overflow-auto no-scrollbar" style={{ paddingTop: 'calc(64px + env(safe-area-inset-top))', paddingBottom: 'env(safe-area-inset-bottom)' }}>
           {children}
         </main>
       </div>

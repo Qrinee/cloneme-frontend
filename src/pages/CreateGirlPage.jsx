@@ -50,8 +50,7 @@ const steps = [
   { id: 4, title: "Ethnicity", icon: Gem },
   { id: 5, title: "Info", icon: User },
   { id: 6, title: "Personality", icon: Smile },
-  { id: 7, title: "Actions", icon: Play },
-  { id: 8, title: "Preview", icon: Sparkles },
+  { id: 7, title: "Preview", icon: Sparkles },
 ];
 
 
@@ -276,7 +275,7 @@ export default function CreateGirlPage() {
       case 3: return formData.bodyType;
       case 5: return formData.name && formData.age && formData.bio;
       case 6: return formData.relationship && formData.initialMessage;
-      case 7: return formData.actions.length > 0;
+      case 7: return true; // Preview step - always valid
       default: return true;
     }
   };
@@ -469,44 +468,6 @@ export default function CreateGirlPage() {
 
       case 7:
         return (
-          <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="text-center">
-              <h2 className="text-4xl font-bold text-white tracking-tighter">Capabilities</h2>
-              <p className="text-white/30 mt-2 font-medium">Define the interactive depth of her existence.</p>
-            </div>
-            <div className="space-y-4 max-h-[400px] overflow-y-auto no-scrollbar pr-2">
-              {actions.map((action) => (
-                <button
-                  key={action._id}
-                  onClick={() => toggleAction(action._id)}
-                  className={`w-full p-5 rounded-2xl border transition-all flex items-center justify-between ${
-                    (formData.actions || []).includes(action._id)
-                      ? 'bg-[#741818] border-[#741818] text-white'
-                      : 'bg-white/5 border-white/5 text-white/40 hover:border-white/10 hover:text-white'
-                  }`}
-                >
-                  <div className="flex items-center gap-4">
-                    <div className={`w-6 h-6 rounded-full flex items-center justify-center border ${
-                      (formData.actions || []).includes(action._id)
-                        ? 'bg-white border-white text-[#741818]'
-                        : 'bg-transparent border-white/10 text-transparent'
-                    }`}>
-                      <Check size={14} strokeWidth={4} />
-                    </div>
-                    <span className="font-bold tracking-tight text-sm">{action.label}</span>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <span className="text-[10px] font-bold uppercase tracking-widest opacity-40">{action.messagesNeeded} XP</span>
-                    {action.premium && <Crown size={14} className="text-yellow-500" />}
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-        );
-
-      case 8:
-        return (
           <div className="space-y-6 md:space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="text-center">
               <h2 className="text-2xl md:text-4xl font-bold text-white tracking-tighter">Synthesis Complete</h2>
@@ -618,7 +579,7 @@ export default function CreateGirlPage() {
               <span className="hidden md:inline">Return</span>
             </button>
 
-            {currentStep < 8 ? (
+            {currentStep < 7 ? (
               <button
                 onClick={() => setCurrentStep(prev => prev + 1)}
                 disabled={!canProceed()}
@@ -694,7 +655,7 @@ export default function CreateGirlPage() {
                 disabled={isSubmitting || (premium?.isActive && !canCreateGirlfriend)}
                 className="flex items-center gap-2 md:gap-3 px-6 md:px-12 py-3 md:py-4 bg-white text-black font-bold rounded-xl md:rounded-2xl hover:bg-white/90 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed text-sm md:text-base"
               >
-                {isSubmitting ? "Synthesizing..." : (premium?.isActive ? (canCreateGirlfriend ? "Create (FREE)" : "Create (1/mo)") : "Create Girlfriend")}
+                {isSubmitting ? "Synthesizing..." : (premium?.isActive ? (canCreateGirlfriend ? "Create (FREE)" : "Create (1/mo)") : "Bring to Life")}
                 <Heart size={16} md:size={20} fill="currentColor" />
               </button>
             )}

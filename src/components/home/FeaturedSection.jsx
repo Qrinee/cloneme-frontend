@@ -35,7 +35,27 @@ export default function FeaturedSection() {
     }
   };
 
-  const handleStartChat = (profile) => {
+  const handleStartChat = async (profile) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/chats`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ chatbotId: profile._id }),
+        });
+        const data = await res.json();
+        if (data.chat?._id) {
+          window.location.href = `/chat/${profile._id}`;
+          return;
+        }
+      } catch (e) {
+        console.error("Error creating chat:", e);
+      }
+    }
     window.location.href = `/chat/${profile._id}`;
   };
 
@@ -118,7 +138,12 @@ export default function FeaturedSection() {
                   ))}
                 </div>
 
-                <button className="cursor-pointer w-full bg-white/5 hover:bg-white/10 text-white/80 py-3 rounded-2xl font-bold text-[10px] uppercase tracking-widest transition-all border border-white/10 flex items-center justify-center gap-2">
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleStartChat(profile);
+                  }}
+                  className="cursor-pointer w-full bg-white/5 hover:bg-white/10 text-white/80 py-3 rounded-2xl font-bold text-[10px] uppercase tracking-widest transition-all border border-white/10 flex items-center justify-center gap-2">
                   <MessageCircle size={14} className="opacity-40" /> {isLoggedIn ? "Open Chat" : "Chat as Guest"}
                 </button>
               </div>

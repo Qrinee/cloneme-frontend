@@ -195,6 +195,10 @@ export default function ChatPage() {
     
     const data = await res.json();
     if (data.type === "error") {
+      if (data.message && data.message.includes('not found')) {
+        navigate("/chat", { replace: true });
+        return;
+      }
       if (!isLoggedIn && data.message && data.message.includes('Limit exceeded')) {
         setLimitErrorMessage(data.message);
         setShowLoginDialog(true);
@@ -591,12 +595,6 @@ export default function ChatPage() {
   };
 
   const activeChat = chats.find((c) => c._id === id) || currentChatbot;
-
-  useEffect(() => {
-    if (id && chats.length > 0 && !activeChat) {
-      navigate("/chat", { replace: true });
-    }
-  }, [id, chats, activeChat, navigate]);
 
   const xpNeeded = xpPerLevel(relationshipLevel);
   const progressPercent = Math.min((relationshipXP / xpNeeded) * 100, 100);

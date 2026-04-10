@@ -199,23 +199,13 @@ const Layout = ({ children }) => {
           <div className="p-4 border-t border-white/5">
 
                 {!premium?.isActive ? (
-                  <Dialog open={premiumDialogOpen} onOpenChange={setPremiumDialogOpen}>
-                    <DialogTrigger asChild>
-                      <button
-                        className="w-full flex items-center px-4 py-3 rounded-xl transition-all duration-200 text-base font-bold text-yellow-400 hover:bg-yellow-500/10 border border-yellow-500/30 cursor-pointer"
-                      >
-                        <Coins className="w-5 h-5 mr-4" />
-                        <span>Upgrade to Premium</span>
-                      </button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-md max-h-[90dvh] bg-[#0a0a0f] border-yellow-500/30 text-white overflow-hidden p-0">
-                      <DialogPremiumPromo 
-                        open={premiumDialogOpen}
-                        onOpenChange={setPremiumDialogOpen}
-                        onMaybeLater={() => setPremiumDialogOpen(false)}
-                      />
-                    </DialogContent>
-                  </Dialog>
+                  <button
+                    onClick={() => navigate('/premium')}
+                    className="w-full flex items-center px-4 py-3 rounded-xl transition-all duration-200 text-base font-bold text-yellow-400 hover:bg-yellow-500/10 border border-yellow-500/30 cursor-pointer"
+                  >
+                    <Coins className="w-5 h-5 mr-4" />
+                    <span>Upgrade to Premium</span>
+                  </button>
                 ) : (
                   <Dialog open={premiumDialogOpen} onOpenChange={setPremiumDialogOpen}>
                     <DialogTrigger asChild>

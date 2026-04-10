@@ -14,6 +14,7 @@ export default function DialogPremiumPromo({ open, onOpenChange, onMaybeLater })
   
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
+
       <DialogContent className="max-w-md max-h-[90dvh] bg-[#0a0a0f] border-yellow-500/30 text-white overflow-hidden p-0">
         <DialogHeader className="text-center shrink-0" style={{ margin: 0 }}>
           <div className="w-12 h-12 md:w-16 md:h-16 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
@@ -96,7 +97,7 @@ export default function DialogPremiumPromo({ open, onOpenChange, onMaybeLater })
             Maybe Later
           </button>
           <button 
-            onClick={() => window.location.href = import.meta.env.VITE_STRIPE_URL}
+            onClick={() => window.location.href = '/premium'}
             className="flex-1 px-4 md:px-6 py-2.5 md:py-3 bg-yellow-500 hover:bg-yellow-600 text-black rounded-xl font-bold transition-colors text-sm"
           >
             <Crown size={14} md:size={18} className="inline mr-1 md:mr-2" />

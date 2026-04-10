@@ -6,7 +6,6 @@ import { Dialog } from "@/components/ui/dialog";
 import Content from "../components/Content";
 import { useLayoutContext } from "../components/LayoutContext";
 import DialogLoginPrompt from "../components/DialogLoginPrompt";
-import DialogPremiumPromo from "../components/DialogPremiumPromo";
 import { 
   ArrowRight, ArrowLeft, Heart, Sparkles, Wand2, 
   Eye, Smile, User, MessageCircle, Play, Lock, Crown,
@@ -198,10 +197,25 @@ export default function CreateGirlPage() {
   const navigate = useNavigate();
   const authFetch = useAuthFetch();
   const { updateUser, premium, canCreateGirlfriend, setCanCreateGirlfriend, lastGirlfriendCreated, setLastGirlfriendCreated, isLoggedIn } = useLayoutContext();
-  const [currentStep, setCurrentStep] = useState(1);
+  
+  const getInitialState = () => {
+    const saved = localStorage.getItem('createGirlState');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        return { currentStep: parsed.currentStep || 1, formData: parsed.formData };
+      } catch (e) {
+        return { currentStep: 1, formData: null };
+      }
+    }
+    return { currentStep: 1, formData: null };
+  };
+  
+  const initialState = getInitialState();
+  const [currentStep, setCurrentStep] = useState(initialState.currentStep);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState(initialState.formData || {
     hairColor: null,
     eyeColor: null,
     bodyType: null,
@@ -216,7 +230,15 @@ export default function CreateGirlPage() {
   });
   const [notification, setNotification] = useState(null);
   const [showPremiumDialog, setShowPremiumDialog] = useState(false);
-  const [showPremiumPromoDialog, setShowPremiumPromoDialog] = useState(false);
+
+  const clearSavedState = () => {
+    localStorage.removeItem('createGirlState');
+  };
+
+  useEffect(() => {
+    const state = { currentStep, formData };
+    localStorage.setItem('createGirlState', JSON.stringify(state));
+  }, [currentStep, formData]);
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -623,6 +645,7 @@ export default function CreateGirlPage() {
                     const data = await res.json();
                     
                     if (data.type === "success") {
+                      clearSavedState();
                       // Update points in Layout
                       if (data.remainingPoints !== undefined) {
                         updateUser({ points: data.remainingPoints });
@@ -640,11 +663,11 @@ export default function CreateGirlPage() {
                         message: data.message,
                         points: data.remainingPoints
                       });
-                      setTimeout(() => window.location.href = import.meta.env.VITE_STRIPE_URL, 2000);
+                      setTimeout(() => window.location.href = '/premium', 2000);
                     } else {
                       // Not enough points, limit exceeded, or premium required - show appropriate dialog
                       if (data?.message?.includes("Premium subscription required")) {
-                        setShowPremiumPromoDialog(true);
+                        navigate('/premium');
                       } else if (data?.message?.includes("Not enough points") || data?.message?.includes("need") || data?.message?.includes("already used")) {
                         setShowPremiumDialog(true);
                         // Update state if limit reached
@@ -748,13 +771,6 @@ export default function CreateGirlPage() {
           setShowLoginPrompt(false);
           navigate("/");
         }}
-      />
-
-      {/* Premium Promo Dialog for premium-required errors */}
-      <DialogPremiumPromo 
-        open={showPremiumPromoDialog}
-        onOpenChange={setShowPremiumPromoDialog}
-        onMaybeLater={() => setShowPremiumPromoDialog(false)}
       />
     </Layout>
   );

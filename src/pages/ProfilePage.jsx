@@ -536,7 +536,7 @@ export default function ProfilePage() {
                           </div>
                         )}
                         {!premium?.isActive && (
-                          <Button onClick={() => window.location = import.meta.env.VITE_STRIPE_URL} className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold rounded-xl py-4 transition-all cursor-pointer">
+                          <Button onClick={() => window.location.href = '/premium'} className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold rounded-xl py-4 transition-all cursor-pointer">
                               <Crown size={20} className="mr-2" />Upgrade to Premium
                             </Button>
                         )}

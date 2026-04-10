@@ -20,6 +20,7 @@ import HowItWorksPage from './pages/HowItWorksPage'
 import TermsPage from './pages/TermsPage'
 import PrivacyPage from './pages/PrivacyPage'
 import ProfilePage from './pages/ProfilePage'
+import PremiumPage from './pages/PremiumPage'
 import { LayoutProvider, useLayoutContext } from './components/LayoutContext'
 
 function Application() {
@@ -117,6 +118,11 @@ function Application() {
       <Route 
         path='/profile' 
         element={isLoggedIn ? <ProfilePage /> : <Navigate to="/login" />} 
+      />
+
+      <Route 
+        path='/premium' 
+        element={<PremiumPage />} 
       />
 
       <Route path="*" element={<NotFound />} />

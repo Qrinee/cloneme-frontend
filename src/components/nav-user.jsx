@@ -89,7 +89,7 @@ import { Link } from "react-router-dom"
 
                 </DropdownMenuItem>
                 </Link>
-                <div onClick={() => window.location = import.meta.env.VITE_STRIPE_URL}>
+                <div onClick={() => window.location.href = '/premium'}>
                 <DropdownMenuItem>
                   <CreditCardIcon />
                   Billing

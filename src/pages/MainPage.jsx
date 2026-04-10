@@ -15,12 +15,16 @@ export default function MainPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [verifyEmail, setVerifyEmail] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
+  const [registeredEmail, setRegisteredEmail] = useState("");
 
   const handleChange = (e) => {
     setForm((prev) => ({
       ...prev,
       [e.target.id]: e.target.value,
     }));
+    if (e.target.id === "email" && registeredEmail) {
+      setRegisteredEmail(e.target.value);
+    }
   };
 
   const handleLogin = async (e) => {
@@ -100,6 +104,16 @@ export default function MainPage() {
     }
   };
 
+  const handleRegisterEmail = async (e) => {
+    e.preventDefault();
+    if (!form.email) {
+      setError("Email is required");
+      return;
+    }
+    setRegisteredEmail(form.email);
+    setView("register-password");
+  };
+
   const handleRegister = async (e) => {
     e.preventDefault();
     setError("");
@@ -116,8 +130,7 @@ export default function MainPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          username: form.username,
-          email: form.email,
+          email: registeredEmail || form.email,
           password: form.password,
         }),
       });
@@ -133,7 +146,7 @@ export default function MainPage() {
       
       if (!res.ok) throw new Error(data.message || "Registration failed");
 
-      await handleLogin(e);
+      window.location.href = '/'
     } catch (err) {
       setError(err.message);
       setIsLoading(false);
@@ -153,11 +166,13 @@ export default function MainPage() {
           {/* Title */}
           <div className="mb-8">
             <h1 className="text-2xl font-semibold text-[var(--foreground)]">
-              {view === "register" ? "Create account" : view === "login" ? "Welcome back" : "Verify Email"}
+              {view === "register" ? "Create account" : view === "register-password" ? "Set password" : view === "login" ? "Welcome back" : "Verify Email"}
             </h1>
             <p className="text-sm text-[var(--text-muted)] mt-2">
               {view === "register" 
-                ? "Get started for free" 
+                ? "Enter your email to get started" 
+                : view === "register-password"
+                ? "Create a secure password"
                 : view === "login"
                 ? "Enter your details to continue"
                 : "Check your inbox for the code"}
@@ -235,14 +250,14 @@ export default function MainPage() {
                   </button>
                 </div>
               </motion.form>
-            ) : view === "register" ? (
+            ) : view === "register" || view === "register-password" ? (
               <motion.form
-                key="register"
+                key={view}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.2 }}
-                onSubmit={handleRegister}
+                onSubmit={view === "register" ? handleRegisterEmail : handleRegister}
                 className="space-y-3"
               >
                 <Button
@@ -261,53 +276,61 @@ export default function MainPage() {
                   <div className="flex-1 h-px bg-[var(--border-subtle)]" />
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="username" className="text-xs text-[var(--text-muted)]">Username</Label>
-                  <Input
-                    id="username"
-                    type="text"
-                    placeholder="johndoe"
-                    required
-                    onChange={handleChange}
-                    className="h-10 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)]"
-                  />
-                </div>
+                {view === "register" ? (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="email" className="text-xs text-[var(--text-muted)]">Email</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="name@example.com"
+                        required
+                        onChange={handleChange}
+                        className="h-10 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)]"
+                      />
+                    </div>
+                  </>
+                ) : view === "register-password" ? (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="email" className="text-xs text-[var(--text-muted)]">Email</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="name@example.com"
+                        required
+                        readOnly
+                        value={registeredEmail || form.email || ""}
+                        onChange={handleChange}
+                        className="h-10 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)]"
+                      />
+                    </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-xs text-[var(--text-muted)]">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="name@example.com"
-                    required
-                    onChange={handleChange}
-                    className="h-10 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)]"
-                  />
-                </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="password" className="text-xs text-[var(--text-muted)]">Password</Label>
+                      <Input
+                        id="password"
+                        type="password"
+                        placeholder="••••••••"
+                        required
+                        onChange={handleChange}
+                        className="h-10 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)]"
+                      />
+                    </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="password" className="text-xs text-[var(--text-muted)]">Password</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="••••••••"
-                    required
-                    onChange={handleChange}
-                    className="h-10 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)]"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="repeat-password" className="text-xs text-[var(--text-muted)]">Confirm password</Label>
-                  <Input
-                    id="repeat-password"
-                    type="password"
-                    placeholder="••••••••"
-                    required
-                    onChange={handleChange}
-                    className="h-10 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)]"
-                  />
-                </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="repeat-password" className="text-xs text-[var(--text-muted)]">Confirm password</Label>
+                      <Input
+                        id="repeat-password"
+                        type="password"
+                        placeholder="••••••••"
+                        required
+                        onChange={handleChange}
+                        className="h-10 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)]"
+                      />
+                    </div>
+                  </>
+                ) : null}
 
                 {error && <p className="text-xs text-red-400">{error}</p>}
 
@@ -316,16 +339,21 @@ export default function MainPage() {
                   className="w-full h-10 bg-[var(--accent-primary)] text-white hover:bg-[var(--accent-primary)]/90 mt-2"
                   disabled={isLoading}
                 >
-                  {isLoading ? "Creating account..." : "Create account"}
+                  {isLoading ? "Creating account..." : view === "register" ? "Continue" : "Create account"}
                 </Button>
 
                 <div className="flex justify-center mt-4">
                   <button
                     type="button"
                     className="text-md text-[var(--text-muted)] hover:text-[var(--foreground)] cursor-pointer"
-                    onClick={() => setView("login")}
+                    onClick={() => {
+                      if (view === "register-password") {
+                        setRegisteredEmail("");
+                      }
+                      setView(view === "register" ? "login" : "register")
+                    }}
                   >
-                    Already have an account? Sign in
+                    {view === "register" ? "Already have an account? Sign in" : "Back"}
                   </button>
                 </div>
               </motion.form>
@@ -381,8 +409,8 @@ export default function MainPage() {
       </div>
 
       {/* Desktop: Right side - Video */}
-      <div className="hidden lg:flex lg:w-1/2 items-center justify-center bg-[var(--bg-secondary)] p-8">
-        <div className="relative w-full max-w-sm aspect-[3/4] rounded-2xl overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 items-center justify-center bg-[var(--bg-secondary)] p-4">
+        <div className="relative w-full max-w-xs aspect-[9/16] rounded-xl overflow-hidden">
           <video
             src={characterVideo}
             autoPlay
@@ -393,8 +421,8 @@ export default function MainPage() {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
           
-          <div className="absolute bottom-6 left-0 right-0 text-center">
-            <p className="text-sm text-[var(--text-muted)]">
+          <div className="absolute bottom-4 left-0 right-0 text-center">
+            <p className="text-xs text-[var(--text-muted)]">
               © {new Date().getFullYear()} ClonMe
             </p>
           </div>
@@ -402,8 +430,8 @@ export default function MainPage() {
       </div>
 
       {/* Mobile: Full screen video with overlay */}
-      <div className="lg:hidden w-full flex flex-col min-h-screen">
-        <div className="flex-1 relative">
+      <div className="lg:hidden w-full flex flex-col" >
+        <div className="relative h-48">
           <video
             src={characterVideo}
             autoPlay
@@ -414,23 +442,16 @@ export default function MainPage() {
           />
           <div className="absolute inset-0 bg-black/50" />
           
-          <div className="relative z-10 flex flex-col items-center justify-center h-full p-6 text-center">
-            <img src={logo} alt="Logo" className="h-12 mb-4" />
-            <h1 className="text-2xl font-semibold text-white mb-2">
-              {view === "register" ? "Create account" : view === "login" ? "Welcome back" : "Verify Email"}
+          <div className="relative z-10 flex flex-col items-center justify-center h-full p-4 text-center">
+            <img src={logo} alt="Logo" className="h-8 mb-2" />
+            <h1 className="text-xl font-semibold text-white">
+              {view === "register" ? "Create account" : view === "register-password" ? "Set password" : view === "login" ? "Welcome back" : "Verify Email"}
             </h1>
-            <p className="text-sm text-white/70 mb-6">
-              {view === "register" 
-                ? "Get started for free" 
-                : view === "login"
-                ? "Enter your details to continue"
-                : "Check your inbox for the code"}
-            </p>
           </div>
         </div>
 
         {/* Mobile: Form section */}
-        <div className="bg-[var(--bg-primary)] p-6">
+        <div className="bg-[var(--bg-primary)] p-4">
           <AnimatePresence mode="wait">
             {view === "login" ? (
               <motion.form
@@ -502,14 +523,14 @@ export default function MainPage() {
                   </button>
                 </div>
               </motion.form>
-            ) : view === "register" ? (
+            ) : view === "register" || view === "register-password" ? (
               <motion.form
-                key="register"
+                key={view}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.2 }}
-                onSubmit={handleRegister}
+                onSubmit={view === "register" ? handleRegisterEmail : handleRegister}
                 className="space-y-3"
               >
                 <Button
@@ -528,53 +549,61 @@ export default function MainPage() {
                   <div className="flex-1 h-px bg-[var(--border-subtle)]" />
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="username" className="text-xs text-white">Username</Label>
-                  <Input
-                    id="username"
-                    type="text"
-                    placeholder="johndoe"
-                    required
-                    onChange={handleChange}
-                    className="h-10 bg-transparent border-[var(--border-subtle)] text-white placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)]"
-                  />
-                </div>
+                {view === "register" ? (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="email" className="text-xs text-white">Email</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="name@example.com"
+                        required
+                        onChange={handleChange}
+                        className="h-10 bg-transparent border-[var(--border-subtle)] text-white placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)]"
+                      />
+                    </div>
+                  </>
+                ) : view === "register-password" ? (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="email" className="text-xs text-white">Email</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="name@example.com"
+                        required
+                        readOnly
+                        value={registeredEmail || form.email || ""}
+                        onChange={handleChange}
+                        className="h-10 bg-transparent border-[var(--border-subtle)] text-white placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)]"
+                      />
+                    </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-xs text-white">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="name@example.com"
-                    required
-                    onChange={handleChange}
-                    className="h-10 bg-transparent border-[var(--border-subtle)] text-white placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)]"
-                  />
-                </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="password" className="text-xs text-white">Password</Label>
+                      <Input
+                        id="password"
+                        type="password"
+                        placeholder="••••••••"
+                        required
+                        onChange={handleChange}
+                        className="h-10 bg-transparent border-[var(--border-subtle)] text-white placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)]"
+                      />
+                    </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="password" className="text-xs text-white">Password</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="••••••••"
-                    required
-                    onChange={handleChange}
-                    className="h-10 bg-transparent border-[var(--border-subtle)] text-white placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)]"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="repeat-password" className="text-xs text-white">Confirm password</Label>
-                  <Input
-                    id="repeat-password"
-                    type="password"
-                    placeholder="••••••••"
-                    required
-                    onChange={handleChange}
-                    className="h-10 bg-transparent border-[var(--border-subtle)] text-white placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)]"
-                  />
-                </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="repeat-password" className="text-xs text-white">Confirm password</Label>
+                      <Input
+                        id="repeat-password"
+                        type="password"
+                        placeholder="••••••••"
+                        required
+                        onChange={handleChange}
+                        className="h-10 bg-transparent border-[var(--border-subtle)] text-white placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)]"
+                      />
+                    </div>
+                  </>
+                ) : null}
 
                 {error && <p className="text-xs text-red-400">{error}</p>}
 
@@ -583,16 +612,21 @@ export default function MainPage() {
                   className="w-full h-10 bg-[var(--accent-primary)] text-white hover:bg-[var(--accent-primary)]/90 mt-2"
                   disabled={isLoading}
                 >
-                  {isLoading ? "Creating account..." : "Create account"}
+                  {isLoading ? "Creating account..." : view === "register" ? "Continue" : "Create account"}
                 </Button>
 
                 <div className="flex justify-center">
                   <button
                     type="button"
                     className="text-xs text-white hover:text-white/80"
-                    onClick={() => setView("login")}
+                    onClick={() => {
+                      if (view === "register-password") {
+                        setRegisteredEmail("");
+                      }
+                      setView(view === "register" ? "login" : "register")
+                    }}
                   >
-                    Already have an account? Sign in
+                    {view === "register" ? "Already have an account? Sign in" : "Back"}
                   </button>
                 </div>
               </motion.form>

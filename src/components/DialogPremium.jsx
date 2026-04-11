@@ -6,8 +6,13 @@ import {
 } from "@/components/ui/dialog";
 import Content from './Content';
 
-export default function DialogPremium({ credits = 0 }) {
+export default function DialogPremium({ credits = 0, open: externalOpen, onOpenChange: externalOnOpenChange }) {
+  const [internalOpen, setInternalOpen] = useState(false);
   const [tooltipVisible, setTooltipVisible] = useState(false);
+  
+  const isControlled = externalOpen !== undefined;
+  const isOpen = isControlled ? externalOpen : internalOpen;
+  const setOpen = isControlled ? externalOnOpenChange : setInternalOpen;
   
   // Determine button text based on credits (styled to match website dark theme)
   const buttonText = credits === 0 
@@ -17,7 +22,7 @@ export default function DialogPremium({ credits = 0 }) {
     : `${credits} credits`;
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setOpen}>
       <div className="relative">
         <DialogTrigger asChild>
           <div 
@@ -33,7 +38,7 @@ export default function DialogPremium({ credits = 0 }) {
           </div>
         </DialogTrigger>
         
-        {tooltipVisible && (
+        {tooltipVisible && !isControlled && (
           <div className="absolute bottom-full left-0 mb-2 p-3 bg-popover text-popover-foreground text-sm rounded-lg shadow-lg w-72 border border-blue-200">
             {credits === 0 ? (
               <p className="font-medium">You've run out of credits. Buy a pack to continue generating AI content</p>

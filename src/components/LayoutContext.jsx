@@ -61,6 +61,21 @@ export function LayoutProvider({ children }) {
               ? data.user.canCreateGirlfriend 
               : true);
             setLastGirlfriendCreated(data.user.lastGirlfriendCreated || null);
+            
+            // Check for pending girlfriend creation after login
+            const pendingGirlfriend = localStorage.getItem('pendingGirlfriendCreation');
+            if (pendingGirlfriend) {
+              localStorage.removeItem('pendingGirlfriendCreation');
+              // Check if premium is active
+              const isPremiumActive = data.user.premium?.isActive && 
+                (!data.user.premium?.expiresAt || new Date(data.user.premium.expiresAt) > new Date());
+              if (isPremiumActive) {
+                // Store for later use - will be picked up by CreateGirlPage
+                window.pendingGirlfriendData = pendingGirlfriend;
+                // Navigate to create page
+                window.location.href = '/create';
+              }
+            }
           }
         } else {
           setIsLoggedIn(false);

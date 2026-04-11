@@ -5,7 +5,6 @@ import DialogPremium from "../components/DialogPremium";
 import { Dialog } from "@/components/ui/dialog";
 import Content from "../components/Content";
 import { useLayoutContext } from "../components/LayoutContext";
-import DialogLoginPrompt from "../components/DialogLoginPrompt";
 import { 
   ArrowRight, ArrowLeft, Heart, Sparkles, Wand2, 
   Eye, Smile, User, MessageCircle, Play, Lock, Crown,
@@ -213,7 +212,6 @@ export default function CreateGirlPage() {
   const initialState = getInitialState();
   const [currentStep, setCurrentStep] = useState(initialState.currentStep);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [formData, setFormData] = useState(initialState.formData || {
     hairColor: null,
     eyeColor: null,
@@ -240,10 +238,18 @@ export default function CreateGirlPage() {
   }, [currentStep, formData]);
 
   useEffect(() => {
-    if (!isLoggedIn) {
-      setShowLoginPrompt(true);
+    if (window.pendingGirlfriendData) {
+      try {
+        const pendingData = JSON.parse(window.pendingGirlfriendData);
+        if (pendingData) {
+          setFormData(pendingData);
+          window.pendingGirlfriendData = null;
+        }
+      } catch (e) {
+        console.error('Error parsing pending girlfriend data:', e);
+      }
     }
-  }, [isLoggedIn]);
+  }, []);
 
 
   const updateFormData = (field, value) => {
@@ -596,6 +602,11 @@ export default function CreateGirlPage() {
             ) : (
               <button
                 onClick={async () => {
+                  if (!isLoggedIn) {
+                    localStorage.setItem('pendingGirlfriendCreation', JSON.stringify(formData));
+                    navigate('/premium');
+                    return;
+                  }
                   try {
                     setIsSubmitting(true);
                     const res = await authFetch(`${import.meta.env.VITE_API_URL}/girlfriends`, {
@@ -618,13 +629,23 @@ export default function CreateGirlPage() {
                       if (data.lastGirlfriendCreated) {
                         setLastGirlfriendCreated(data.lastGirlfriendCreated);
                       }
+                      
                       // Show success notification
                       setNotification({
                         type: 'success',
                         message: data.message,
                         points: data.remainingPoints
                       });
-                      setTimeout(() => window.location.href = '/premium', 2000);
+                      
+                      // For non-logged-in users, redirect to premium immediately
+                      // After payment and account creation, the AI Girlfriend will be linked to their email
+                      if (!isLoggedIn) {
+                        window.location.href = '/premium';
+                      } else {
+                        setTimeout(() => {
+                          window.location.href = '/collection';
+                        }, 2000);
+                      }
                     } else {
                       // Not enough points, limit exceeded, or premium required - show appropriate dialog
                       if (data?.message?.includes("Premium subscription required")) {
@@ -719,20 +740,6 @@ export default function CreateGirlPage() {
           <Content />
         </Dialog>
       )}
-
-      {/* Login Prompt Dialog for non-logged in users */}
-      <DialogLoginPrompt 
-        open={showLoginPrompt}
-        onOpenChange={setShowLoginPrompt}
-        onLogin={() => {
-          setShowLoginPrompt(false);
-          navigate("/login");
-        }}
-        onMaybeLater={() => {
-          setShowLoginPrompt(false);
-          navigate("/");
-        }}
-      />
     </Layout>
   );
 }

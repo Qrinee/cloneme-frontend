@@ -14,7 +14,7 @@ import img1 from '../assets/task_01kmwzbe1tfvp912tg8rwe5hay_1774793926_img_1.web
 import img2 from '../assets/task_01kmwzmaxbfbtrtm45b78g5cv6_1774794217_img_0.webp';
 import img3 from '../assets/task_01kmx0114jf4n8czx2xbegyq4b_1774794633_img_1.webp';
 
-export default function Content({ onClose }) {
+export default function Content({ onClose, onOpenChange }) {
   const oneTimePlans = [
     {
       name: "Quickie",
@@ -48,6 +48,11 @@ export default function Content({ onClose }) {
     }
   ];
 
+  const handleClose = () => {
+    if (onClose) onClose();
+    if (onOpenChange) onOpenChange(false);
+  };
+
   return (
       <DialogContent
         showClose={false}
@@ -55,7 +60,7 @@ export default function Content({ onClose }) {
       >
         {/* Close button */}
         <button
-          onClick={onClose}
+          onClick={handleClose}
           className="absolute top-4 right-4 z-50 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white/60 hover:text-white transition-colors md:hidden"
         >
           <X size={20} />

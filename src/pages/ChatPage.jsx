@@ -5,17 +5,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Layout from "../components/Layout";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
-  FaPaperPlane,
-  FaImage,
-  FaSmile,
-  FaSearch,
-  FaPlus,
-  FaTrash,
-  FaArrowLeft,
-  FaLock,
-  FaUnlock,
-} from "react-icons/fa";
-import { Sparkles, Lock, Star, Heart, Coins, Play, Camera } from "lucide-react";
+  Sparkles, Lock, Star, Heart, Coins, Play, Camera
+} from "lucide-react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Dialog } from "@/components/ui/dialog";
 import Content from "@/components/Content";
@@ -23,6 +14,7 @@ import DialogMessageLimit from "@/components/DialogMessageLimit";
 import { useAuthFetch } from "@/utils/authFetch";
 import { useLayoutContext } from "@/components/LayoutContext";
 import LoginRequiredDialog from "@/components/LoginRequiredDialog";
+import { FaArrowLeft, FaGlasses, FaPaperPlane, FaSmile, FaTrash, FaUnlock } from "react-icons/fa";
 
 export default function ChatPage() {
   const { id } = useParams();
@@ -67,6 +59,7 @@ export default function ChatPage() {
   const [requestingMedia, setRequestingMedia] = useState(null); // 'photo' or 'video'
   const [showLoginDialog, setShowLoginDialog] = useState(false);
   const [showChatList, setShowChatList] = useState(false);
+  const [showPremiumDialog, setShowPremiumDialog] = useState(false);
   
   // Sync with context
   useEffect(() => {
@@ -150,6 +143,10 @@ export default function ChatPage() {
   };
 
   const fetchChatMessages = async (chatbotId) => {
+    setMessages([]);
+    setIsInitialLoad(true);
+    setIsTyping(false);
+    setIncomingAiMessages(0);
     const res = await authFetch(
       `${import.meta.env.VITE_URL}/api/chats/${chatbotId}`
     );
@@ -628,13 +625,17 @@ export default function ChatPage() {
         message={limitErrorMessage}
       />
 
+      <Dialog open={showPremiumDialog} onOpenChange={setShowPremiumDialog}>
+        <Content />
+      </Dialog>
+
       <div className="flex flex-1 bg-[#0a0a0f] text-white overflow-hidden h-[calc(100dvh-64px)] md:h-full">
         {/* LEFT – CHAT LIST */}
         <div className="hidden md:flex w-80 border-r border-white/5 flex-col bg-[#0a0a0f] h-full overflow-hidden">
           <div className="p-6">
             <h3 className="text-2xl font-bold tracking-tight mb-6">Messages</h3>
             <div className="relative">
-              <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" size={14} />
+              <FaGlasses className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" size={14} />
               <input
                 placeholder="Search conversations..."
                 value={searchQuery}
@@ -678,7 +679,7 @@ export default function ChatPage() {
           <div className="p-6">
             <Link to="/">
               <button className="w-full bg-white/5 backdrop-blur-md border border-white/10 text-white py-4 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-white/10 transition-all flex items-center justify-center gap-2">
-                <FaPlus size={12} /> New Chat
+                + New Chat
               </button>
             </Link>
           </div>
@@ -739,12 +740,12 @@ export default function ChatPage() {
                           </div>
                         )}
                         {(m.type === 'photo' || m.type === 'video') && (
-                          <div className="relative rounded-2xl overflow-hidden border border-white/10 aspect-[3/4] w-64 bg-white/5">
+                          <div className="relative rounded-2xl overflow-hidden border border-white/10 aspect-[3/4] w-64 bg-white/5"  onClick={() => m.isLocked && navigate('/premium')}>
                             {m.isLocked && (
                               <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 z-10 bg-black/40 backdrop-blur-md">
                                 <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center"><Lock size={20} className="text-white/60" /></div>
-                                <button onClick={() => handleUnlockMedia(m.id)} className="bg-white text-black px-4 py-2 rounded-xl text-xs font-bold hover:bg-white/90 flex items-center gap-2">
-                                  <Coins size={14} /> Unlock for {m.price} Credits
+                                <button className="bg-[#741818] text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-[#8d1d1d] flex items-center gap-2">
+                                  Click to Unlock
                                 </button>
                               </div>
                             )}
@@ -787,37 +788,23 @@ export default function ChatPage() {
                   {/* Desktop media buttons */}
                   <div className="hidden md:flex gap-4 mb-4">
                     <button 
-                      onClick={() => handleRequestMedia('photo')}
+                      onClick={() => navigate('/premium')}
                       disabled={isLoading || requestingMedia}
-                      className={`flex-1 bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 backdrop-blur-md px-4 py-3 rounded-2xl text-[10px] font-bold text-white/80 transition-all flex flex-col items-center justify-center gap-1 group uppercase tracking-widest ${isLoading || requestingMedia ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                      className={`flex-1 bg-[#741818]/20 hover:bg-[#741818]/30 border border-[#741818]/40 backdrop-blur-md px-4 py-3 rounded-2xl text-[10px] font-bold text-white/80 transition-all flex flex-col items-center justify-center gap-1 group uppercase tracking-widest cursor-pointer`}
                     >
                       <div className="flex items-center gap-2">
-                        {requestingMedia === 'photo' ? (
-                          <div className="w-3.5 h-3.5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                        ) : (
-                          <Camera size={14} className="text-white/40 group-hover:text-pink-500 transition-colors" />
-                        )}
-                        Send a naughty photo 📸
-                      </div>
-                      <div className="text-[9px] text-white/30 flex items-center gap-1 font-medium">
-                        <Coins size={10} /> 50 Credits
+                        <Camera size={14} className="text-white/40 group-hover:text-pink-500 transition-colors" />
+                        Get Premium for Photos 📸
                       </div>
                     </button>
                     <button 
-                      onClick={() => handleRequestMedia('video')}
+                      onClick={() => navigate('/premium')}
                       disabled={isLoading || requestingMedia}
-                      className={`flex-1 bg-white/5 hover:bg-[#741818]/20 border border-white/5 hover:border-[#741818]/40 backdrop-blur-md px-4 py-3 rounded-2xl text-[10px] font-bold text-white/80 transition-all flex flex-col items-center justify-center gap-1 group uppercase tracking-widest ${isLoading || requestingMedia ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                      className={`flex-1 bg-[#741818]/20 hover:bg-[#741818]/30 border border-[#741818]/40 backdrop-blur-md px-4 py-3 rounded-2xl text-[10px] font-bold text-white/80 transition-all flex flex-col items-center justify-center gap-1 group uppercase tracking-widest cursor-pointer`}
                     >
                       <div className="flex items-center gap-2">
-                        {requestingMedia === 'video' ? (
-                          <div className="w-3.5 h-3.5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                        ) : (
-                          <Play size={14} className="text-white/40 group-hover:text-red-500 transition-colors" />
-                        )}
-                        Send a naughty video 🔥
-                      </div>
-                      <div className="text-[9px] text-white/30 flex items-center gap-1 font-medium">
-                        <Coins size={10} /> 200 Credits
+                        <Play size={14} className="text-white/40 group-hover:text-red-500 transition-colors" />
+                        Get Premium for Videos 🔥
                       </div>
                     </button>
                   </div>
@@ -825,18 +812,18 @@ export default function ChatPage() {
                   {/* Mobile media buttons - simplified row */}
                   <div className="md:hidden flex gap-2 mb-3">
                     <button 
-                      onClick={() => handleRequestMedia('photo')}
+                      onClick={() => navigate('/premium')}
                       disabled={isLoading || requestingMedia}
-                      className={`flex-1 bg-white/5 border border-white/5 backdrop-blur-md px-3 py-2 rounded-xl text-[9px] font-bold text-white/80 transition-all flex items-center justify-center gap-1 ${isLoading || requestingMedia ? 'opacity-50' : ''}`}
+                      className={`flex-1 bg-[#741818]/20 border border-[#741818]/40 backdrop-blur-md px-3 py-2 rounded-xl text-[9px] font-bold text-white/80 transition-all flex items-center justify-center gap-1 cursor-pointer`}
                     >
-                      <Camera size={12} /> 📸 50
+                      <Camera size={12} /> Go Premium 📸
                     </button>
                     <button 
-                      onClick={() => handleRequestMedia('video')}
+                      onClick={() => navigate('/premium')}
                       disabled={isLoading || requestingMedia}
-                      className={`flex-1 bg-white/5 border border-white/5 backdrop-blur-md px-3 py-2 rounded-xl text-[9px] font-bold text-white/80 transition-all flex items-center justify-center gap-1 ${isLoading || requestingMedia ? 'opacity-50' : ''}`}
+                      className={`flex-1 bg-[#741818]/20 border border-[#741818]/40 backdrop-blur-md px-3 py-2 rounded-xl text-[9px] font-bold text-white/80 transition-all flex items-center justify-center gap-1 cursor-pointer`}
                     >
-                      <Play size={12} /> 🔥 200
+                      <Play size={12} /> Go Premium 🔥
                     </button>
                   </div>
                   
@@ -877,7 +864,7 @@ export default function ChatPage() {
                   </button>
                 </div>
                 <div className="relative">
-                  <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-white/20" size={12} />
+                  <FaGlasses className="absolute left-3 top-1/2 -translate-y-1/2 text-white/20" size={12} />
                   <input
                     placeholder="Search..."
                     value={searchQuery}

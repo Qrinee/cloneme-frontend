@@ -131,6 +131,10 @@ export default function JerkOffPage() {
                 id: m._id || index,
                 text: m.content,
                 sender: m.role === "user" ? "user" : "girl",
+                type: m.type,
+                isLocked: m.isLocked,
+                price: m.price,
+                mediaUrl: m.mediaUrl,
                 time: m.timestamp ? new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'now'
               }));
               setMessages(loadedMessages);
@@ -153,6 +157,10 @@ export default function JerkOffPage() {
             id: m._id || index,
             text: m.content,
             sender: m.role === "user" ? "user" : "girl",
+            type: m.type,
+            isLocked: m.isLocked,
+            price: m.price,
+            mediaUrl: m.mediaUrl,
             time: m.timestamp ? new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'now'
           }));
           setMessages(loadedMessages);
@@ -174,6 +182,10 @@ export default function JerkOffPage() {
               id: id,
               text: m.content,
               sender: m.role === "user" ? "user" : "girl",
+              type: m.type,
+              isLocked: m.isLocked,
+              price: m.price,
+              mediaUrl: m.mediaUrl,
               time: m.timestamp ? new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'now'
             });
           }
@@ -245,6 +257,10 @@ export default function JerkOffPage() {
                 id: m._id || Date.now() + index,
                 text: m.content,
                 sender: m.role === "user" ? "user" : "girl",
+                type: m.type,
+                isLocked: m.isLocked,
+                price: m.price,
+                mediaUrl: m.mediaUrl,
                 time: m.timestamp ? new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
               }));
               setMessages(newMessages);
@@ -294,6 +310,10 @@ export default function JerkOffPage() {
             id: m._id || Date.now() + index,
             text: m.content,
             sender: m.role === "user" ? "user" : "girl",
+            type: m.type,
+            isLocked: m.isLocked,
+            price: m.price,
+            mediaUrl: m.mediaUrl,
             time: m.timestamp ? new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
           }));
           setMessages(newMessages);
@@ -317,6 +337,10 @@ export default function JerkOffPage() {
                 id: msg._id || Date.now() + Math.random(),
                 text: msg.content,
                 sender: "girl",
+                type: msg.type,
+                isLocked: msg.isLocked,
+                price: msg.price,
+                mediaUrl: msg.mediaUrl,
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
               };
               setMessages(prev => [...prev, aiMessage]);

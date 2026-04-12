@@ -189,7 +189,7 @@ export default function LoginPage() {
                   type="button"
                   onClick={() => window.location = `${import.meta.env.VITE_URL}/auth/google`}
                   variant="outline"
-                  className="w-full h-11 sm:h-12 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] hover:bg-[var(--bg-tertiary)] hover:border-[var(--border-subtle)] text-sm sm:text-base"
+                  className="w-full h-11 sm:h-12 bg-transparent border-[var(--border-subtle)] text-white hover:bg-[var(--bg-tertiary)] hover:border-[var(--border-subtle)] text-sm sm:text-base"
                 >
                   <FcGoogle size={18} className="mr-2" />
                   Continue with Google

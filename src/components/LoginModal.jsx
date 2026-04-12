@@ -167,7 +167,7 @@ export default function LoginModal({ open, onClose }) {
             type="button"
             onClick={() => window.location = `${import.meta.env.VITE_URL}/auth/google`}
             variant="outline"
-            className="w-full flex gap-2 justify-center"
+            className="w-full flex gap-2 justify-center text-white"
           >
             <FcGoogle size={20} />
             Continue with Google

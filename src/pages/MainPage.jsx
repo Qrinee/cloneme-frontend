@@ -194,7 +194,7 @@ export default function MainPage() {
                   type="button"
                   onClick={() => window.location = `${import.meta.env.VITE_URL}/auth/google`}
                   variant="outline"
-                  className="w-full h-11 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] hover:bg-[var(--bg-tertiary)]"
+                  className="w-full h-11 bg-transparent border-[var(--border-subtle)] text-white hover:bg-[var(--bg-tertiary)]"
                 >
                   <FcGoogle size={18} className="mr-2" />
                   Continue with Google
@@ -264,7 +264,7 @@ export default function MainPage() {
                   type="button"
                   onClick={() => window.location = `${import.meta.env.VITE_URL}/auth/google`}
                   variant="outline"
-                  className="w-full h-11 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] hover:bg-[var(--bg-tertiary)]"
+                  className="w-full h-11 bg-transparent border-[var(--border-subtle)] text-white hover:bg-[var(--bg-tertiary)]"
                 >
                   <FcGoogle size={18} className="mr-2" />
                   Continue with Google

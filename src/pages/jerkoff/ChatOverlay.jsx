@@ -1,4 +1,4 @@
-import { Send, Lock, Play } from "lucide-react";
+import { Send, Lock, Play, Unlock } from "lucide-react";
 
 export default function ChatOverlay({ 
   messages, 
@@ -38,8 +38,16 @@ export default function ChatOverlay({
                   {(msg.type === 'photo' || msg.type === 'video') ? (
                     <div className="relative rounded-2xl overflow-hidden border border-white/10 aspect-[3/4] w-48 bg-white/5">
                       {msg.isLocked && (
-                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 z-10 bg-black/40 backdrop-blur-md">
-                          <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center"><Lock size={16} className="text-white/60" /></div>
+                        <div 
+                          className="absolute inset-0 flex flex-col items-center justify-center gap-3 z-10 bg-black/40 backdrop-blur-md cursor-pointer"
+                          onClick={() => window.location.href = '/premium'}
+                        >
+                          <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
+                            <Lock size={20} className="text-white/60" />
+                          </div>
+                          <button className="px-4 py-2 bg-[#741818] hover:bg-[#8d1d1d] text-white text-xs font-bold uppercase tracking-widest rounded-full transition-all">
+                            Unlock
+                          </button>
                         </div>
                       )}
                       {msg.type === 'photo' ? (

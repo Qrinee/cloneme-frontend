@@ -11,7 +11,6 @@ import { useState, useRef, useEffect } from 'react';
 import {
   ChevronUp,
   ChevronDown,
-  Send,
   Heart,
   MessageSquare,
   Share2,
@@ -30,7 +29,6 @@ export default function DiscoverPage() {
   const [girlfriends, setGirlfriends] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
-  const [message, setMessage] = useState("");
   const containerRef = useRef(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isLiked, setIsLiked] = useState({});
@@ -100,12 +98,6 @@ export default function DiscoverPage() {
 
   const goToPrev = () => {
     scrollToIndex(currentIndex - 1);
-  };
-
-  const handleSendMessage = () => {
-    if (message.trim()) {
-      navigate(`/chat/${girlfriends[currentIndex]._id}?msg=${encodeURIComponent(message)}`);
-    }
   };
 
   const toggleLike = async (id) => {
@@ -257,31 +249,21 @@ export default function DiscoverPage() {
                         ))}
                       </div>
 
-                      {/* Message input area */}
-                      <div className="flex items-center gap-2 bg-white/5 border border-white/5 rounded-2xl p-1">
-                        <input
-                          type="text"
-                          value={index === currentIndex ? message : ''}
-                          onChange={(e) => setMessage(e.target.value)}
-                          placeholder="Say something sweet..."
-                          className="flex-1 bg-transparent text-white placeholder:text-white/20 px-5 py-3 text-sm outline-none"
-                          onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                        />
+                      {/* Action buttons */}
+                      <div className="flex items-center gap-2">
                         <button
                           onClick={() => toggleLike(profile._id)}
-                          className={`p-3 rounded-xl transition-all active:scale-95 ${isLiked[profile._id] ? 'bg-[#741818] text-white' : 'bg-white/5 text-white/40 hover:text-white/80 border border-white/5'}`}
+                          className={`flex-1 p-3 rounded-2xl transition-all active:scale-95 flex items-center justify-center gap-2 ${isLiked[profile._id] ? 'bg-[#741818] text-white' : 'bg-white/5 text-white/40 hover:text-white/80 border border-white/5'}`}
                         >
                           <Heart size={16} fill={isLiked[profile._id] ? "currentColor" : "none"} />
+                          <span className="text-xs font-bold uppercase tracking-widest">Like</span>
                         </button>
                         <button
-                          onClick={handleSendMessage}
-                          disabled={!message.trim()}
-                          className={`p-3.5 rounded-xl transition-all active:scale-95 ${message.trim()
-                            ? 'bg-[#741818] text-white hover:bg-[#8d1d1d]'
-                            : 'bg-white/5 text-white/10 cursor-not-allowed border border-white/5'
-                            }`}
+                          onClick={() => navigate(`/chat/${profile._id}`)}
+                          className="flex-[2] p-3 rounded-2xl transition-all active:scale-95 bg-[#741818] text-white hover:bg-[#8d1d1d] flex items-center justify-center gap-2"
                         >
-                          <Send size={16} />
+                          <MessageSquare size={16} />
+                          <span className="text-xs font-bold uppercase tracking-widest">Start Chatting</span>
                         </button>
                       </div>
                     </div>

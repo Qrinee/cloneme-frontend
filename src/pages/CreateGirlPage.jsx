@@ -2,9 +2,10 @@ import { useNavigate } from "react-router-dom";
 import { useAuthFetch } from "../utils/authFetch";
 import Layout from "../components/Layout";
 import DialogPremium from "../components/DialogPremium";
-import { Dialog } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import Content from "../components/Content";
 import { useLayoutContext } from "../components/LayoutContext";
+import PaywallDialog from "../components/PaywallDialog";
 import { 
   ArrowRight, ArrowLeft, Heart, Sparkles, Wand2, 
   Eye, Smile, User, MessageCircle, Play, Lock, Crown,
@@ -227,6 +228,9 @@ export default function CreateGirlPage() {
   });
   const [notification, setNotification] = useState(null);
   const [showPremiumDialog, setShowPremiumDialog] = useState(false);
+  const [previewImage, setPreviewImage] = useState(null);
+  const [generatingPreview, setGeneratingPreview] = useState(false);
+  const [previewProgress, setPreviewProgress] = useState(0);
 
   const clearSavedState = () => {
     localStorage.removeItem('createGirlState');
@@ -250,6 +254,52 @@ export default function CreateGirlPage() {
       }
     }
   }, []);
+
+  useEffect(() => {
+    const hasGeneratedPreview = localStorage.getItem('previewGenerated');
+    const savedPreview = localStorage.getItem('previewImage');
+    
+    if (currentStep === 7 && !previewImage && !generatingPreview) {
+      if (hasGeneratedPreview && savedPreview) {
+        setPreviewImage(savedPreview);
+        setGeneratingPreview(false);
+      } else if (!hasGeneratedPreview) {
+        const generatePreview = async () => {
+          setGeneratingPreview(true);
+          setPreviewProgress(0);
+          
+          const progressInterval = setInterval(() => {
+            setPreviewProgress(prev => Math.min(prev + Math.random() * 15, 90));
+          }, 300);
+          
+          try {
+            const apiUrl = import.meta.env.VITE_API_URL || '/api/v1';
+            const res = await fetch(`${apiUrl}/girlfriends/preview`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(formData)
+            });
+            const data = await res.json();
+            
+            clearInterval(progressInterval);
+            setPreviewProgress(100);
+            
+            if (data.type === "success" && data.previewImage) {
+              setPreviewImage(data.previewImage);
+              localStorage.setItem('previewGenerated', 'true');
+              localStorage.setItem('previewImage', data.previewImage);
+            }
+          } catch (err) {
+            console.error('Preview error:', err);
+          } finally {
+            setGeneratingPreview(false);
+          }
+        };
+        
+        generatePreview();
+      }
+    }
+  }, [currentStep, previewImage, generatingPreview]);
 
 
   const updateFormData = (field, value) => {
@@ -476,53 +526,92 @@ export default function CreateGirlPage() {
         return (
           <div className="space-y-6 md:space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="text-center">
-              <h2 className="text-2xl md:text-4xl font-bold text-white tracking-tighter">Synthesis Complete</h2>
-              <p className="text-white/30 mt-2 font-medium text-sm md:text-base">Review the essence of your creation.</p>
+              <h2 className="text-2xl md:text-4xl font-bold text-white tracking-tighter">
+                {generatingPreview ? "Creating Your Girl" : "Synthesis Complete"}
+              </h2>
+              <p className="text-white/30 mt-2 font-medium text-sm md:text-base">
+                {generatingPreview ? "Please wait while we bring her to life..." : "Review the essence of your creation."}
+              </p>
             </div>
 
-            <div className="bg-white/5 rounded-[2rem] md:rounded-[2.5rem] p-4 md:p-8 border border-white/5">
-              <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6 mb-6 md:mb-8">
-                <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-white/5 border border-white/10 flex items-center justify-center relative overflow-hidden flex-shrink-0">
-                  <User className="w-8 h-8 md:w-10 md:h-10 text-white/20" />
-                </div>
-                <div className="text-center md:text-left">
-                  <h3 className="text-xl md:text-3xl font-bold text-white tracking-tighter">{formData.name || "Nameless Essence"}</h3>
-                  <p className="text-white/40 font-bold text-xs uppercase tracking-widest mt-1">
-                    {formData.age} Years Old • {formData.ethnicity || "Unknown origin"} • {formData.relationship || "Relationship undefined"}
-                  </p>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-3 gap-2 md:gap-4 mb-6 md:mb-8">
-                {[
-                  { label: "Visual", val: formData.hairColor },
-                  { label: "Gaze", val: formData.eyeColor },
-                  { label: "Physique", val: formData.bodyType }
-                ].map((stat, i) => (
-                  <div key={i} className="bg-white/5 rounded-xl md:rounded-2xl p-2 md:p-4 border border-white/5 text-center">
-                    <span className="text-[8px] md:text-[10px] font-bold text-white/20 uppercase tracking-widest block mb-1">{stat.label}</span>
-                    <p className="text-white text-sm md:text-base font-bold tracking-tight capitalize">{stat.val || "—"}</p>
+            {generatingPreview ? (
+              <div className="bg-white/5 rounded-[2rem] md:rounded-[2.5rem] p-8 md:p-12 border border-white/5">
+                <div className="text-center space-y-6">
+                  <div className="relative w-32 h-32 mx-auto">
+                    <div className="absolute inset-0 rounded-full border-4 border-white/10"></div>
+                    <div 
+                      className="absolute inset-0 rounded-full border-4 border-red-500 border-t-transparent animate-spin"
+                      style={{ animationDuration: '1s' }}
+                    ></div>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-2xl font-bold text-white">{Math.round(previewProgress)}%</span>
+                    </div>
                   </div>
-                ))}
+                  <div className="space-y-2">
+                    <p className="text-white/60 text-sm">Generating portrait...</p>
+                    <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-red-500 rounded-full transition-all duration-300"
+                        style={{ width: `${previewProgress}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                  <p className="text-white/30 text-xs">This may take a few seconds</p>
+                </div>
               </div>
-              
-              <div className="space-y-4 md:space-y-6">
-                <div className="p-4 md:p-6 bg-white/5 rounded-xl md:rounded-2xl border border-white/5 italic text-white/70 leading-relaxed font-medium text-sm md:text-base">
-                  "{formData.bio || "Her story remains unwritten..."}"
+            ) : (
+              <div className="bg-white/5 rounded-[2rem] md:rounded-[2.5rem] p-4 md:p-8 border border-white/5">
+                <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6 mb-6 md:mb-8">
+                  {previewImage ? (
+                    <img 
+                      src={`${import.meta.env.VITE_API_URL?.replace('/api/v1', '') || 'http://localhost:3000'}${previewImage}`}
+                      alt={formData.name} 
+                      className="w-32 h-32 md:w-48 md:h-48 rounded-2xl object-cover border-2 border-white/10"
+                    />
+                  ) : (
+                    <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-white/5 border border-white/10 flex items-center justify-center relative overflow-hidden flex-shrink-0">
+                      <User className="w-8 h-8 md:w-10 md:h-10 text-white/20" />
+                    </div>
+                  )}
+                  <div className="text-center md:text-left">
+                    <h3 className="text-xl md:text-3xl font-bold text-white tracking-tighter">{formData.name || "Nameless Essence"}</h3>
+                    <p className="text-white/40 font-bold text-xs uppercase tracking-widest mt-1">
+                      {formData.age} Years Old • {formData.ethnicity || "Unknown origin"} • {formData.relationship || "Relationship undefined"}
+                    </p>
+                  </div>
                 </div>
                 
-                <div className="flex flex-wrap gap-2 justify-center md:justify-start">
-                  {formData.tags.map(tagId => {
-                    const tag = tags.find(t => t._id === tagId);
-                    return tag ? (
-                      <span key={tagId} className="px-3 py-1.5 md:px-4 md:py-2 bg-[#741818]/20 border border-[#741818]/20 rounded-lg md:rounded-xl text-white text-[9px] md:text-[10px] font-bold uppercase tracking-widest">
-                        {tag.label}
-                      </span>
-                    ) : null;
-                  })}
+                <div className="grid grid-cols-3 gap-2 md:gap-4 mb-6 md:mb-8">
+                  {[
+                    { label: "Visual", val: formData.hairColor },
+                    { label: "Gaze", val: formData.eyeColor },
+                    { label: "Physique", val: formData.bodyType }
+                  ].map((stat, i) => (
+                    <div key={i} className="bg-white/5 rounded-xl md:rounded-2xl p-2 md:p-4 border border-white/5 text-center">
+                      <span className="text-[8px] md:text-[10px] font-bold text-white/20 uppercase tracking-widest block mb-1">{stat.label}</span>
+                      <p className="text-white text-sm md:text-base font-bold tracking-tight capitalize">{stat.val || "—"}</p>
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="space-y-4 md:space-y-6">
+                  <div className="p-4 md:p-6 bg-white/5 rounded-xl md:rounded-2xl border border-white/5 italic text-white/70 leading-relaxed font-medium text-sm md:text-base">
+                    "{formData.bio || "Her story remains unwritten..."}"
+                  </div>
+                  
+                  <div className="flex flex-wrap gap-2 justify-center md:justify-start">
+                    {formData.tags.map(tagId => {
+                      const tag = tags.find(t => t._id === tagId);
+                      return tag ? (
+                        <span key={tagId} className="px-3 py-1.5 md:px-4 md:py-2 bg-[#741818]/20 border border-[#741818]/20 rounded-lg md:rounded-xl text-white text-[9px] md:text-[10px] font-bold uppercase tracking-widest">
+                          {tag.label}
+                        </span>
+                      ) : null;
+                    })}
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         );
 
@@ -574,9 +663,9 @@ export default function CreateGirlPage() {
           <div className="flex justify-between items-center bg-white/5 p-2 md:p-3 rounded-[2rem] md:rounded-[2.5rem] border border-white/5">
             <button
               onClick={() => setCurrentStep(prev => Math.max(1, prev - 1))}
-              disabled={currentStep === 1}
+              disabled={currentStep === 1 || previewImage}
               className={`flex items-center gap-2 md:gap-3 px-4 md:px-8 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold transition-all text-sm md:text-base ${
-                currentStep === 1 
+                currentStep === 1 || previewImage
                   ? 'text-white/10 cursor-not-allowed opacity-50' 
                   : 'text-white/60 hover:text-white hover:bg-white/5'
               }`}
@@ -607,76 +696,40 @@ export default function CreateGirlPage() {
                     navigate('/premium');
                     return;
                   }
+                  
                   try {
                     setIsSubmitting(true);
-                    const res = await authFetch(`${import.meta.env.VITE_API_URL}/girlfriends`, {
+                    
+                    // Generate preview first
+                    setGeneratingPreview(true);
+                    const apiUrl = import.meta.env.VITE_API_URL || '/api/v1';
+                    const previewRes = await fetch(`${apiUrl}/girlfriends/preview`, {
                       method: "POST",
                       headers: { "Content-Type": "application/json" },
                       body: JSON.stringify(formData)
                     });
-                    const data = await res.json();
+                    const previewData = await previewRes.json();
                     
-                    if (data.type === "success") {
-                      clearSavedState();
-                      // Update points in Layout
-                      if (data.remainingPoints !== undefined) {
-                        updateUser({ points: data.remainingPoints });
-                      }
-                      // Update girlfriend creation status for premium
-                      if (data.canCreateGirlfriend !== undefined) {
-                        setCanCreateGirlfriend(data.canCreateGirlfriend);
-                      }
-                      if (data.lastGirlfriendCreated) {
-                        setLastGirlfriendCreated(data.lastGirlfriendCreated);
-                      }
-                      
-                      // Show success notification
-                      setNotification({
-                        type: 'success',
-                        message: data.message,
-                        points: data.remainingPoints
-                      });
-                      
-                      // For non-logged-in users, redirect to premium immediately
-                      // After payment and account creation, the AI Girlfriend will be linked to their email
-                      if (!isLoggedIn) {
-                        window.location.href = '/premium';
-                      } else {
-                        setTimeout(() => {
-                          window.location.href = '/collection';
-                        }, 2000);
-                      }
+                    if (previewData.type === "success" && previewData.previewImage) {
+                      setPreviewImage(previewData.previewImage);
+                      setGeneratingPreview(false);
+                      // Show payment dialog after preview
+                      setShowPremiumDialog(true);
                     } else {
-                      // Not enough points, limit exceeded, or premium required - show appropriate dialog
-                      if (data?.message?.includes("Premium subscription required")) {
-                        navigate('/premium');
-                      } else if (data?.message?.includes("Not enough points") || data?.message?.includes("need") || data?.message?.includes("already used")) {
-                        setShowPremiumDialog(true);
-                        // Update state if limit reached
-                        if (data.canCreateGirlfriend !== undefined) {
-                          setCanCreateGirlfriend(data.canCreateGirlfriend);
-                        }
-                      } else {
-                        setNotification({
-                          type: 'error',
-                          message: data.message
-                        });
-                      }
+                      // If preview fails, still show payment
+                      setGeneratingPreview(false);
+                      setShowPremiumDialog(true);
                     }
                   } catch (err) {
                     console.error(err);
-                    setNotification({
-                      type: 'error',
-                      message: "An error occurred during synthesis"
-                    });
-                  } finally {
-                    setIsSubmitting(false);
+                    setGeneratingPreview(false);
+                    setShowPremiumDialog(true);
                   }
                 }}
                 disabled={isSubmitting || (premium?.isActive && !canCreateGirlfriend)}
                 className="flex items-center gap-2 md:gap-3 px-6 md:px-12 py-3 md:py-4 bg-white text-black font-bold rounded-xl md:rounded-2xl hover:bg-white/90 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed text-sm md:text-base"
               >
-                {isSubmitting ? "Synthesizing..." : (premium?.isActive ? (canCreateGirlfriend ? "Create (FREE)" : "Create (1/mo)") : "Bring to Life")}
+                {generatingPreview ? "Generating Preview..." : isSubmitting ? "Creating..." : premium?.isActive ? canCreateGirlfriend ? "Preview & Create (FREE)" : "Preview & Create (1/mo)" : "Preview & Get Premium"}
                 <Heart size={16} md:size={20} fill="currentColor" />
               </button>
             )}
@@ -734,12 +787,11 @@ export default function CreateGirlPage() {
 
       `}</style>
 
-      {/* Premium Dialog for insufficient points */}
-      {showPremiumDialog && (
-        <Dialog open={showPremiumDialog} onOpenChange={setShowPremiumDialog}>
-          <Content />
-        </Dialog>
-      )}
+      {/* Premium Dialog for payment with preview */}
+      <PaywallDialog 
+        open={showPremiumDialog} 
+        onOpenChange={setShowPremiumDialog}
+      />
     </Layout>
   );
 }

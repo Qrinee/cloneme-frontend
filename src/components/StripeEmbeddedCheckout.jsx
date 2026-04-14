@@ -88,7 +88,6 @@ export default function StripeEmbeddedCheckout({ selectedPlan, onClose }) {
     <div className="bg-[#15151d] rounded-xl p-4 w-full">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-lg font-semibold">Premium Plan</h3>
-        <button onClick={onClose} className="text-gray-400 hover:text-white">✕</button>
       </div>
       <div id="checkout">
         <EmbeddedCheckoutProvider

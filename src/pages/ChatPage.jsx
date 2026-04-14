@@ -15,6 +15,7 @@ import { useAuthFetch } from "@/utils/authFetch";
 import { useLayoutContext } from "@/components/LayoutContext";
 import LoginRequiredDialog from "@/components/LoginRequiredDialog";
 import { FaArrowLeft, FaGlasses, FaPaperPlane, FaSmile, FaTrash, FaUnlock } from "react-icons/fa";
+import PaywallDialog from "@/components/PaywallDialog";
 
 export default function ChatPage() {
   const { id } = useParams();
@@ -58,6 +59,7 @@ export default function ChatPage() {
   const [limitErrorMessage, setLimitErrorMessage] = useState("Message limit reached. Upgrade to premium for unlimited messages.");
   const [requestingMedia, setRequestingMedia] = useState(null); // 'photo' or 'video'
   const [showLoginDialog, setShowLoginDialog] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
   const [showChatList, setShowChatList] = useState(false);
   const [showPremiumDialog, setShowPremiumDialog] = useState(false);
   
@@ -341,7 +343,11 @@ export default function ChatPage() {
       if (res.status === 403) {
         try {
           const errorData = await res.json();
-          if (errorData.message?.includes("Limit exceeded") || errorData.message?.toLowerCase().includes("log in") || errorData.message?.toLowerCase().includes("login")) {
+          if (errorData.message === "paywall" || errorData.requiresPremium) {
+            setShowPaywall(true);
+            setIsTyping(false);
+            return;
+          } else if (errorData.message?.includes("Limit exceeded") || errorData.message?.toLowerCase().includes("log in") || errorData.message?.toLowerCase().includes("login")) {
             setLimitErrorMessage(errorData.message);
             setShowLoginDialog(true);
           } else if (errorData.message?.includes("Message limit") || errorData.message?.includes("message")) {
@@ -394,6 +400,14 @@ export default function ChatPage() {
 
       if (data.type === "error") {
         const errorMsg = data.message || "Message limit reached. Upgrade to premium for unlimited messages.";
+        
+        if (errorMsg === "paywall" || data.requiresPremium) {
+          setShowPaywall(true);
+          setIsLoading(false);
+          setIsTyping(false);
+          return;
+        }
+        
         setLimitErrorMessage(errorMsg);
         
         if (!isLoggedIn && (errorMsg.toLowerCase().includes("log in") || errorMsg.toLowerCase().includes("login") || errorMsg.includes("Limit exceeded"))) {
@@ -623,6 +637,11 @@ export default function ChatPage() {
         open={showLoginDialog} 
         onClose={() => setShowLoginDialog(false)}
         message={limitErrorMessage}
+      />
+
+      <PaywallDialog 
+        open={showPaywall} 
+        onOpenChange={setShowPaywall}
       />
 
       <Dialog open={showPremiumDialog} onOpenChange={setShowPremiumDialog}>

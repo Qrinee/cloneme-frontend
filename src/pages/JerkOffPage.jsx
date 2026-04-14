@@ -4,6 +4,7 @@ import { useAuthFetch } from "@/utils/authFetch";
 import { useLayoutContext } from "@/components/LayoutContext";
 import Layout from "@/components/Layout";
 import DialogMessageLimit from "@/components/DialogMessageLimit";
+import PaywallDialog from "@/components/PaywallDialog";
 import ActionPanel from "./jerkoff/ActionPanel";
 import LoginRequiredDialog from "@/components/LoginRequiredDialog";
 import { LevelUpNotification, UnlockModal } from "./jerkoff/Modals";
@@ -40,6 +41,7 @@ export default function JerkOffPage() {
   const [showLimitExceeded, setShowLimitExceeded] = useState(false);
   const [showGuestLimit, setShowGuestLimit] = useState(false);
   const [showLoginDialog, setShowLoginDialog] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
   const [limitErrorMessage, setLimitErrorMessage] = useState("You've used all your guest messages. Log in to continue chatting without limits.");
   
   // Relationship progression
@@ -286,6 +288,14 @@ export default function JerkOffPage() {
 
       if (data.type === "error") {
         const errorMsg = data.message || "Message limit reached. Upgrade to premium for unlimited messages.";
+        
+        if (errorMsg === "paywall" || data.requiresPremium) {
+          setShowPaywall(true);
+          setIsLoading(false);
+          setIsTyping(false);
+          return;
+        }
+        
         setLimitErrorMessage(errorMsg);
         
         if (!isLoggedIn && (errorMsg.toLowerCase().includes("log in") || errorMsg.toLowerCase().includes("login") || errorMsg.includes("Limit exceeded"))) {
@@ -410,6 +420,11 @@ export default function JerkOffPage() {
         open={showLoginDialog} 
         onClose={() => setShowLoginDialog(false)}
         message={limitErrorMessage}
+      />
+
+      <PaywallDialog 
+        open={showPaywall} 
+        onOpenChange={setShowPaywall}
       />
       
       {girls && (

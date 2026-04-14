@@ -729,8 +729,8 @@ export default function CreateGirlPage() {
                 disabled={isSubmitting || (premium?.isActive && !canCreateGirlfriend)}
                 className="flex items-center gap-2 md:gap-3 px-6 md:px-12 py-3 md:py-4 bg-white text-black font-bold rounded-xl md:rounded-2xl hover:bg-white/90 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed text-sm md:text-base"
               >
-                {generatingPreview ? "Generating Preview..." : isSubmitting ? "Creating..." : premium?.isActive ? canCreateGirlfriend ? "Preview & Create (FREE)" : "Preview & Create (1/mo)" : "Preview & Get Premium"}
-                <Heart size={16} md:size={20} fill="currentColor" />
+                {generatingPreview ? "Generating Preview..." : isSubmitting ? "Creating..." : "Start Chatting"}
+                <MessageCircle size={16} md:size={20} fill="currentColor" />
               </button>
             )}
           </div>

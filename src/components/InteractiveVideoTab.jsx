@@ -60,7 +60,7 @@ export default function InteractiveVideoCard() {
           <p className="text-sm mb-1">Level {level}</p>
           <div className="w-full bg-gray-700 rounded-full h-2">
             <div
-              className="bg-red-500 h-2 rounded-full transition-all"
+              className="bg-[#e11d48] h-2 rounded-full transition-all"
               style={{ width: `${(level / 8) * 100}%` }}
             ></div>
           </div>
@@ -94,3 +94,8 @@ export default function InteractiveVideoCard() {
     </div>
   );
 }
+
+
+
+
+

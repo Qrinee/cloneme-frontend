@@ -73,8 +73,8 @@ export default function RegisterPage() {
       
       if (!res.ok) throw new Error(data.message || "Registration failed");
 
-      // Redirect to login after successful registration
-      window.location.href = "/login";
+      // Redirect to premium after successful registration
+      window.location.href = "/premium?plan=1month";
     } catch (err) {
       setError(err.message || "Registration failed. Please try again.");
       setIsLoading(false);
@@ -109,7 +109,7 @@ export default function RegisterPage() {
         throw new Error(data.message || "Verification failed");
       }
 
-      window.location.href = "/";
+      window.location.href = "/premium?plan=1month";
     } catch (err) {
       setError(err.message || "Verification failed. Please try again.");
       setIsLoading(false);
@@ -164,7 +164,7 @@ export default function RegisterPage() {
                 />
               </div>
 
-              {error && <p className="text-sm text-red-500">{error}</p>}
+              {error && <p className="text-sm text-[#e11d48]">{error}</p>}
 
               <Button type="submit" className="w-full mt-4" disabled={isLoading}>
                 {isLoading ? "Verifying..." : "Verify Email"}
@@ -224,7 +224,7 @@ export default function RegisterPage() {
                 />
               </div>
 
-              {error && <p className="text-sm text-red-500">{error}</p>}
+              {error && <p className="text-sm text-[#e11d48]">{error}</p>}
 
               <Button 
                 type="submit" 
@@ -268,3 +268,8 @@ export default function RegisterPage() {
     </div>
   );
 }
+
+
+
+
+

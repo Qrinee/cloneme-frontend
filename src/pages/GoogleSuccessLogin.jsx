@@ -10,7 +10,7 @@ export default function GoogleSuccessLogin() {
   const [secondsLeft, setSecondsLeft] = useState(5)
 
   const handleContinue = () => {
-  window.location.href = '/'
+    window.location.href = '/premium?plan=1month'
   }
 
   useEffect(() => {
@@ -35,7 +35,7 @@ export default function GoogleSuccessLogin() {
     }, 1000)
 
     const timeout = setTimeout(() => {
-  window.location.href = '/'
+      window.location.href = '/premium?plan=1month'
     }, 5000)
 
     return () => {
@@ -71,3 +71,8 @@ export default function GoogleSuccessLogin() {
     </div>
   )
 }
+
+
+
+
+

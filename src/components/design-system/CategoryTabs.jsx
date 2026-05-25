@@ -36,3 +36,8 @@ export function CategoryTabs({ activeTab = 'girls', onTabChange }) {
 }
 
 export default CategoryTabs;
+
+
+
+
+

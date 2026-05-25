@@ -16,7 +16,7 @@ export default function CategorySelector({ selectedCategory, onSelectCategory })
           onClick={() => onSelectCategory(category.name)}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all text-sm font-medium border ${
             selectedCategory === category.name
-              ? "bg-red-600 text-white border-red-600 shadow-md"
+              ? "bg-[#be123c] text-white border-red-600 shadow-md"
               : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100 dark:bg-[#1a1a1a] dark:text-gray-300 dark:border-[#2a2a2a] dark:hover:bg-[#222] dark:hover:border-[#333]"
           }`}
         >
@@ -26,3 +26,8 @@ export default function CategorySelector({ selectedCategory, onSelectCategory })
     </div>
   );
 }
+
+
+
+
+

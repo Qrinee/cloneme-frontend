@@ -139,8 +139,8 @@ export default function DiscoverPage() {
         {/* Background Decorative Blobs - Desktop only */}
         {!isMobile && (
           <>
-            <div className="absolute top-[10%] left-[5%] w-[400px] h-[400px] bg-[#741818]/5 rounded-full blur-[120px] animate-pulse" />
-            <div className="absolute bottom-[10%] right-[5%] w-[500px] h-[500px] bg-[#741818]/10 rounded-full blur-[150px] animate-pulse" style={{ animationDelay: '2s' }} />
+            <div className="absolute top-[10%] left-[5%] w-[400px] h-[400px] bg-[#e11d48]/5 rounded-full blur-[120px] animate-pulse" />
+            <div className="absolute bottom-[10%] right-[5%] w-[500px] h-[500px] bg-[#e11d48]/10 rounded-full blur-[150px] animate-pulse" style={{ animationDelay: '2s' }} />
             <div className="absolute top-[40%] right-[15%] w-[300px] h-[300px] bg-white/5 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '1s' }} />
           </>
         )}
@@ -150,7 +150,7 @@ export default function DiscoverPage() {
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
             <div className="absolute top-20 left-20 p-6 bg-white/5 border border-white/10 rounded-3xl backdrop-blur-xl opacity-20">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-[#741818]/20" />
+                <div className="w-10 h-10 rounded-full bg-[#e11d48]/20" />
                 <div className="space-y-2">
                   <div className="w-24 h-2 bg-white/20 rounded-full" />
                   <div className="w-16 h-2 bg-white/10 rounded-full" />
@@ -253,14 +253,14 @@ export default function DiscoverPage() {
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => toggleLike(profile._id)}
-                          className={`flex-1 p-3 rounded-2xl transition-all active:scale-95 flex items-center justify-center gap-2 ${isLiked[profile._id] ? 'bg-[#741818] text-white' : 'bg-white/5 text-white/40 hover:text-white/80 border border-white/5'}`}
+                          className={`flex-1 p-3 rounded-2xl transition-all active:scale-95 flex items-center justify-center gap-2 ${isLiked[profile._id] ? 'bg-[#e11d48] text-white' : 'bg-white/5 text-white/40 hover:text-white/80 border border-white/5'}`}
                         >
                           <Heart size={16} fill={isLiked[profile._id] ? "currentColor" : "none"} />
                           <span className="text-xs font-bold uppercase tracking-widest">Like</span>
                         </button>
                         <button
                           onClick={() => navigate(`/chat/${profile._id}`)}
-                          className="flex-[2] p-3 rounded-2xl transition-all active:scale-95 bg-[#741818] text-white hover:bg-[#8d1d1d] flex items-center justify-center gap-2"
+                          className="flex-[2] p-3 rounded-2xl transition-all active:scale-95 bg-[#e11d48] text-white hover:bg-[#be123c] flex items-center justify-center gap-2"
                         >
                           <MessageSquare size={16} />
                           <span className="text-xs font-bold uppercase tracking-widest">Start Chatting</span>
@@ -336,3 +336,8 @@ export default function DiscoverPage() {
     </Layout>
   );
 }
+
+
+
+
+

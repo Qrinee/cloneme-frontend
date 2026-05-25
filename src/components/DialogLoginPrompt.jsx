@@ -9,10 +9,10 @@ import {
 export default function DialogLoginPrompt({ open, onOpenChange, onLogin, onMaybeLater }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md bg-[#0a0a0f] border-red-900/30 text-white overflow-hidden">
+      <DialogContent className="max-w-md bg-[#0a0a0f] border-[#e11d48]/20 text-white overflow-hidden">
         <DialogHeader className="text-center">
-          <div className="w-16 h-16 bg-[#741818]/20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <UserPlus size={32} className="text-[#741818]" />
+          <div className="w-16 h-16 bg-[#e11d48]/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <UserPlus size={32} className="text-[#e11d48]" />
           </div>
           <DialogTitle className="text-2xl font-bold text-center">
             Create Your AI Girlfriend
@@ -36,7 +36,7 @@ export default function DialogLoginPrompt({ open, onOpenChange, onLogin, onMaybe
           </button>
           <button 
             onClick={onLogin}
-            className="flex-1 px-6 py-3 bg-[#741818] hover:bg-[#8d1d1d] text-white rounded-xl font-bold transition-colors"
+            className="flex-1 px-6 py-3 bg-[#e11d48] hover:bg-[#be123c] text-white rounded-xl font-bold transition-colors"
           >
             Log In
           </button>
@@ -45,3 +45,8 @@ export default function DialogLoginPrompt({ open, onOpenChange, onLogin, onMaybe
     </Dialog>
   );
 }
+
+
+
+
+

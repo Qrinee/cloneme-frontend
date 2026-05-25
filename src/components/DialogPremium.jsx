@@ -32,9 +32,9 @@ export default function DialogPremium({ credits = 0, open: externalOpen, onOpenC
           >
             <div className="flex items-center gap-2 font-semibold text-base">
               <Coins className="w-5 h-5 text-yellow-400" />
-              <span className={credits === 0 ? "text-red-400 animate-pulse" : credits < 50 ? "text-orange-400" : "text-white"}>{buttonText}</span>
+              <span className={credits === 0 ? "text-[#e11d48] animate-pulse" : credits < 50 ? "text-orange-400" : "text-white"}>{buttonText}</span>
             </div>
-            <span className={`text-xl font-bold ${credits === 0 ? "text-red-400" : credits < 50 ? "text-orange-400" : "text-yellow-400"}`}>{credits}</span>
+            <span className={`text-xl font-bold ${credits === 0 ? "text-[#e11d48]" : credits < 50 ? "text-orange-400" : "text-yellow-400"}`}>{credits}</span>
           </div>
         </DialogTrigger>
         
@@ -53,3 +53,8 @@ export default function DialogPremium({ credits = 0, open: externalOpen, onOpenC
     </Dialog>
   );
 }
+
+
+
+
+

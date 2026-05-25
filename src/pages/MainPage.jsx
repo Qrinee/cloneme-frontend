@@ -230,7 +230,7 @@ export default function MainPage() {
                   />
                 </div>
 
-                {error && <p className="text-xs text-red-400">{error}</p>}
+                {error && <p className="text-xs text-[#e11d48]">{error}</p>}
 
                 <Button 
                   type="submit"
@@ -332,7 +332,7 @@ export default function MainPage() {
                   </>
                 ) : null}
 
-                {error && <p className="text-xs text-red-400">{error}</p>}
+                {error && <p className="text-xs text-[#e11d48]">{error}</p>}
 
                 <Button 
                   type="submit"
@@ -386,7 +386,7 @@ export default function MainPage() {
                   />
                 </div>
 
-                {error && <p className="text-xs text-red-400">{error}</p>}
+                {error && <p className="text-xs text-[#e11d48]">{error}</p>}
 
                 <Button 
                   type="submit" 
@@ -503,7 +503,7 @@ export default function MainPage() {
                   />
                 </div>
 
-                {error && <p className="text-xs text-red-400">{error}</p>}
+                {error && <p className="text-xs text-[#e11d48]">{error}</p>}
 
                 <Button 
                   type="submit"
@@ -605,7 +605,7 @@ export default function MainPage() {
                   </>
                 ) : null}
 
-                {error && <p className="text-xs text-red-400">{error}</p>}
+                {error && <p className="text-xs text-[#e11d48]">{error}</p>}
 
                 <Button 
                   type="submit"
@@ -659,7 +659,7 @@ export default function MainPage() {
                   />
                 </div>
 
-                {error && <p className="text-xs text-red-400">{error}</p>}
+                {error && <p className="text-xs text-[#e11d48]">{error}</p>}
 
                 <Button 
                   type="submit" 
@@ -676,3 +676,8 @@ export default function MainPage() {
     </div>
   );
 }
+
+
+
+
+

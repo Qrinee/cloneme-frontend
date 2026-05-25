@@ -21,8 +21,8 @@ export default function Content({ onClose, onOpenChange }) {
       credits: "50 credits",
       price: "$3.99",
       link: "https://buy.stripe.com/dRm4gyczo5zz8kebNB6sw08",
-      icon: <Flame className="w-6 h-6 text-red-400" />,
-      color: "bg-red-900/50",
+      icon: <Flame className="w-6 h-6 text-[#e11d48]" />,
+      color: "bg-[#e11d48]/10",
       value: "1 AI photo",
       image: img1
     },
@@ -41,8 +41,8 @@ export default function Content({ onClose, onOpenChange }) {
       credits: "400 credits",
       price: "$14.99",
       link: "https://buy.stripe.com/3cIfZgczo9PPdEyaJx6sw06",
-      icon: <Infinity className="w-6 h-6 text-pink-400" />,
-      color: "bg-pink-900/50",
+      icon: <Infinity className="w-6 h-6 text-[#e11d48]" />,
+      color: "bg-[#e11d48]/10",
       value: "8 AI photos",
       image: img3
     }
@@ -56,7 +56,7 @@ export default function Content({ onClose, onOpenChange }) {
   return (
       <DialogContent
         showClose={false}
-        className="max-w-[95vw] sm:max-w-[90vw] md:max-w-[80vw] bg-[#0a0a0f] border-red-900/30 p-0 overflow-hidden max-h-[95dvh] flex flex-col"
+        className="max-w-[95vw] sm:max-w-[90vw] md:max-w-[80vw] bg-[#0a0a0f] border-[#e11d48]/20 p-0 overflow-hidden max-h-[95dvh] flex flex-col"
       >
         {/* Close button */}
         <button
@@ -75,9 +75,9 @@ export default function Content({ onClose, onOpenChange }) {
             animate={{ opacity: 1, y: 0 }}
             className="inline-flex items-center gap-2 mb-1"
           >
-            <Coins className="w-4 h-4 text-red-400" />
-            <span className="text-[10px] font-bold tracking-[0.3em] text-red-400 uppercase">BUY POINTS</span>
-            <Coins className="w-4 h-4 text-red-400" />
+            <Coins className="w-4 h-4 text-[#e11d48]" />
+            <span className="text-[10px] font-bold tracking-[0.3em] text-[#e11d48] uppercase">BUY POINTS</span>
+            <Coins className="w-4 h-4 text-[#e11d48]" />
           </motion.div>
           <DialogTitle className="text-2xl md:text-4xl font-bold text-white">
             One-Time Packs
@@ -177,3 +177,8 @@ export default function Content({ onClose, onOpenChange }) {
     </DialogContent>
   );
 }
+
+
+
+
+

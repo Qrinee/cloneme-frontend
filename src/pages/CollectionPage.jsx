@@ -82,7 +82,7 @@ export default function CollectionPage() {
           <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/5 rounded-full mb-4">
-                <Crown size={12} className="text-[#741818]" />
+                <Crown size={12} className="text-[#e11d48]" />
                 <span className="text-[10px] font-bold text-white uppercase tracking-widest">Premium Vault</span>
               </div>
               <h1 className="text-5xl font-bold text-white tracking-tighter">My Collection</h1>
@@ -95,7 +95,7 @@ export default function CollectionPage() {
                 onClick={() => setActiveTab("favorites")}
                 className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${
                   activeTab === "favorites" 
-                    ? "bg-[#741818] text-white" 
+                    ? "bg-[#e11d48] text-white" 
                     : "text-white/40 hover:text-white/70"
                 }`}
               >
@@ -106,7 +106,7 @@ export default function CollectionPage() {
                 onClick={() => setActiveTab("created")}
                 className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${
                   activeTab === "created" 
-                    ? "bg-[#741818] text-white" 
+                    ? "bg-[#e11d48] text-white" 
                     : "text-white/40 hover:text-white/70"
                 }`}
               >
@@ -175,7 +175,7 @@ export default function CollectionPage() {
                           e.stopPropagation();
                           openDeleteModal(girl);
                         }}
-                        className="absolute top-5 left-5 w-10 h-10 bg-black/40 backdrop-blur-md rounded-full border border-white/10 text-white hover:text-red-500 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100"
+                        className="absolute top-5 left-5 w-10 h-10 bg-black/40 backdrop-blur-md rounded-full border border-white/10 text-white hover:text-[#e11d48] transition-all flex items-center justify-center opacity-0 group-hover:opacity-100"
                       >
                         <Trash2 size={18} />
                       </button>
@@ -200,7 +200,7 @@ export default function CollectionPage() {
                             e.stopPropagation();
                             handleChat(girl);
                           }}
-                          className="w-full py-3.5 bg-[#741818] hover:bg-[#8d1d1d] text-white font-bold rounded-2xl text-sm transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+                          className="w-full py-3.5 bg-[#e11d48] hover:bg-[#be123c] text-white font-bold rounded-2xl text-sm transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95"
                         >
                           <MessageCircle size={18} />
                           Resume Chat
@@ -281,7 +281,7 @@ export default function CollectionPage() {
                             e.stopPropagation();
                             openDeleteModal(girl);
                           }}
-                          className="absolute top-5 left-5 w-10 h-10 bg-black/40 backdrop-blur-md rounded-full border border-white/10 text-white hover:text-red-500 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100"
+                          className="absolute top-5 left-5 w-10 h-10 bg-black/40 backdrop-blur-md rounded-full border border-white/10 text-white hover:text-[#e11d48] transition-all flex items-center justify-center opacity-0 group-hover:opacity-100"
                         >
                           <Trash2 size={18} />
                         </button>
@@ -306,7 +306,7 @@ export default function CollectionPage() {
                               e.stopPropagation();
                               handleChat(girl);
                             }}
-                            className="w-full py-3.5 bg-[#741818] hover:bg-[#8d1d1d] text-white font-bold rounded-2xl text-sm transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+                            className="w-full py-3.5 bg-[#e11d48] hover:bg-[#be123c] text-white font-bold rounded-2xl text-sm transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95"
                           >
                             <MessageCircle size={18} />
                             Resume Chat
@@ -338,11 +338,11 @@ export default function CollectionPage() {
 
       {/* Delete Confirmation Modal */}
       <Dialog open={deleteModal.open} onOpenChange={(open) => !open && setDeleteModal({ open: false, girlId: null, girlName: "" })}>
-        <DialogContent className="bg-[#0a0a0f] border-red-900/30 text-white max-w-sm mx-4">
+        <DialogContent className="bg-[#0a0a0f] border-[#e11d48]/20 text-white max-w-sm mx-4">
           <DialogHeader>
             <div className="flex items-center justify-center mb-2">
-              <div className="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center">
-                <Trash2 className="w-6 h-6 text-red-400" />
+              <div className="w-12 h-12 rounded-full bg-[#e11d48]/20 flex items-center justify-center">
+                <Trash2 className="w-6 h-6 text-[#e11d48]" />
               </div>
             </div>
             <DialogTitle className="text-xl font-bold text-center">Remove Companion</DialogTitle>
@@ -359,7 +359,7 @@ export default function CollectionPage() {
             </Button>
             <Button
               onClick={handleRemove}
-              className="flex-1 bg-red-600 text-white hover:bg-red-500 font-bold"
+              className="flex-1 bg-[#be123c] text-white hover:bg-[#e11d48] font-bold"
             >
               Remove
             </Button>
@@ -369,3 +369,8 @@ export default function CollectionPage() {
     </Layout>
   );
 }
+
+
+
+
+

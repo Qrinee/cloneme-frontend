@@ -153,7 +153,7 @@ export default function ProfilePage() {
     return (
       <Layout>
         <div className="flex items-center justify-center h-screen bg-[#0a0a0f]">
-          <div className="w-12 h-12 border-2 border-white/5 border-t-[#741818] rounded-full animate-spin"></div>
+          <div className="w-12 h-12 border-2 border-white/5 border-t-[#e11d48] rounded-full animate-spin"></div>
         </div>
       </Layout>
     );
@@ -179,7 +179,7 @@ export default function ProfilePage() {
                   onClick={() => setActiveTab("general")}
                   className={`flex cursor-pointer items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all border ${
                     activeTab === "general" 
-                    ? "bg-[#741818]/10 text-[#741818] border-[#741818]/20" 
+                    ? "bg-[#e11d48]/10 text-[#e11d48] border-[#e11d48]/20" 
                     : "text-white/40 hover:text-white hover:bg-white/5 border-transparent"
                   }`}
                 >
@@ -191,7 +191,7 @@ export default function ProfilePage() {
                   onClick={() => setActiveTab("security")}
                   className={`flex cursor-pointer items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all border ${
                     activeTab === "security" 
-                    ? "bg-[#741818]/10 text-[#741818] border-[#741818]/20" 
+                    ? "bg-[#e11d48]/10 text-[#e11d48] border-[#e11d48]/20" 
                     : "text-white/40 hover:text-white hover:bg-white/5 border-transparent"
                   }`}
                 >
@@ -203,7 +203,7 @@ export default function ProfilePage() {
                   onClick={() => setActiveTab("premium")}
                   className={`flex cursor-pointer items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all border ${
                     activeTab === "premium" 
-                    ? "bg-[#741818]/10 text-[#741818] border-[#741818]/20" 
+                    ? "bg-[#e11d48]/10 text-[#e11d48] border-[#e11d48]/20" 
                     : "text-white/40 hover:text-white hover:bg-white/5 border-transparent"
                   }`}
                 >
@@ -250,7 +250,7 @@ export default function ProfilePage() {
                               id="name"
                               value={form.name}
                               onChange={handleChange}
-                              className="bg-white/5 border-white/10 text-white focus:border-[#741818] rounded-xl h-12 outline-none"
+                              className="bg-white/5 border-white/10 text-white focus:border-[#e11d48] rounded-xl h-12 outline-none"
                             />
                           </div>
                           <div className="space-y-2">
@@ -260,13 +260,13 @@ export default function ProfilePage() {
                               type="email"
                               value={form.email}
                               onChange={handleChange}
-                              className="bg-white/5 border-white/10 text-white focus:border-[#741818] rounded-xl h-12 outline-none"
+                              className="bg-white/5 border-white/10 text-white focus:border-[#e11d48] rounded-xl h-12 outline-none"
                             />
                           </div>
                         </div>
 
                         {error && activeTab === "general" && (
-                          <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-xl text-sm flex items-center gap-3">
+                          <div className="bg-[#e11d48]/10 border border-[#e11d48]/20 text-[#e11d48] p-4 rounded-xl text-sm flex items-center gap-3">
                             <AlertTriangle size={16} />
                             {error}
                           </div>
@@ -281,7 +281,7 @@ export default function ProfilePage() {
                         <Button 
                           onClick={handleUpdate}
                           disabled={isSaving}
-                          className="bg-[#741818] hover:bg-[#8d1d1d] text-white font-bold rounded-xl px-8 h-11 cursor-pointer transition-all active:scale-95 flex items-center gap-2"
+                          className="bg-[#e11d48] hover:bg-[#be123c] text-white font-bold rounded-xl px-8 h-11 cursor-pointer transition-all active:scale-95 flex items-center gap-2"
                         >
                           {isSaving ? (
                              <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
@@ -294,13 +294,13 @@ export default function ProfilePage() {
                     </Card>
 
                     {/* Danger Zone */}
-                    <Card className="mt-8 bg-red-500/[0.02] border-red-500/10 rounded-3xl  pt-5  pb-5 overflow-hidden">
+                    <Card className="mt-8 bg-[#e11d48]/[0.02] border-[#e11d48]/10 rounded-3xl  pt-5  pb-5 overflow-hidden">
                       <CardHeader>
-                        <CardTitle className="text-xl font-bold text-red-400">Danger Zone</CardTitle>
+                        <CardTitle className="text-xl font-bold text-[#e11d48]">Danger Zone</CardTitle>
                         <CardDescription className="text-white/30">Irreversible actions that will permanently delete your data.</CardDescription>
                       </CardHeader>
                       <CardContent>
-                        <div className="flex items-center justify-between gap-4 p-4 rounded-2xl bg-red-500/[0.05] border border-red-500/10">
+                        <div className="flex items-center justify-between gap-4 p-4 rounded-2xl bg-[#e11d48]/[0.05] border border-[#e11d48]/10">
                           <div>
                             <h4 className="font-bold text-white text-sm mb-1">Delete Account</h4>
                             <p className="text-white/30 text-xs">Permanently remove your account and all your chats.</p>
@@ -309,7 +309,7 @@ export default function ProfilePage() {
                             <Button 
                               variant="destructive" 
                               onClick={() => setShowDeleteConfirm(true)}
-                              className="bg-red-500/10 hover:bg-red-600 hover:text-red-500 text-white-500  border border-red-500/20 rounded-xl px-6 h-10 transition-all cursor-pointer font-bold"
+                              className="bg-[#e11d48]/10 hover:bg-[#be123c] hover:text-[#e11d48] text-white-500  border border-[#e11d48]/20 rounded-xl px-6 h-10 transition-all cursor-pointer font-bold"
                             >
                               Delete
                             </Button>
@@ -325,7 +325,7 @@ export default function ProfilePage() {
                               <Button 
                                 variant="destructive" 
                                 onClick={handleDeleteAccount}
-                                className="bg-red-500 hover:bg-red-600 text-white rounded-xl px-6 h-10 transition-all font-bold shadow-lg shadow-red-500/20"
+                                className="bg-[#e11d48] hover:bg-[#be123c] text-white rounded-xl px-6 h-10 transition-all font-bold shadow-lg shadow-[#e11d48]/20"
                               >
                                 Confirm
                               </Button>
@@ -362,7 +362,7 @@ export default function ProfilePage() {
                                 type={showPasswords.current ? "text" : "password"}
                                 value={passwordForm.currentPassword}
                                 onChange={handlePasswordChange}
-                                className="bg-white/5 border-white/10 text-white focus:border-[#741818] rounded-xl h-12 pr-12 outline-none"
+                                className="bg-white/5 border-white/10 text-white focus:border-[#e11d48] rounded-xl h-12 pr-12 outline-none"
                                 placeholder="••••••••"
                               />
                               <button
@@ -386,7 +386,7 @@ export default function ProfilePage() {
                                   type={showPasswords.new ? "text" : "password"}
                                   value={passwordForm.newPassword}
                                   onChange={handlePasswordChange}
-                                  className="bg-white/5 border-white/10 text-white focus:border-[#741818] rounded-xl h-12 pr-12 outline-none"
+                                  className="bg-white/5 border-white/10 text-white focus:border-[#e11d48] rounded-xl h-12 pr-12 outline-none"
                                   placeholder="••••••••"
                                 />
                                 <button
@@ -409,7 +409,7 @@ export default function ProfilePage() {
                                   type={showPasswords.confirm ? "text" : "password"}
                                   value={passwordForm.confirmPassword}
                                   onChange={handlePasswordChange}
-                                  className="bg-white/5 border-white/10 text-white focus:border-[#741818] rounded-xl h-12 pr-12 outline-none"
+                                  className="bg-white/5 border-white/10 text-white focus:border-[#e11d48] rounded-xl h-12 pr-12 outline-none"
                                   placeholder="••••••••"
                                 />
                                 <button
@@ -425,7 +425,7 @@ export default function ProfilePage() {
                           </div>
 
                           {error && activeTab === "security" && (
-                            <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-xl text-sm flex items-center gap-3">
+                            <div className="bg-[#e11d48]/10 border border-[#e11d48]/20 text-[#e11d48] p-4 rounded-xl text-sm flex items-center gap-3">
                               <AlertTriangle size={16} />
                               {error}
                             </div>
@@ -441,7 +441,7 @@ export default function ProfilePage() {
                          <Button 
                           onClick={handlePasswordUpdate}
                           disabled={isSaving}
-                          className="bg-[#741818] hover:bg-[#8d1d1d] text-white font-bold rounded-xl px-8 h-11 transition-all active:scale-95 flex items-center gap-2 cursor-pointer "
+                          className="bg-[#e11d48] hover:bg-[#be123c] text-white font-bold rounded-xl px-8 h-11 transition-all active:scale-95 flex items-center gap-2 cursor-pointer "
                         >
                           {isSaving ? (
                              <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
@@ -558,3 +558,8 @@ export default function ProfilePage() {
     </Layout>
   );
 }
+
+
+
+
+

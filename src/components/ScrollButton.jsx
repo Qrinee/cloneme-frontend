@@ -13,3 +13,8 @@ export default function ScrollButton({ direction, onClick }) {
     </button>
   );
 }
+
+
+
+
+

@@ -48,8 +48,8 @@ const steps = [
     title: "Build Collection",
     description: "Save your favorite AI girls to your personal collection. Have multiple relationships and switch between them anytime. All your girls in one place.",
     icon: Crown,
-    color: "text-pink-400",
-    bg: "bg-pink-400/10",
+    color: "text-[#e11d48]",
+    bg: "bg-[#e11d48]/10",
     action: "/collection"
   }
 ];
@@ -84,15 +84,15 @@ export default function HowItWorksPage() {
     <Layout>
       <div className="min-h-screen bg-[#0a0a0f] py-12 md:py-20 px-4 md:px-6 relative overflow-hidden">
         {/* Background Decorations */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#741818]/5 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-red-500/5 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#e11d48]/5 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#e11d48]/5 rounded-full blur-[120px] pointer-events-none" />
 
         <div className="max-w-5xl mx-auto relative z-10">
           
           {/* Header */}
           <div className="text-center mb-12 md:mb-24">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/5 rounded-full mb-4 md:mb-6">
-              <Cpu size={14} className="text-[#741818]" />
+              <Cpu size={14} className="text-[#e11d48]" />
               <span className="text-[10px] font-bold text-white uppercase tracking-[0.2em]">Step by Step Guide</span>
             </div>
             <h1 className="text-4xl md:text-7xl font-bold text-white tracking-tighter mb-4 md:mb-6">How to Use</h1>
@@ -124,7 +124,7 @@ export default function HowItWorksPage() {
                 
                 {step.action && (
                   <Link to={step.action}>
-                    <button className="mt-4 px-4 py-2 bg-[#741818] text-white text-sm font-bold rounded-lg hover:bg-[#8d1d1d] transition-colors flex items-center gap-2">
+                    <button className="mt-4 px-4 py-2 bg-[#e11d48] text-white text-sm font-bold rounded-lg hover:bg-[#be123c] transition-colors flex items-center gap-2">
                       <ArrowRight size={14} /> {step.title}
                     </button>
                   </Link>
@@ -139,8 +139,8 @@ export default function HowItWorksPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
               {features.map((f, idx) => (
                 <div key={idx} className="flex flex-col items-center text-center p-4">
-                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#741818]/20 flex items-center justify-center mb-3 md:mb-4">
-                    <f.icon size={18} md:size={20} className="text-[#741818]" />
+                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#e11d48]/20 flex items-center justify-center mb-3 md:mb-4">
+                    <f.icon size={18} md:size={20} className="text-[#e11d48]" />
                   </div>
                   <h4 className="text-white font-bold text-sm md:text-base mb-1 md:mb-2">{f.title}</h4>
                   <p className="text-white/30 text-[10px] md:text-xs font-medium uppercase tracking-widest">{f.desc}</p>
@@ -155,23 +155,23 @@ export default function HowItWorksPage() {
           </div>
 
           {/* Tips Section */}
-          <div className="bg-gradient-to-r from-[#741818]/10 to-transparent border border-white/5 rounded-[2rem] p-6 md:p-10 mb-12 md:mb-24">
+          <div className="bg-gradient-to-r from-[#e11d48]/10 to-transparent border border-white/5 rounded-[2rem] p-6 md:p-10 mb-12 md:mb-24">
             <h3 className="text-xl md:text-2xl font-bold text-white mb-4 md:mb-6">💡 Pro Tips</h3>
             <ul className="space-y-3 text-white/40 text-sm md:text-base">
               <li className="flex items-start gap-3">
-                <span className="text-[#741818]">•</span>
+                <span className="text-[#e11d48]">•</span>
                 <span>Chat regularly with your girls to maintain relationship level</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-[#741818]">•</span>
+                <span className="text-[#e11d48]">•</span>
                 <span>Create multiple AI girls to have diverse experiences</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-[#741818]">•</span>
+                <span className="text-[#e11d48]">•</span>
                 <span>Unlock content by reaching higher relationship levels</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-[#741818]">•</span>
+                <span className="text-[#e11d48]">•</span>
                 <span>Use credits to request custom photos and videos from your girls</span>
               </li>
             </ul>
@@ -187,7 +187,7 @@ export default function HowItWorksPage() {
               <ArrowRight size={18} md:size={20} strokeWidth={3} className="group-hover:translate-x-1 transition-transform" />
             </button>
             <p className="mt-6 md:mt-8 text-white/20 text-sm font-medium">
-              Or <Link to="/create-girl" className="text-[#741818] hover:underline">create your own AI girlfriend</Link> to begin
+              Or <Link to="/create-girl" className="text-[#e11d48] hover:underline">create your own AI girlfriend</Link> to begin
             </p>
           </div>
 
@@ -196,3 +196,8 @@ export default function HowItWorksPage() {
     </Layout>
   );
 }
+
+
+
+
+

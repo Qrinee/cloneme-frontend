@@ -32,7 +32,7 @@ const sections = [
     title: "4. User Conduct",
     content: "You agree to use our platform in a manner consistent with all applicable laws and regulations. prohibited behaviors include: harassment, abuse, sharing inappropriate content, attempting to extract personal information from other users, and any activity that violates the rights of others.",
     icon: MessageCircle,
-    color: "text-red-400",
+    color: "text-[#e11d48]",
     bg: "bg-red-400/10"
   },
   {
@@ -56,8 +56,8 @@ const sections = [
     title: "7. Limitation of Liability",
     content: "Our platform is provided 'as is' without any warranties. We shall not be liable for any indirect, incidental, or consequential damages arising from your use of our services.",
     icon: Heart,
-    color: "text-pink-400",
-    bg: "bg-pink-400/10"
+    color: "text-[#e11d48]",
+    bg: "bg-[#e11d48]/10"
   },
   {
     id: "changes",
@@ -74,15 +74,15 @@ export default function TermsPage() {
     <Layout>
       <div className="min-h-screen bg-[#0a0a0f] py-20 px-6 relative overflow-hidden">
   
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#741818]/5 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-red-500/5 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#e11d48]/5 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#e11d48]/5 rounded-full blur-[120px] pointer-events-none" />
 
         <div className="max-w-4xl mx-auto relative z-10">
           
           {/* Header */}
           <div className="text-center mb-20">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/5 rounded-full mb-6">
-              <Scale size={14} className="text-[#741818]" />
+              <Scale size={14} className="text-[#e11d48]" />
               <span className="text-[10px] font-bold text-white uppercase tracking-[0.2em]">Legal Framework</span>
             </div>
             <h1 className="text-6xl font-bold text-white tracking-tighter mb-6">Terms of Service</h1>
@@ -139,3 +139,8 @@ export default function TermsPage() {
     </Layout>
   );
 }
+
+
+
+
+

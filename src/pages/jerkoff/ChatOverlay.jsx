@@ -45,7 +45,7 @@ export default function ChatOverlay({
                           <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
                             <Lock size={20} className="text-white/60" />
                           </div>
-                          <button className="px-4 py-2 bg-[#741818] hover:bg-[#8d1d1d] text-white text-xs font-bold uppercase tracking-widest rounded-full transition-all">
+                          <button className="px-4 py-2 bg-[#e11d48] hover:bg-[#be123c] text-white text-xs font-bold uppercase tracking-widest rounded-full transition-all">
                             Unlock
                           </button>
                         </div>
@@ -62,7 +62,7 @@ export default function ChatOverlay({
                   ) : (
                     <div
                       className={`px-4 py-2.5 rounded-2xl text-sm ${msg.sender === 'user'
-                          ? 'bg-[#741818] text-white border border-white/5'
+                          ? 'bg-[#e11d48] text-white border border-white/5'
                           : 'bg-white/5 backdrop-blur-xl text-white/90 border border-white/10'
                         }`}
                       style={{ opacity }}
@@ -92,25 +92,42 @@ export default function ChatOverlay({
       </div>
 
       {/* Chat Input */}
-      <div className="flex items-center gap-3 relative">
-        <input
-          type="text"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          onKeyPress={onKeyPress}
-          placeholder={isLoggedIn ? "Message..." : "Chat with girl..."}
-          className={`flex-1 bg-white/5 backdrop-blur-xl text-white px-5 py-3 rounded-full focus:outline-none border border-white/10 placeholder:text-white/20 transition-colors focus:border-white/20 ${isGuest && !isLoggedIn && messagesRemaining <= 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
-        />
-        <button
-          onClick={onSend}
-          className={`cursor-pointer p-3 rounded-full transition-all text-white/80 active:scale-95 ${message.trim() && !isLoading && !(isGuest && !isLoggedIn && messagesRemaining <= 0)
-              ? 'bg-[#741818] hover:bg-[#8d1d1d]' 
-              : 'bg-white/10 cursor-not-allowed'
-            }`}
-        >
-          <Send size={18} />
-        </button>
+      <div className="w-full flex flex-col items-center">
+        {!isLoggedIn && (
+          <div className="w-full flex justify-center mb-4">
+            <button 
+              onClick={() => window.location.href = '/register'} 
+              className="bg-[#e11d48] text-white px-6 py-2.5 rounded-full font-bold flex items-center gap-2 shadow-lg shadow-red-500/20 border border-[#e11d48]/50 hover:bg-[#be123c] transition-all active:scale-95"
+            >
+              <Unlock size={18} /> Unlock actions
+            </button>
+          </div>
+        )}
+        <div className="flex items-center gap-3 relative w-full">
+          <input
+            type="text"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onKeyPress={onKeyPress}
+            placeholder={isLoggedIn ? "Message..." : "Chat with girl..."}
+            className={`flex-1 bg-white/5 backdrop-blur-xl text-white px-5 py-3 rounded-full focus:outline-none border border-white/10 placeholder:text-white/20 transition-colors focus:border-white/20 ${isGuest && !isLoggedIn && messagesRemaining <= 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+          />
+          <button
+            onClick={onSend}
+            className={`cursor-pointer p-3 rounded-full transition-all text-white/80 active:scale-95 ${message.trim() && !isLoading && !(isGuest && !isLoggedIn && messagesRemaining <= 0)
+                ? 'bg-[#e11d48] hover:bg-[#be123c]' 
+                : 'bg-white/10 cursor-not-allowed'
+              }`}
+          >
+            <Send size={18} />
+          </button>
+        </div>
       </div>
     </div>
   );
 }
+
+
+
+
+

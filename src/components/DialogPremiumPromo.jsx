@@ -47,8 +47,8 @@ export default function DialogPremiumPromo({ open, onOpenChange, onMaybeLater })
           {/* Premium benefits */}
           <div className="space-y-2 md:space-y-3">
             <div className="flex items-center gap-3 p-2.5 md:p-3 rounded-xl bg-white/5 border border-white/10">
-              <div className="w-8 h-8 md:w-10 md:h-10 bg-[#741818]/20 rounded-lg md:rounded-xl flex items-center justify-center">
-                <Heart size={16} md:size={20} className="text-[#741818]" />
+              <div className="w-8 h-8 md:w-10 md:h-10 bg-[#e11d48]/20 rounded-lg md:rounded-xl flex items-center justify-center">
+                <Heart size={16} md:size={20} className="text-[#e11d48]" />
               </div>
               <div>
                 <span className="font-bold text-white text-sm">Create AI Girlfriends</span>
@@ -57,8 +57,8 @@ export default function DialogPremiumPromo({ open, onOpenChange, onMaybeLater })
             </div>
             
             <div className="flex items-center gap-3 p-2.5 md:p-3 rounded-xl bg-white/5 border border-white/10">
-              <div className="w-8 h-8 md:w-10 md:h-10 bg-[#741818]/20 rounded-lg md:rounded-xl flex items-center justify-center">
-                <MessageCircle size={16} md:size={20} className="text-[#741818]" />
+              <div className="w-8 h-8 md:w-10 md:h-10 bg-[#e11d48]/20 rounded-lg md:rounded-xl flex items-center justify-center">
+                <MessageCircle size={16} md:size={20} className="text-[#e11d48]" />
               </div>
               <div>
                 <span className="font-bold text-white text-sm">Unlimited Messages</span>
@@ -108,3 +108,8 @@ export default function DialogPremiumPromo({ open, onOpenChange, onMaybeLater })
     </Dialog>
   );
 }
+
+
+
+
+

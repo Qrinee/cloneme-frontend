@@ -253,7 +253,7 @@ export default function LoginPage() {
                   />
                 </div>
 
-                {error && <p className="text-xs sm:text-sm text-red-400">{error}</p>}
+                {error && <p className="text-xs sm:text-sm text-[#e11d48]">{error}</p>}
 
                 <Button
                   type="submit"
@@ -340,7 +340,7 @@ export default function LoginPage() {
                   />
                 </div>
 
-                {error && <p className="text-xs sm:text-sm text-red-400">{error}</p>}
+                {error && <p className="text-xs sm:text-sm text-[#e11d48]">{error}</p>}
 
                 <Button
                   type="submit"
@@ -393,7 +393,7 @@ export default function LoginPage() {
                   />
                 </div>
 
-                {error && <p className="text-xs sm:text-sm text-red-400">{error}</p>}
+                {error && <p className="text-xs sm:text-sm text-[#e11d48]">{error}</p>}
 
                 <Button type="submit" className="w-full h-10 sm:h-11 bg-[var(--accent-primary)] text-white hover:bg-[var(--accent-primary)]/90 text-sm sm:text-base" disabled={isLoading}>
                   {isLoading ? "Verifying..." : "Verify Email"}
@@ -413,3 +413,8 @@ export default function LoginPage() {
     </div>
   );
 }
+
+
+
+
+

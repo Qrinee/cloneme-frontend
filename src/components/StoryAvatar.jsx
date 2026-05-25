@@ -22,3 +22,8 @@ export default function StoryAvatar({ image, label, onClick }) {
     </div>
   );
 }
+
+
+
+
+

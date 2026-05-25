@@ -1,38 +1,58 @@
-import { useEffect, useRef, useState } from "react";
-import { Crown, ArrowRight, MessageCircle } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Search, Zap, MessageCircle } from "lucide-react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { useLayoutContext } from "../LayoutContext";
-import video1 from '../../assets/video2.mp4'
-import video2 from '../../assets/examplereel.mp4'
 
-const feedProfiles = [
-  { id: 1, name: "Alice", age: 25, location: "Paris", tags: ["Sensual", "Romantic", "Flirty"], video: video1, likes: 1240, comments: 89, online: true, mood: "Missing you" },
-  { id: 2, name: "Bella", age: 22, location: "Tokyo", tags: ["Cute", "Shy", "Teasing"], video: video2, likes: 890, comments: 45, online: true, mood: "Come say hi" },
-  { id: 3, name: "Cathy", age: 30, location: "NYC", tags: ["Experienced", "Bold", "Daring"], video: video1, likes: 2100, comments: 156, online: false, mood: "Next time" },
-  { id: 4, name: "Diana", age: 27, location: "London", tags: ["Fit", "Active", "Athletic"], video: video2, likes: 3200, comments: 234, online: true, mood: "Work out together" },
-  { id: 5, name: "Eva", age: 24, location: "LA", tags: ["Free Spirit", "Artistic", "Wild"], video: video1, likes: 4500, comments: 312, online: true, mood: "Live in the moment" },
-  { id: 6, name: "Fiona", age: 26, location: "Berlin", tags: ["Mysterious", "Deep", "Soul"], video: video2, likes: 780, comments: 56, online: false, mood: "Let's talk night" },
-  { id: 7, name: "Grace", age: 23, location: "Seoul", tags: ["K-pop", "Dancer", "Cute"], video: video1, likes: 1890, comments: 145, online: true, mood: "Dance with me" },
-  { id: 8, name: "Hannah", age: 28, location: "Sydney", tags: ["Beach", "Sunset", "Vibes"], video: video2, likes: 2650, comments: 198, online: true, mood: "Sunset vibes" },
+import imgGirls from "../../assets/task_01kmwzmaxbfbtrtm45b78g5cv6_1774794217_img_0.webp";
+import imgAnime from "../../assets/anime.jpg";
+import imgMen from "../../assets/men.jpg";
+
+const mainCategories = [
+  { id: "girls", name: "Girls", image: imgGirls },
+  { id: "anime", name: "Anime", image: imgAnime },
+  { id: "men", name: "Men", image: imgMen }
+];
+
+const subCategories = [
+  "All",
+  "Flirty",
+  "Romantic",
+  "Bold",
+  "Shy",
+  "Cute",
+  "18-21",
+  "22-30",
+  "30+"
 ];
 
 export default function FeaturedSection() {
-    const [girls, setGirls] = useState();
-    const { isLoggedIn } = useLayoutContext();
-    useEffect(() => {
-        fetch(import.meta.env.VITE_API_URL + '/girlfriends')
-            .then(response => response.json())
-            .then(data => {
-                // Randomize the position of girlfriends
-                const shuffled = [...data.girlfriends].sort(() => Math.random() - 0.5);
-                setGirls({ ...data, girlfriends: shuffled });
-            });
-    }, [])
-  const carouselRef = useRef(null);
+  const [girls, setGirls] = useState([]);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { isLoggedIn } = useLayoutContext();
 
-  const scrollCarousel = (direction) => {
-    if (carouselRef.current) {
-      carouselRef.current.scrollBy({ left: direction * 340, behavior: 'smooth' });
-    }
+  const activeCategory = searchParams.get("category") || "girls";
+  const [activeSubCategory, setActiveSubCategory] = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Sync subcategory reset when main category changes
+  useEffect(() => {
+    setActiveSubCategory("All");
+  }, [activeCategory]);
+
+  useEffect(() => {
+    fetch(import.meta.env.VITE_API_URL + '/girlfriends')
+      .then(response => response.json())
+      .then(data => {
+        // Randomize the position of girlfriends
+        const shuffled = [...data.girlfriends].sort(() => Math.random() - 0.5);
+        setGirls(shuffled);
+      })
+      .catch(err => console.error("Error fetching girlfriends:", err));
+  }, []);
+
+  const handleCategorySelect = (category) => {
+    setSearchParams({ category });
   };
 
   const handleStartChat = async (profile) => {
@@ -45,120 +65,172 @@ export default function FeaturedSection() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ chatbotId: profile._id }),
+          body: JSON.stringify({ chatbotId: profile._id || profile.id }),
         });
         const data = await res.json();
         if (data.chat?._id) {
-          window.location.href = `/chat/${profile._id}`;
+          navigate(`/jerk-off/${profile._id || profile.id}`);
           return;
         }
       } catch (e) {
         console.error("Error creating chat:", e);
       }
     }
-    window.location.href = `/chat/${profile._id}`;
+    navigate(`/jerk-off/${profile._id || profile.id}`);
   };
 
+  const filteredGirls = girls.filter((girl) => {
+    // 0. Only show active characters
+    if (girl.status !== 'active') return false;
+
+    // 1. Search query filter
+    if (searchQuery && !girl.name.toLowerCase().includes(searchQuery.toLowerCase())) {
+      return false;
+    }
+
+    // 2. Main Category Filter
+    const tagsLower = girl.tags?.map(t => t.toLowerCase()) || [];
+    const isMale = tagsLower.includes("male") || tagsLower.includes("men") || tagsLower.includes("mężczyzna");
+    const isAnime = tagsLower.includes("anime");
+
+    const catLower = activeCategory.toLowerCase();
+    const isAnimeTab = catLower === "anime";
+    const isMenTab = catLower === "men" || catLower === "mężczyźni" || catLower === "mezczyzni" || catLower === "mężczyzna";
+    const isGirlsTab = !isAnimeTab && !isMenTab;
+
+    if (isGirlsTab) {
+      if (isMale) return false;
+      if (isAnime) return false; // Realistic girls only
+    } else if (isAnimeTab) {
+      if (!isAnime) return false;
+    } else if (isMenTab) {
+      if (!isMale) return false;
+    }
+
+    // 3. Sub-category filter within active main category
+    if (activeSubCategory === "All") return true;
+
+    if (activeSubCategory === "18-21") return girl.age >= 18 && girl.age <= 21;
+    if (activeSubCategory === "22-30") return girl.age >= 22 && girl.age <= 30;
+    if (activeSubCategory === "30+") return girl.age > 30;
+
+    const searchTarget = `${girl.tags?.join(" ")} ${girl.bio} ${girl.description || ''}`.toLowerCase();
+    return searchTarget.includes(activeSubCategory.toLowerCase());
+  });
+
   return (
-    <section className="mb-20">
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-yellow-500/10 rounded-xl border border-yellow-500/10">
-            <Crown className="text-yellow-500" size={24} />
+    <section className="mb-20 mt-12">
+      {/* Category Card Selector */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        {mainCategories.map((cat) => (
+          <div
+            key={cat.id}
+            onClick={() => handleCategorySelect(cat.id)}
+            className={`relative aspect-[21/9] md:aspect-[16/10] rounded-3xl overflow-hidden cursor-pointer group border transition-all duration-300 ${activeCategory === cat.id
+              ? "border-[#e11d48] shadow-lg shadow-[#e11d48]/15 scale-[1.02]"
+              : "border-white/5 hover:border-white/10 hover:scale-[1.01]"
+              }`}
+          >
+            <img
+              src={cat.image}
+              alt={cat.name}
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-60 group-hover:opacity-75"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f] via-black/30 to-transparent" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-white text-2xl font-black uppercase tracking-wider drop-shadow-md">
+                {cat.name}
+              </span>
+            </div>
           </div>
-          <div>
-            <h2 className="text-3xl font-bold text-white tracking-tight">Top Trending</h2>
-            <p className="text-white/30 text-xs uppercase tracking-widest font-bold mt-1">Voted by the community</p>
-          </div>
-        </div>
-        <button className="text-white/40 text-[10px] font-bold uppercase tracking-widest hover:text-white transition-colors flex items-center gap-2" aria-label="View all profiles">
-          View All <ArrowRight size={14} />
-        </button>
+        ))}
       </div>
 
-      <div className="relative group/carousel-feed">
-        <button
-          onClick={() => scrollCarousel(-1)}
-          aria-label="Scroll carousel left"
-          className="absolute -left-4 top-1/2 -translate-y-1/2 z-10 bg-white/5 backdrop-blur-xl hover:bg-white/10 p-4 rounded-full text-white border border-white/10 transition-all opacity-0 group-hover/carousel-feed:opacity-100 hidden md:block"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-        </button>
-
-        <div
-          ref={carouselRef}
-          className="flex gap-6 overflow-x-auto no-scrollbar scroll-smooth pb-4 px-2"
-        >
-          {girls && girls.girlfriends.map((profile) => (
-            <article
-              key={profile._id}
-              className="flex-shrink-0 w-80 bg-white/5 rounded-[2rem] overflow-hidden border border-white/5 hover:border-white/10 transition-all cursor-pointer group"
-              onClick={() => handleStartChat(profile)}
-              onMouseEnter={e => {
-                const vid = e.currentTarget.querySelector('video');
-                if (vid) vid.play().catch(() => { });
-              }}
-              onMouseLeave={e => {
-                const vid = e.currentTarget.querySelector('video');
-                if (vid) { vid.pause(); vid.currentTime = 0; }
-              }}
-            >
-              <div className="relative">
-                <video
-                  src={profile.mainVideo ? `${import.meta.env.VITE_URL}${profile.mainVideo}` : null}
-                  className="w-full h-96 object-cover opacity-60 group-hover:opacity-80 transition-opacity duration-500 md:block hidden"
-                  loop
-                  muted
-                  playsInline
-                  preload="auto"
-                />
-                <img
-                  src={profile.mainPhoto ? `${import.meta.env.VITE_URL}${profile.mainPhoto}` : null}
-                  alt={profile.name}
-                  className="w-full h-96 object-cover opacity-60 group-hover:opacity-80 transition-opacity duration-500 md:hidden"
-                />
-                  <div className="absolute top-4 right-4 flex items-center gap-2 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10">
-                    <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
-                    <span className="text-white text-[10px] font-bold uppercase tracking-widest">Live</span>
-                  </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f] via-transparent to-transparent" />
-              </div>
-
-              <div className="p-6">
-                <div className="flex flex-col gap-1 mb-4">
-                  <h3 className="font-bold text-white text-xl tracking-tight">{profile.name}, {profile.age}</h3>
-                  <p className="text-white/30 text-xs italic line-clamp-2">{profile.bio?.length > 80 ? profile.bio.substring(0, 80) + '...' : profile.bio}</p>
-                </div>
-
-                <div className="flex flex-wrap gap-2 mb-6">
-                  {profile.tags.map((tag, idx) => (
-                    <span key={idx} className="px-3 py-1 bg-white/5 text-white/50 text-[9px] font-bold uppercase tracking-widest rounded-lg border border-white/5">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-
-                <button 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleStartChat(profile);
-                  }}
-                  className="cursor-pointer w-full bg-white/5 hover:bg-white/10 text-white/80 py-3 rounded-2xl font-bold text-[10px] uppercase tracking-widest transition-all border border-white/10 flex items-center justify-center gap-2">
-                  <MessageCircle size={14} className="opacity-40" /> {isLoggedIn ? "Open Chat" : "Chat as Guest"}
-                </button>
-              </div>
-            </article>
-          ))}
+      {/* Filters Bar */}
+      <div className="flex flex-col md:flex-row gap-4 items-center mb-8">
+        <div className="relative w-full md:w-64 flex-shrink-0">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/50" />
+          <input
+            type="text"
+            placeholder="Search character..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full bg-[#12121a] border border-white/5 text-white pl-11 pr-4 py-2.5 rounded-full focus:outline-none focus:border-white/20 transition-colors text-sm"
+          />
         </div>
 
-        <button
-          onClick={() => scrollCarousel(1)}
-          aria-label="Scroll carousel right"
-          className="absolute -right-4 top-1/2 -translate-y-1/2 z-10 bg-white/5 backdrop-blur-xl hover:bg-white/10 p-4 rounded-full text-white border border-white/10 transition-all opacity-0 group-hover/carousel-feed:opacity-100 hidden md:block"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-        </button>
+        <div className="flex gap-2 overflow-x-auto no-scrollbar w-full pb-2 md:pb-0">
+          {subCategories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setActiveSubCategory(cat)}
+              className={`whitespace-nowrap px-5 py-2.5 rounded-full text-sm font-semibold transition-all ${activeSubCategory === cat
+                ? "bg-transparent text-white border border-[#e11d48]"
+                : "bg-[#12121a] text-white/70 hover:bg-[#1a1a24] hover:text-white border border-transparent"
+                }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Grid of Characters */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        {filteredGirls.map((profile) => (
+          <article
+            key={profile._id || profile.id}
+            className="relative bg-[#12121a] border border-white/5 hover:border-white/10 rounded-3xl overflow-hidden cursor-pointer group aspect-[3/4.2] transition-all duration-300 hover:shadow-2xl hover:shadow-[#0a0a0f]/80"
+            onClick={() => handleStartChat(profile)}
+          >
+            <img
+              src={profile.mainPhoto ? `${import.meta.env.VITE_URL}${profile.mainPhoto}` : null}
+              alt={profile.name}
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-90 group-hover:opacity-100"
+            />
+
+            {/* Top Right Badge */}
+            <div className="absolute top-4 right-4 z-10">
+              <span className="bg-[#e11d48] text-white px-3 py-1.5 rounded-full text-[11px] font-black flex items-center gap-1.5 shadow-lg shadow-red-500/25">
+                <Zap size={13} fill="currentColor" /> New
+              </span>
+            </div>
+
+            {/* Bottom Info Gradient */}
+            <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-[#0a0a0f] via-[#0a0a0f]/60 to-transparent flex flex-col justify-end min-h-[40%]">
+              <div className="flex items-center gap-2 mb-2">
+                <h3 className="font-bold text-white text-[22px] tracking-tight">
+                  {profile.name}
+                </h3>
+                <span className="font-medium text-white/80 text-[20px]">{profile.age}</span>
+              </div>
+              <p className="text-white/70 text-sm line-clamp-2 leading-relaxed mb-4">
+                {profile.bio}
+              </p>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleStartChat(profile);
+                }}
+                className="w-full bg-[#e11d48]/10 hover:bg-[#e11d48] border border-[#e11d48]/20 hover:border-transparent text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-red-500/5 group-hover:scale-[1.02]"
+              >
+                <MessageCircle size={14} className="fill-current" />
+                Chat
+              </button>
+            </div>
+          </article>
+        ))}
+        {filteredGirls.length === 0 && (
+          <div className="col-span-full py-20 text-center text-white/40 font-bold bg-[#12121a] rounded-3xl border border-white/5">
+            No characters found for selected filters in this category.
+          </div>
+        )}
       </div>
     </section>
   );
 }
+
+
+
+
+

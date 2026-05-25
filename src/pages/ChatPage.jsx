@@ -737,11 +737,11 @@ export default function ChatPage() {
                       <Star size={10} md:size={12} className="text-yellow-500" />
                       <span className="text-[8px] md:text-[10px] font-bold uppercase tracking-widest">LVL {relationshipLevel}</span>
                     </div>
-                    <button onClick={handleDeleteChat} className="p-2 md:p-3 text-white/20 hover:text-red-500"><FaTrash size={12} md:size={14} /></button>
+                    <button onClick={handleDeleteChat} className="p-2 md:p-3 text-white/20 hover:text-[#e11d48]"><FaTrash size={12} md:size={14} /></button>
                   </div>
                 </div>
                 <div className="w-full h-0.5 md:h-1 bg-white/5 rounded-full overflow-hidden relative">
-                  <div className="absolute inset-y-0 left-0 bg-[#741818] transition-all duration-1000 ease-out" style={{ width: `${progressPercent}%` }} />
+                  <div className="absolute inset-y-0 left-0 bg-[#e11d48] transition-all duration-1000 ease-out" style={{ width: `${progressPercent}%` }} />
                 </div>
               </div>
 
@@ -754,7 +754,7 @@ export default function ChatPage() {
                     <div key={m.id} className={`flex ${m.sender === "me" ? "justify-end" : "justify-start"}`}>
                       <div className={`flex flex-col gap-1 md:gap-2 max-w-[80%] ${m.sender === "me" ? "items-end" : "items-start"}`}>
                         {m.text && (
-                          <div className={`px-3 md:px-5 py-2 md:py-3.5 rounded-[1rem] md:rounded-[1.5rem] text-xs md:text-sm leading-relaxed ${m.sender === "me" ? "bg-[#741818] text-white rounded-br-none font-medium" : "bg-white/5 backdrop-blur-xl border border-white/5 text-white/90 rounded-bl-none"}`}>
+                          <div className={`px-3 md:px-5 py-2 md:py-3.5 rounded-[1rem] md:rounded-[1.5rem] text-xs md:text-sm leading-relaxed ${m.sender === "me" ? "bg-[#e11d48] text-white rounded-br-none font-medium" : "bg-white/5 backdrop-blur-xl border border-white/5 text-white/90 rounded-bl-none"}`}>
                             {m.text}
                           </div>
                         )}
@@ -763,7 +763,7 @@ export default function ChatPage() {
                             {m.isLocked && (
                               <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 z-10 bg-black/40 backdrop-blur-md">
                                 <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center"><Lock size={20} className="text-white/60" /></div>
-                                <button className="bg-[#741818] text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-[#8d1d1d] flex items-center gap-2">
+                                <button className="bg-[#e11d48] text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-[#be123c] flex items-center gap-2">
                                   Click to Unlock
                                 </button>
                               </div>
@@ -798,9 +798,9 @@ export default function ChatPage() {
 
               <div className="p-3 md:p-6 pb-safe">
                 {isGuest && !isLoggedIn && (
-                  <div className="max-w-4xl mx-auto mb-2 md:mb-4 bg-[#741818]/10 border border-[#741818]/20 rounded-lg md:rounded-xl px-3 md:px-4 py-2 flex items-center justify-between">
-                    <div className="flex items-center gap-2"><FaUnlock size={12} md:size={14} className="text-[#741818]" /><span className="text-[10px] md:text-xs text-white/60">Guest</span></div>
-                    <div className="flex items-center gap-2"><span className="text-[10px] md:text-xs text-white/40">Left:</span><span className={`text-[10px] md:text-xs font-bold ${messagesRemaining <= 3 ? 'text-[#741818]' : 'text-white/80'}`}>{messagesRemaining}</span></div>
+                  <div className="max-w-4xl mx-auto mb-2 md:mb-4 bg-[#e11d48]/10 border border-[#e11d48]/20 rounded-lg md:rounded-xl px-3 md:px-4 py-2 flex items-center justify-between">
+                    <div className="flex items-center gap-2"><FaUnlock size={12} md:size={14} className="text-[#e11d48]" /><span className="text-[10px] md:text-xs text-white/60">Guest</span></div>
+                    <div className="flex items-center gap-2"><span className="text-[10px] md:text-xs text-white/40">Left:</span><span className={`text-[10px] md:text-xs font-bold ${messagesRemaining <= 3 ? 'text-[#e11d48]' : 'text-white/80'}`}>{messagesRemaining}</span></div>
                   </div>
                 )}
                 <div className="max-w-4xl mx-auto pb-5">
@@ -809,20 +809,20 @@ export default function ChatPage() {
                     <button 
                       onClick={() => navigate('/premium')}
                       disabled={isLoading || requestingMedia}
-                      className={`flex-1 bg-[#741818]/20 hover:bg-[#741818]/30 border border-[#741818]/40 backdrop-blur-md px-4 py-3 rounded-2xl text-[10px] font-bold text-white/80 transition-all flex flex-col items-center justify-center gap-1 group uppercase tracking-widest cursor-pointer`}
+                      className={`flex-1 bg-[#e11d48]/20 hover:bg-[#e11d48]/30 border border-[#e11d48]/40 backdrop-blur-md px-4 py-3 rounded-2xl text-[10px] font-bold text-white/80 transition-all flex flex-col items-center justify-center gap-1 group uppercase tracking-widest cursor-pointer`}
                     >
                       <div className="flex items-center gap-2">
-                        <Camera size={14} className="text-white/40 group-hover:text-pink-500 transition-colors" />
+                        <Camera size={14} className="text-white/40 group-hover:text-red-500 transition-colors" />
                         Get Premium for Photos 📸
                       </div>
                     </button>
                     <button 
                       onClick={() => navigate('/premium')}
                       disabled={isLoading || requestingMedia}
-                      className={`flex-1 bg-[#741818]/20 hover:bg-[#741818]/30 border border-[#741818]/40 backdrop-blur-md px-4 py-3 rounded-2xl text-[10px] font-bold text-white/80 transition-all flex flex-col items-center justify-center gap-1 group uppercase tracking-widest cursor-pointer`}
+                      className={`flex-1 bg-[#e11d48]/20 hover:bg-[#e11d48]/30 border border-[#e11d48]/40 backdrop-blur-md px-4 py-3 rounded-2xl text-[10px] font-bold text-white/80 transition-all flex flex-col items-center justify-center gap-1 group uppercase tracking-widest cursor-pointer`}
                     >
                       <div className="flex items-center gap-2">
-                        <Play size={14} className="text-white/40 group-hover:text-red-500 transition-colors" />
+                        <Play size={14} className="text-white/40 group-hover:text-[#e11d48] transition-colors" />
                         Get Premium for Videos 🔥
                       </div>
                     </button>
@@ -833,14 +833,14 @@ export default function ChatPage() {
                     <button 
                       onClick={() => navigate('/premium')}
                       disabled={isLoading || requestingMedia}
-                      className={`flex-1 bg-[#741818]/20 border border-[#741818]/40 backdrop-blur-md px-3 py-2 rounded-xl text-[9px] font-bold text-white/80 transition-all flex items-center justify-center gap-1 cursor-pointer`}
+                      className={`flex-1 bg-[#e11d48]/20 border border-[#e11d48]/40 backdrop-blur-md px-3 py-2 rounded-xl text-[9px] font-bold text-white/80 transition-all flex items-center justify-center gap-1 cursor-pointer`}
                     >
                       <Camera size={12} /> Go Premium 📸
                     </button>
                     <button 
                       onClick={() => navigate('/premium')}
                       disabled={isLoading || requestingMedia}
-                      className={`flex-1 bg-[#741818]/20 border border-[#741818]/40 backdrop-blur-md px-3 py-2 rounded-xl text-[9px] font-bold text-white/80 transition-all flex items-center justify-center gap-1 cursor-pointer`}
+                      className={`flex-1 bg-[#e11d48]/20 border border-[#e11d48]/40 backdrop-blur-md px-3 py-2 rounded-xl text-[9px] font-bold text-white/80 transition-all flex items-center justify-center gap-1 cursor-pointer`}
                     >
                       <Play size={12} /> Go Premium 🔥
                     </button>
@@ -859,7 +859,7 @@ export default function ChatPage() {
                     <button
                       onClick={handleSend}
                       disabled={!newMessage.trim() || (isGuest && !isLoggedIn && messagesRemaining <= 0)}
-                      className={`w-9 h-9 md:w-11 md:h-11 rounded-[1rem] md:rounded-[1.25rem] flex items-center justify-center transition-all ${newMessage.trim() && !(isGuest && !isLoggedIn && messagesRemaining <= 0) ? "bg-[#741818] text-white hover:bg-[#8d1d1d]" : "bg-white/5 text-white/10"}`}
+                      className={`w-9 h-9 md:w-11 md:h-11 rounded-[1rem] md:rounded-[1.25rem] flex items-center justify-center transition-all ${newMessage.trim() && !(isGuest && !isLoggedIn && messagesRemaining <= 0) ? "bg-[#e11d48] text-white hover:bg-[#be123c]" : "bg-white/5 text-white/10"}`}
                     >
                       <FaPaperPlane size={12} md:size={14} />
                     </button>
@@ -943,7 +943,7 @@ export default function ChatPage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f] via-transparent" />
                 <div className="absolute bottom-6 left-6">
                   <h2 className="text-3xl font-bold tracking-tight mb-1">{activeChat?.name}, {activeChat?.age}</h2>
-                  <p className="text-white/30 text-xs font-bold uppercase flex items-center gap-2"><Heart size={14} className="text-[#741818]" /> {activeChat?.age ? `${activeChat.age} years old` : 'Online'}</p>
+                  <p className="text-white/30 text-xs font-bold uppercase flex items-center gap-2"><Heart size={14} className="text-[#e11d48]" /> {activeChat?.age ? `${activeChat.age} years old` : 'Online'}</p>
                 </div>
               </div>
               <div className="p-8 space-y-8">
@@ -956,7 +956,7 @@ export default function ChatPage() {
                   <div className="space-y-3">
                     {unlockables.filter(u => u.level <= relationshipLevel).map((unlock, idx) => (
                       <div key={idx} className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/10">
-                        <div className="w-12 h-12 rounded-xl bg-[#741818]/20 flex items-center justify-center text-xl">{unlock.icon}</div>
+                        <div className="w-12 h-12 rounded-xl bg-[#e11d48]/20 flex items-center justify-center text-xl">{unlock.icon}</div>
                         <div><p className="text-xs font-bold text-white/80">{unlock.name}</p><p className="text-[10px] text-white/30 uppercase tracking-widest font-bold">Unlocked</p></div>
                       </div>
                     ))}
@@ -976,7 +976,7 @@ export default function ChatPage() {
 
       {showLevelUp && (
         <div className="fixed top-12 left-1/2 -translate-x-1/2 z-50 animate-fade-in-up">
-          <div className="bg-[#741818] text-white px-8 py-4 rounded-[2rem] border border-white/20 flex items-center gap-4 shadow-[0_0_40px_rgba(116,24,24,0.4)]">
+          <div className="bg-[#e11d48] text-white px-8 py-4 rounded-[2rem] border border-white/20 flex items-center gap-4 shadow-[0_0_40px_rgba(116,24,24,0.4)]">
             <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center"><Sparkles size={20} /></div>
             <div>
               <p className="text-xs font-bold uppercase tracking-widest opacity-60">Level Up!</p>
@@ -988,7 +988,7 @@ export default function ChatPage() {
 
       {showUnlockModal && newUnlock && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-gradient-to-b from-[#741818] to-[#0a0a0f] border border-yellow-500/30 rounded-[2rem] p-8 max-w-md w-full text-center">
+          <div className="bg-gradient-to-b from-[#e11d48] to-[#0a0a0f] border border-yellow-500/30 rounded-[2rem] p-8 max-w-md w-full text-center">
             <div className="w-20 h-20 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
               <Sparkles size={40} className="text-yellow-500" />
             </div>
@@ -1010,3 +1010,8 @@ export default function ChatPage() {
     </Layout>
   );
 }
+
+
+
+
+

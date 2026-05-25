@@ -72,3 +72,8 @@ const FAQItem = ({
 };
 
 export default FAQItem;
+
+
+
+
+

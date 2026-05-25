@@ -60,12 +60,12 @@ export default function PaywallDialog({ open, onOpenChange }) {
                     onClick={() => setSelectedPlan(plan.id)}
                     className={`relative border rounded-lg p-3 cursor-pointer transition ${
                       selectedPlan === plan.id
-                        ? "border-red-500 bg-red-500/10"
+                        ? "border-[#e11d48] bg-[#e11d48]/10"
                         : "border-gray-700 bg-[#1b1b24] hover:border-gray-600"
                     }`}
                   >
                     {plan.badge && (
-                      <span className="absolute -top-2 right-2 bg-red-500 text-[10px] px-1.5 py-0.5 rounded font-bold">
+                      <span className="absolute -top-2 right-2 bg-[#e11d48] text-[10px] px-1.5 py-0.5 rounded font-bold">
                         {plan.badge}
                       </span>
                     )}
@@ -73,7 +73,7 @@ export default function PaywallDialog({ open, onOpenChange }) {
                       <p className="font-medium text-sm">{plan.title}</p>
                       <div className="text-right">
                         {plan.discount && (
-                          <span className="text-xs text-red-400 mr-2">{plan.discount}</span>
+                          <span className="text-xs text-[#e11d48] mr-2">{plan.discount}</span>
                         )}
                         <span className="font-bold">${plan.price}</span>
                       </div>
@@ -85,8 +85,8 @@ export default function PaywallDialog({ open, onOpenChange }) {
               <ul className="space-y-2">
                 {benefits.map((item, i) => (
                   <li key={i} className="flex items-center gap-2 text-xs text-gray-300">
-                    <div className="w-4 h-4 bg-red-500/20 rounded-full flex items-center justify-center">
-                      <Check size={10} className="text-red-400" />
+                    <div className="w-4 h-4 bg-[#e11d48]/20 rounded-full flex items-center justify-center">
+                      <Check size={10} className="text-[#e11d48]" />
                     </div>
                     {item}
                   </li>
@@ -95,7 +95,7 @@ export default function PaywallDialog({ open, onOpenChange }) {
 
               <Button 
                 onClick={() => setShowCheckout(true)}
-                className="w-full bg-red-500 hover:bg-red-600 font-semibold"
+                className="w-full bg-[#e11d48] hover:bg-[#be123c] font-semibold"
               >
                 <Crown size={18} className="mr-2" />
                 Upgrade Now
@@ -111,3 +111,8 @@ export default function PaywallDialog({ open, onOpenChange }) {
     </Dialog>
   );
 }
+
+
+
+
+

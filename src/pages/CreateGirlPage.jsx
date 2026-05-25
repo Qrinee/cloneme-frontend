@@ -136,7 +136,7 @@ function ImageTile({ item, isSelected, onClick }) {
       onClick={onClick}
       className={`
         relative overflow-hidden rounded-3xl aspect-[3/4] transition-all duration-500
-        border-2 ${isSelected ? 'border-[#741818]' : 'border-transparent opacity-60 hover:opacity-100'}
+        border-2 ${isSelected ? 'border-[#e11d48]' : 'border-transparent opacity-60 hover:opacity-100'}
       `}
     >
       <img 
@@ -149,7 +149,7 @@ function ImageTile({ item, isSelected, onClick }) {
       </div>
 
       {isSelected && (
-        <div className="absolute top-4 right-4 w-8 h-8 bg-[#741818] rounded-full flex items-center justify-center">
+        <div className="absolute top-4 right-4 w-8 h-8 bg-[#e11d48] rounded-full flex items-center justify-center">
           <Check className="w-5 h-5 text-white" />
         </div>
       )}
@@ -171,7 +171,7 @@ function AgeSlider({ value, onChange }) {
       
       <div className="relative h-2 bg-white/5 rounded-full">
         <div 
-          className="absolute inset-y-0 left-0 bg-[#741818] rounded-full"
+          className="absolute inset-y-0 left-0 bg-[#e11d48] rounded-full"
           style={{ width: `${((value - 18) / (35 - 18)) * 100}%` }}
         />
         <input
@@ -439,7 +439,7 @@ export default function CreateGirlPage() {
                   value={formData.name}
                   onChange={(e) => updateFormData("name", e.target.value)}
                   placeholder="Enter her name..."
-                  className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-5 text-white placeholder-white/20 focus:outline-none focus:border-[#741818] transition-all text-xl font-bold tracking-tight"
+                  className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-5 text-white placeholder-white/20 focus:outline-none focus:border-[#e11d48] transition-all text-xl font-bold tracking-tight"
                 />
               </div>
 
@@ -455,7 +455,7 @@ export default function CreateGirlPage() {
                   onChange={(e) => updateFormData("bio", e.target.value)}
                   placeholder="What is her story?"
                   rows={4}
-                  className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-5 text-white placeholder-white/20 focus:outline-none focus:border-[#741818] transition-all resize-none leading-relaxed font-medium"
+                  className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-5 text-white placeholder-white/20 focus:outline-none focus:border-[#e11d48] transition-all resize-none leading-relaxed font-medium"
                 />
               </div>
             </div>
@@ -479,7 +479,7 @@ export default function CreateGirlPage() {
                       onClick={() => toggleTag(tag._id)}
                       className={`px-6 py-3.5 rounded-2xl font-bold text-xs tracking-tight transition-all border ${
                         (formData.tags || []).includes(tag._id)
-                          ? 'bg-[#741818] border-[#741818] text-white'
+                          ? 'bg-[#e11d48] border-[#e11d48] text-white'
                           : 'bg-white/5 border-white/5 text-white/40 hover:text-white hover:border-white/10'
                       }`}
                     >
@@ -498,7 +498,7 @@ export default function CreateGirlPage() {
                       onClick={() => updateFormData("relationship", option.value)}
                       className={`px-6 py-3.5 rounded-2xl font-bold text-xs tracking-tight transition-all border ${
                         formData.relationship === option.value
-                          ? 'bg-[#741818] border-[#741818] text-white'
+                          ? 'bg-[#e11d48] border-[#e11d48] text-white'
                           : 'bg-white/5 border-white/5 text-white/40 hover:text-white hover:border-white/10'
                       }`}
                     >
@@ -515,7 +515,7 @@ export default function CreateGirlPage() {
                   onChange={(e) => updateFormData("initialMessage", e.target.value)}
                   placeholder="The first words she will speak..."
                   rows={3}
-                  className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-5 text-white placeholder-white/20 focus:outline-none focus:border-[#741818] transition-all resize-none leading-relaxed font-medium"
+                  className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-5 text-white placeholder-white/20 focus:outline-none focus:border-[#e11d48] transition-all resize-none leading-relaxed font-medium"
                 />
               </div>
             </div>
@@ -540,7 +540,7 @@ export default function CreateGirlPage() {
                   <div className="relative w-32 h-32 mx-auto">
                     <div className="absolute inset-0 rounded-full border-4 border-white/10"></div>
                     <div 
-                      className="absolute inset-0 rounded-full border-4 border-red-500 border-t-transparent animate-spin"
+                      className="absolute inset-0 rounded-full border-4 border-[#e11d48] border-t-transparent animate-spin"
                       style={{ animationDuration: '1s' }}
                     ></div>
                     <div className="absolute inset-0 flex items-center justify-center">
@@ -551,7 +551,7 @@ export default function CreateGirlPage() {
                     <p className="text-white/60 text-sm">Generating portrait...</p>
                     <div className="h-1 bg-white/10 rounded-full overflow-hidden">
                       <div 
-                        className="h-full bg-red-500 rounded-full transition-all duration-300"
+                        className="h-full bg-[#e11d48] rounded-full transition-all duration-300"
                         style={{ width: `${previewProgress}%` }}
                       ></div>
                     </div>
@@ -603,7 +603,7 @@ export default function CreateGirlPage() {
                     {formData.tags.map(tagId => {
                       const tag = tags.find(t => t._id === tagId);
                       return tag ? (
-                        <span key={tagId} className="px-3 py-1.5 md:px-4 md:py-2 bg-[#741818]/20 border border-[#741818]/20 rounded-lg md:rounded-xl text-white text-[9px] md:text-[10px] font-bold uppercase tracking-widest">
+                        <span key={tagId} className="px-3 py-1.5 md:px-4 md:py-2 bg-[#e11d48]/20 border border-[#e11d48]/20 rounded-lg md:rounded-xl text-white text-[9px] md:text-[10px] font-bold uppercase tracking-widest">
                           {tag.label}
                         </span>
                       ) : null;
@@ -633,7 +633,7 @@ export default function CreateGirlPage() {
                     <div className={`
                       w-8 h-8 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-500
                       ${currentStep === step.id 
-                        ? 'bg-[#741818] text-white' 
+                        ? 'bg-[#e11d48] text-white' 
                         : currentStep > step.id 
                           ? 'bg-white/10 text-white' 
                           : 'bg-white/5 text-white/20'}
@@ -642,7 +642,7 @@ export default function CreateGirlPage() {
                     </div>
                   </div>
                   {index < steps.length - 1 && (
-                    <div className={`w-4 md:w-8 h-px mx-1 md:mx-4 ${currentStep > step.id ? 'bg-[#741818]' : 'bg-white/5'}`} />
+                    <div className={`w-4 md:w-8 h-px mx-1 md:mx-4 ${currentStep > step.id ? 'bg-[#e11d48]' : 'bg-white/5'}`} />
                   )}
                 </div>
               ))}
@@ -652,7 +652,7 @@ export default function CreateGirlPage() {
           {/* Form Content Area */}
           <div className="bg-white/5 backdrop-blur-3xl rounded-[2rem] md:rounded-[3rem] p-6 md:p-14 border border-white/5 relative overflow-hidden mb-8 md:mb-10">
             {/* Subtle light effect inside */}
-            <div className="absolute -top-24 -right-24 w-64 h-64 bg-[#741818]/5 rounded-full blur-[80px] pointer-events-none" />
+            <div className="absolute -top-24 -right-24 w-64 h-64 bg-[#e11d48]/5 rounded-full blur-[80px] pointer-events-none" />
             
             <div className="relative z-10">
               {renderStep()}
@@ -680,7 +680,7 @@ export default function CreateGirlPage() {
                 disabled={!canProceed()}
                 className={`flex items-center gap-2 md:gap-3 px-6 md:px-10 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold transition-all text-sm md:text-base ${
                   canProceed()
-                    ? 'bg-[#741818] text-white hover:bg-[#8d1d1d] active:scale-95'
+                    ? 'bg-[#e11d48] text-white hover:bg-[#be123c] active:scale-95'
                     : 'bg-white/5 text-white/10 cursor-not-allowed'
                 }`}
               >
@@ -742,7 +742,7 @@ export default function CreateGirlPage() {
         <div className={`fixed top-6 left-1/2 -translate-x-1/2 z-50 px-6 py-4 rounded-2xl border shadow-2xl animate-in slide-in-from-top-2 ${
           notification.type === 'success' 
             ? 'bg-green-900/90 border-green-500/50 text-green-100' 
-            : 'bg-red-900/90 border-red-500/50 text-red-100'
+            : 'bg-[#e11d48]/20 border-[#e11d48]/50 text-red-100'
         }`}>
           <div className="flex items-center gap-3">
             {notification.type === 'success' ? (
@@ -752,8 +752,8 @@ export default function CreateGirlPage() {
                 </svg>
               </div>
             ) : (
-              <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center">
-                <svg className="w-5 h-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="w-8 h-8 rounded-full bg-[#e11d48]/20 flex items-center justify-center">
+                <svg className="w-5 h-5 text-[#e11d48]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </div>
@@ -764,7 +764,7 @@ export default function CreateGirlPage() {
                 <p className="text-xs text-green-300/70 mt-1">Remaining points: {notification.points}</p>
               )}
               {notification.type === 'error' && notification.current !== undefined && (
-                <p className="text-xs text-red-300/70 mt-1">
+                <p className="text-xs text-[#e11d48]/80/70 mt-1">
                   You have {notification.current} points, need {notification.required}
                 </p>
               )}
@@ -795,3 +795,8 @@ export default function CreateGirlPage() {
     </Layout>
   );
 }
+
+
+
+
+

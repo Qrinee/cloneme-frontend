@@ -1,48 +1,24 @@
-import { useState, useEffect, useRef } from "react";
-import { FiMenu, FiX, FiHome, FiCompass, FiMessageCircle, FiStar, FiUser, FiGlobe, FiMail, FiSettings, FiLogOut, FiHelpCircle, FiUserPlus } from "react-icons/fi";
-import { FaFemale, FaMale, FaDragon } from "react-icons/fa";
-import logo from '../assets/gpt.png';
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import { useLayoutContext } from "./LayoutContext";
-import { useAuthFetch } from "../utils/authFetch";
-import { Coins } from "lucide-react";
-import { Dialog, DialogTrigger, DialogContent } from "./ui/dialog";
-import Content from "./Content";
-import DialogPremiumPromo from "./DialogPremiumPromo";
+import { useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { FiHome, FiCompass, FiMessageCircle, FiStar, FiUser, FiHelpCircle, FiLogOut, FiUserPlus, FiLock } from "react-icons/fi";
+import { Crown, Coins, Flame, User as UserIcon, LogOut } from "lucide-react";
+import Header from "./Header/Header";
+import RightSidebar from "./RightSidebar";
 import DialogLoginPrompt from "./DialogLoginPrompt";
+import { useLayoutContext } from "./LayoutContext";
 
 const Layout = ({ children }) => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [premiumDialogOpen, setPremiumDialogOpen] = useState(false);
   const [loginPromptOpen, setLoginPromptOpen] = useState(false);
-  const navigate = useNavigate();
   const location = useLocation();
-  const { isLoggedIn, user, updateUser, premium } = useLayoutContext();
-  const authFetch = useAuthFetch();
+  const navigate = useNavigate();
+  const { isLoggedIn, user, premium } = useLayoutContext();
 
-  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
-
-  const navItems = [
-    { id: "home", label: "Home", icon: <FiHome />, link: "/" },
-    { id: "discover", label: "Meet Girls", icon: <FiCompass />, link: "/discover", tourId: "discover-link" },
-    ...(isLoggedIn ? [
-      { id: "chat", label: "Chat", icon: <FiMessageCircle />, link: "/chat" },
-      { id: "collection", label: "Collection", icon: <FiStar />, link: "/collection" },
-    ] : []),
-    { 
-      id: "create", 
-      label: "Create", 
-      icon: <FiUser />, 
-      link: "/create-girl",
-      tourId: "create-link"
-    },
-    { id: "how-it-works", label: "How it works", icon: <FiHelpCircle />, link: "/how-it-works" },
-  ];
+  const isChatOrJerkoff = location.pathname.startsWith('/chat') || location.pathname.startsWith('/jerk-off');
 
   const handleLogout = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${import.meta.env.VITE_URL}/auth/logout`, {
+      await fetch(`${import.meta.env.VITE_URL}/auth/logout`, {
         credentials: "include"
       });
       window.location.href = '/login';
@@ -51,262 +27,161 @@ const Layout = ({ children }) => {
     }
   };
 
-  const footerItems = isLoggedIn ? [
-    { id: "profile", label: "Profile", icon: <FiUser />, link: "/profile" },
-    { id: "logout", label: "Log Out", icon: <FiLogOut />, onClick: handleLogout },
-  ] : [
-    { id: "login", label: "Log In", icon: <FiUser />, link: "/login" },
-    { id: "register", label: "Sign Up", icon: <FiUserPlus />, link: "/register" },
-  ];
-
   const isActive = (path) => {
     if (path === "/" && location.pathname === "/") return true;
     if (path !== "/" && location.pathname.startsWith(path)) return true;
     return false;
   };
 
+  const navItems = [
+    { id: "home", label: "Home", icon: <FiHome />, link: "/" },
+    { id: "discover", label: "Discover", icon: <FiCompass />, link: "/discover" },
+    { id: "chat", label: "Chat", icon: <FiMessageCircle />, link: "/chat" },
+    { id: "collection", label: "My Collection", icon: <FiStar />, link: "/collection" },
+    { id: "create", label: "Create AI", icon: <FiUser />, link: "/create-girl" },
+    { id: "how-it-works", label: "How It Works", icon: <FiHelpCircle />, link: "/how-it-works" },
+  ];
+
   return (
-    <div className="flex h-[100dvh] bg-[#0a0a0f] text-gray-100 font-sans overflow-hidden">
-      
-      {/* Mobile Top Header */}
-      <header className="md:hidden fixed top-0 left-0 right-0 bg-black/20 backdrop-blur-3xl border-b border-white/5 flex items-center justify-between px-6 z-40" style={{ paddingTop: 'env(safe-area-inset-top)', height: 'calc(64px + env(safe-area-inset-top))' }}>
-        <Link to={'/'}>
-          <img src={logo} alt="Logo" className="h-7" />
-        </Link>
-        <button 
-          onClick={toggleSidebar}
-          className="p-2 rounded-xl bg-white/5 border border-white/10 active:scale-95 transition-all outline-none cursor-pointer"
-        >
-          {sidebarOpen ? <FiX size={20} /> : <FiMenu size={20} />}
-        </button>
-      </header>
+    <div className="flex flex-col h-[100dvh] bg-[#0a0a0f] text-gray-100 font-sans overflow-hidden">
+      {/* Top Header Navigation */}
+      <Header />
 
-      {/* Sidebar Backdrop (Mobile) */}
-      {sidebarOpen && (
-        <div 
-          className="md:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
+      {/* Main content wrapper */}
+      <div className="flex-1 flex flex-row min-w-0 relative overflow-hidden">
+        
+        {/* Desktop Sidebar (hidden on mobile, visible from md up) */}
+        <aside className="hidden md:flex flex-col w-64 bg-[#0a0a0f] border-r border-white/5 h-full overflow-y-auto no-scrollbar shrink-0 justify-between py-6">
+          <div className="flex flex-col gap-6">
+            
+            {/* Sidebar Navigation */}
+            <div className="px-4">
+              <span className="text-[10px] uppercase font-black tracking-[0.2em] text-white/20 px-4 block mb-3">
+                Navigation
+              </span>
+              <nav className="flex flex-col gap-1">
+                {navItems.map((item) => (
+                  <Link 
+                    key={item.id} 
+                    to={item.link} 
+                    style={{ textDecoration: 'none' }}
+                  >
+                    <button
+                      className={`w-full flex items-center px-4 py-3 rounded-xl transition-all duration-200 text-sm font-bold cursor-pointer border ${
+                        isActive(item.link)
+                          ? 'bg-[#e11d48]/10 text-[#e11d48] border-[#e11d48]/20 shadow-md shadow-[#e11d48]/5'
+                          : 'text-white/40 border-transparent hover:text-white hover:bg-white/5'
+                      }`}
+                    >
+                      <span className="text-lg mr-3.5">{item.icon}</span>
+                      <span>{item.label}</span>
+                    </button>
+                  </Link>
+                ))}
+              </nav>
+            </div>
 
-      {/* Sidebar - Modern Glass */}
-      <aside
-        className={`fixed top-0 left-0 h-full w-72 bg-[#0f0f14] border-r border-white/5 transform transition-all duration-500 z-50
-          ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 md:static md:flex-shrink-0`}
-      >
-        <div className="flex flex-col h-full">
-          {/* Logo Section (Desktop) */}
-          <div className="hidden md:block p-6">
-            <Link to={'/'}>
-              <div className="flex items-center space-x-3">
-                <img src={logo} alt="Logo" className="h-9" />
+            {/* Sensual Premium Promo Card */}
+            <div className="px-4">
+              <div 
+                onClick={() => navigate('/premium')}
+                className="mx-1 p-4 rounded-2xl bg-gradient-to-br from-amber-500/10 to-[#e11d48]/10 border border-amber-500/20 hover:border-amber-500/40 relative group overflow-hidden cursor-pointer transition-all duration-300 shadow-lg shadow-black/40 hover:scale-[1.01]"
+              >
+                <div className="absolute top-0 right-0 w-16 h-16 bg-[#e11d48]/10 rounded-full blur-md group-hover:scale-125 transition-all duration-500" />
+                <div className="flex items-center gap-2 mb-2 relative z-10">
+                  <Crown className="w-4 h-4 text-amber-400 fill-amber-400" />
+                  <span className="text-xs font-black text-amber-400 uppercase tracking-wider">Premium</span>
+                  <span className="ml-auto bg-[#e11d48] text-white text-[9px] font-black px-1.5 py-0.5 rounded-full shadow-sm shadow-[#e11d48]/35">-70%</span>
+                </div>
+                <p className="text-[10px] text-white/50 leading-relaxed relative z-10 font-bold">
+                  Unlock unlimited messages and premium 18+ photo generation!
+                </p>
               </div>
-            </Link>
+            </div>
+
           </div>
 
-          {/* Navigation Section */}
-          <nav className="flex-1 px-4 py-2 mt-20 md:mt-0 overflow-y-auto no-scrollbar">
-            {/* Main Menu Section */}
-            <div className="mb-8">
-              <h3 className="text-[10px] uppercase tracking-[0.15em] text-white/20 font-bold mb-4 px-4">Main Menu</h3>
-              <ul className="space-y-1.5">
-                {navItems.map((item) => (
-                  <li key={item.id}>
-                    {item.onClick ? (
-                      <button
-                        onClick={() => {
-                          setSidebarOpen(false);
-                          item.onClick();
-                        }}
-                        data-tour-target={item.tourId}
-                        className={`w-full flex items-center px-4 py-3.5 rounded-xl transition-all duration-200 text-base font-bold cursor-pointer
-                          text-white/40 hover:text-white hover:bg-white/5`}
-                      >
-                        <span className="text-xl mr-4">{item.icon}</span>
-                        <span>{item.label}</span>
-                        {item.badge && (
-                          <span className="ml-auto bg-[#741818] text-white text-[10px] font-black px-2 py-0.5 rounded-lg">
-                            {item.badge}
-                          </span>
-                        )}
-                      </button>
-                    ) : (
-                      <Link to={item.link || '#'} onClick={() => setSidebarOpen(false)} style={{ textDecoration: 'none' }}>
-                        <button
-                          data-tour-target={item.tourId}
-                          className={`w-full flex items-center px-4 py-3.5 rounded-xl transition-all duration-200 text-base font-bold cursor-pointer
-                            ${isActive(item.link)
-                              ? 'bg-[#ff3333]/20 text-[#ff4444] border border-[#ff4444]/30'
-                              : 'text-white/40 hover:text-white hover:bg-white/5'
-                            }`}
-                        >
-                          <span className="text-xl mr-4">{item.icon}</span>
-                          <span>{item.label}</span>
-                          {item.badge && (
-                            <span className="ml-auto bg-[#741818] text-white text-[10px] font-black px-2 py-0.5 rounded-lg">
-                              {item.badge}
-                            </span>
-                          )}
-                        </button>
-                      </Link>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Account Section */}
-            <div>
-              <h3 className="text-[10px] uppercase tracking-[0.15em] text-white/20 font-bold mb-4 px-4">Account</h3>
-              <ul className="space-y-1.5">
-                {footerItems.map((item) => (
-                  <li key={item.id}>
-                    {item.link ? (
-                      <Link to={item.link} onClick={() => setSidebarOpen(false)} style={{ textDecoration: 'none' }}>
-                        <button
-                          className={`w-full flex items-center px-4 py-3.5 rounded-xl transition-all duration-200 text-base font-bold cursor-pointer
-                            ${isActive(item.link)
-                              ? 'bg-[#ff3333]/20 text-[#ff4444] border border-[#ff4444]/30'
-                              : 'text-white/40 hover:text-white hover:bg-white/5'
-                            }`}
-                        >
-                          <span className="text-xl mr-4">{item.icon}</span>
-                          <span>{item.label}</span>
-                        </button>
-                      </Link>
-                    ) : (
-                      <button
-                        onClick={(e) => {
-                          setSidebarOpen(false);
-                          item.onClick && item.onClick(e);
-                        }}
-                        className="w-full flex items-center px-4 py-3.5 rounded-xl text-white/40 hover:text-white hover:bg-white/5 transition-all duration-200 text-base font-bold cursor-pointer"
-                      >
-                        <span className="text-xl mr-4">{item.icon}</span>
-                        <span>{item.label}</span>
-                      </button>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </nav>
-
-
-          
-
-          {/* User Profile Section */}
-          <div className="p-4 border-t border-white/5">
-
-                {!premium?.isActive ? (
-                  <button
-                    onClick={() => navigate('/premium')}
-                    className="w-full flex items-center px-4 py-3 rounded-xl transition-all duration-200 text-base font-bold text-yellow-400 hover:bg-yellow-500/10 border border-yellow-500/30 cursor-pointer"
-                  >
-                    <Coins className="w-5 h-5 mr-4" />
-                    <span>Upgrade to Premium</span>
-                  </button>
-                ) : (
-                  <Dialog open={premiumDialogOpen} onOpenChange={setPremiumDialogOpen}>
-                    <DialogTrigger asChild>
-                      <button
-                        data-tour-target="premium-link"
-                        className="w-full flex items-center px-4 py-3 rounded-xl transition-all duration-200 text-base font-bold  text-red-400 hover:bg-white/5 border border-white/5 border-red-500/30 cursor-pointer"
-                      >
-                        <Coins className="w-5 h-5 mr-4" />
-                        <span>Buy Points</span>
-                      </button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-[95vw] sm:max-w-[90vw] md:max-w-[80vw] bg-[#0a0a0f] border-red-900/30 overflow-hidden p-0">
-                      <Content />
-                    </DialogContent>
-                  </Dialog>
-                )}
-
-            {isLoggedIn && user && (
-              <a href="/profile" className="block mt-4">
-                <div className="flex items-center mt-5 space-x-4 p-3 rounded-2xl hover:bg-white/5 cursor-pointer transition-colors group">
+          {/* User Account / Footer Area */}
+          <div className="px-4 border-t border-white/5 pt-5">
+            {isLoggedIn && user ? (
+              <div className="flex flex-col gap-3">
+                
+                {/* User stats widget */}
+                <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/5 border border-white/5">
                   <img
                     alt="Avatar"
                     src="image.webp"
-                    className="h-9 w-9 rounded-full border border-white/10"
+                    className="h-9 w-9 rounded-full border border-white/10 object-cover"
+                    onError={(e) => {
+                      e.target.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80';
+                    }}
                   />
                   <div className="flex-1 min-w-0">
-                    <h4 className="text-sm font-bold text-white truncate group-hover:text-[#741818] transition-colors">{user.username}</h4>
-                    <div className="flex items-center space-x-2 mt-1">
-                      <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest leading-none">{user.subscriptionPlan || 'Free'}</p>
-                    </div>
+                    <h4 className="text-xs font-bold text-white truncate">{user.username}</h4>
+                    <p className="text-[9px] font-black uppercase text-white/30 tracking-widest mt-0.5">
+                      {user.subscriptionPlan || 'Free'}
+                    </p>
                   </div>
-         
-                    <div className="flex items-center bg-red-500/20 border border-red-500/40 px-2 py-1 rounded-lg">
-                      <span className="text-white-400 text-xs font-bold">{user.points.toLocaleString('en-US').replace(/,/g, ' ')}</span>
-                      <span className="text-red-400/60 text-[9px] ml-1">PTS</span>
-                    </div>
-
+                  
+                  {/* Points display */}
+                  <div className="flex items-center bg-[#e11d48]/15 border border-[#e11d48]/30 px-2 py-1 rounded-lg shrink-0">
+                    <span className="text-white text-xs font-black">
+                      {user.points?.toLocaleString('en-US').replace(/,/g, ' ')}
+                    </span>
+                    <span className="text-[#e11d48] text-[8px] font-black ml-1">PTS</span>
+                  </div>
                 </div>
-                {/* Buy Points Button - Styled to match sidebar */}
 
-              </a>
+                 {/* Log Out Button */}
+                <button 
+                  onClick={handleLogout}
+                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-white/5 hover:border-[#e11d48]/20 bg-white/5 hover:bg-[#e11d48]/10 text-white/60 hover:text-[#e11d48] text-xs font-bold transition-all cursor-pointer"
+                >
+                  <LogOut size={14} />
+                  <span>Log Out</span>
+                </button>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2">
+                <Link to="/login" style={{ textDecoration: 'none' }}>
+                  <button className="w-full py-3 rounded-xl bg-white/5 hover:bg-white/10 text-white font-bold text-xs transition-all cursor-pointer border border-white/5">
+                    Log In
+                  </button>
+                </Link>
+                <Link to="/register" style={{ textDecoration: 'none' }}>
+                  <button className="w-full py-3 rounded-xl bg-[#e11d48] hover:bg-[#be123c] text-white font-black text-xs uppercase tracking-wider transition-all cursor-pointer border-none shadow-md shadow-[#e11d48]/15">
+                    Sign Up Free
+                  </button>
+                </Link>
+              </div>
             )}
           </div>
-        </div>
-      </aside>
+        </aside>
 
-      {/* Main content */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Page content */}
-        <main className="flex-1 overflow-auto no-scrollbar" style={{ paddingTop: 'calc(64px + env(safe-area-inset-top))' }}>
+        {/* Main Content Area */}
+        <main className="flex-1 overflow-auto no-scrollbar relative bg-[#0a0a0f]">
           {children}
         </main>
+
+        {/* Desktop Right Sidebar (hidden on mobile, visible from xl up, hidden on chat/jerk-off pages) */}
+        {!isChatOrJerkoff && <RightSidebar />}
       </div>
 
-      {/* Mobile Bottom Navigation */}
-      {/* <nav className="md:hidden fixed bottom-0 left-0 right-0 h-20 bg-black/20 backdrop-blur-3xl border-t border-white/5 flex items-center justify-around px-6 z-40">
-        {navItems.slice(0, 4).map((item) => (
-          item.onClick ? (
-            <button 
-              key={item.id}
-              onClick={item.onClick}
-              className="flex flex-col items-center justify-center space-y-1.5 transition-all duration-300 text-white/30"
-            >
-              <span className="text-2xl transition-transform duration-300">
-                {item.icon}
-              </span>
-              <span className="text-[10px] font-black uppercase tracking-widest leading-none">
-                {item.label === "Collection" ? "Vault" : item.label}
-              </span>
-            </button>
-          ) : (
-            <Link 
-              key={item.id} 
-              to={item.link}
-              className={`flex flex-col items-center justify-center space-y-1.5 transition-all duration-300 ${isActive(item.link) ? 'text-[#741818]' : 'text-white/30'}`}
-            >
-              <span className={`text-2xl transition-transform duration-300 ${isActive(item.link) ? 'scale-110' : ''}`}>
-                {item.icon}
-              </span>
-              <span className="text-[10px] font-black uppercase tracking-widest leading-none">
-                {item.label === "Collection" ? "Vault" : item.label}
-              </span>
-            </Link>
-          )
-        ))}
-      </nav> */}
-
-      <style>{`
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-      `}</style>
-
+      {/* Dialog for Guest message limit redirect */}
       <DialogLoginPrompt 
         open={loginPromptOpen}
         onOpenChange={setLoginPromptOpen}
         onLogin={() => {
           setLoginPromptOpen(false);
-          navigate("/login");
+          window.location.href = "/login";
         }}
         onMaybeLater={() => setLoginPromptOpen(false)}
       />
+
+      <style>{`
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      `}</style>
     </div>
   );
 };

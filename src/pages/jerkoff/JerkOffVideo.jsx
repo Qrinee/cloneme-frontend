@@ -47,10 +47,15 @@ export default function JerkOffVideo({
             }}
             className={`cursor-pointer p-2 rounded-lg transition-all text-white/40 hover:text-white/80 ${likeAnimation ? 'animate-ping' : 'hover:bg-white/5'}`}
           >
-            <Heart size={16} className={likeAnimation ? 'text-red-500 fill-current' : ''} />
+            <Heart size={16} className={likeAnimation ? 'text-[#e11d48] fill-current' : ''} />
           </button>
         </div>
       </div>
     </div>
   );
 }
+
+
+
+
+

@@ -64,3 +64,8 @@ export default function CloneCarousel({ title, clones, navigate }) {
     </section>
   );
 }
+
+
+
+
+

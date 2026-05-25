@@ -70,7 +70,7 @@ export default function StripeEmbeddedCheckout({ selectedPlan, onClose }) {
   if (loadingUser) {
     return (
       <div className="p-4 text-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500 mx-auto"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#e11d48] mx-auto"></div>
       </div>
     );
   }
@@ -78,7 +78,7 @@ export default function StripeEmbeddedCheckout({ selectedPlan, onClose }) {
   if (error) {
     return (
       <div className="p-4 text-center">
-        <p className="text-red-500 mb-4">{error}</p>
+        <p className="text-[#e11d48] mb-4">{error}</p>
         <button onClick={onClose} className="px-4 py-2 bg-white/10 rounded-lg hover:bg-white/20">Close</button>
       </div>
     );
@@ -101,3 +101,8 @@ export default function StripeEmbeddedCheckout({ selectedPlan, onClose }) {
     </div>
   );
 }
+
+
+
+
+

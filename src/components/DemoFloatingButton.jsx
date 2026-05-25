@@ -49,7 +49,7 @@ export default function DemoFloatingButton({ onDemoClick }) {
         >
           <div className="relative group">
             {/* Glow effect */}
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-[#741818] to-[#8B5CF6] rounded-2xl blur opacity-40 group-hover:opacity-70 transition-opacity duration-300" />
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-[#e11d48] to-[#8B5CF6] rounded-2xl blur opacity-40 group-hover:opacity-70 transition-opacity duration-300" />
             
             {/* Main button */}
             <button
@@ -57,7 +57,7 @@ export default function DemoFloatingButton({ onDemoClick }) {
               className="relative flex items-center gap-3 px-5 py-3.5 bg-[#0a0a0f]/95 backdrop-blur-xl rounded-2xl border border-white/5 hover:border-white/10 transition-all duration-300 group-hover:scale-105"
             >
               {/* Avatar */}
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#741818]/20 to-transparent border border-white/10 flex items-center justify-center overflow-hidden">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#e11d48]/20 to-transparent border border-white/10 flex items-center justify-center overflow-hidden">
                 <img src="/icon.png" alt="Demo" className="w-full h-full object-cover" />
               </div>
               
@@ -87,7 +87,7 @@ export default function DemoFloatingButton({ onDemoClick }) {
 
           {/* Pulse animation */}
           <motion.div
-            className="absolute top-1/2 left-4 w-12 h-12 rounded-full bg-[#741818]/30"
+            className="absolute top-1/2 left-4 w-12 h-12 rounded-full bg-[#e11d48]/30"
             animate={{ scale: [1, 1.5, 1], opacity: [0.3, 0, 0.3] }}
             transition={{ duration: 2, repeat: Infinity }}
           />
@@ -96,3 +96,8 @@ export default function DemoFloatingButton({ onDemoClick }) {
     </AnimatePresence>
   );
 }
+
+
+
+
+

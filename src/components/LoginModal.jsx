@@ -246,7 +246,7 @@ export default function LoginModal({ open, onClose }) {
                   />
                 </div>
 
-                {error && <p className="text-sm text-red-500">{error}</p>}
+                {error && <p className="text-sm text-[#e11d48]">{error}</p>}
 
                 <Button type="submit" className="w-full">
                   Create Account
@@ -288,7 +288,7 @@ export default function LoginModal({ open, onClose }) {
                   />
                 </div>
 
-                {error && <p className="text-sm text-red-500">{error}</p>}
+                {error && <p className="text-sm text-[#e11d48]">{error}</p>}
 
                 <Button type="submit" className="w-full">
                   Login
@@ -324,7 +324,7 @@ export default function LoginModal({ open, onClose }) {
                     />
                   </div>
 
-                  {error && <p className="text-sm text-red-500">{error}</p>}
+                  {error && <p className="text-sm text-[#e11d48]">{error}</p>}
 
                   <Button type="submit" className="w-full">
                     Verify Email
@@ -354,3 +354,8 @@ export default function LoginModal({ open, onClose }) {
     </Dialog>
   );
 }
+
+
+
+
+

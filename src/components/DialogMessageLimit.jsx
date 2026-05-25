@@ -34,10 +34,10 @@ export default function DialogMessageLimit({ open, onOpenChange, messagesUsed = 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md bg-[#0a0a0f] border-red-900/30 text-white overflow-hidden">
+      <DialogContent className="max-w-md bg-[#0a0a0f] border-[#e11d48]/20 text-white overflow-hidden">
         <DialogHeader className="text-center">
-          <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Lock size={32} className="text-red-500" />
+          <div className="w-16 h-16 bg-[#e11d48]/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Lock size={32} className="text-[#e11d48]" />
           </div>
           <DialogTitle className="text-2xl font-bold text-center">
             Messages Limit Reached
@@ -52,7 +52,7 @@ export default function DialogMessageLimit({ open, onOpenChange, messagesUsed = 
             </div>
             <div className="h-2 bg-white/10 rounded-full overflow-hidden">
               <div 
-                className="h-full bg-red-500 rounded-full"
+                className="h-full bg-[#e11d48] rounded-full"
                 style={{ width: `${Math.min((messagesUsed / messageLimit) * 100, 100)}%` }}
               />
             </div>
@@ -116,3 +116,8 @@ export default function DialogMessageLimit({ open, onOpenChange, messagesUsed = 
     </Dialog>
   );
 }
+
+
+
+
+

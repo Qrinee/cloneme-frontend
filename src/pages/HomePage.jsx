@@ -4,14 +4,41 @@ import QuickChatSection from "../components/home/QuickChatSection";
 import FeaturedSection from "../components/home/FeaturedSection";
 import { Link } from "react-router-dom";
 import { FiHeart, FiTwitter, FiInstagram, FiMail } from "react-icons/fi";
+import { Wand2 } from "lucide-react";
+import customAiBanner from "../assets/banners/new_banner_2.png";
 
 export default function HomePage() {
   return (
     <Layout>
       <div className="w-full max-w-7xl mx-auto pb-12 px-4">
         <HeroSection />
+        
+        {/* Section Heading */}
+        <div className="text-center mt-12 mb-8">
+          <h2 className="text-xl md:text-3xl font-black text-white uppercase tracking-[0.1em] drop-shadow-md">
+            JOIN NOW, LIVE, TALK TO OUR GIRLS
+          </h2>
+        </div>
+
         <QuickChatSection />
         <FeaturedSection />
+
+        {/* Create Your Own Custom AI Girl Banner */}
+        <div className="mt-12 w-full rounded-3xl overflow-hidden relative group cursor-pointer border border-white/5 hover:border-white/20 transition-all shadow-2xl" onClick={() => window.location.href = '/premium'}>
+          <img src={customAiBanner} alt="Create AI Girl" className="w-full h-[300px] md:h-[400px] object-cover transition-transform duration-700 group-hover:scale-105" />
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#0a0a0f]/80 to-[#0a0a0f] md:via-[#0a0a0f]/50" />
+          
+          <div className="absolute inset-0 p-8 md:p-16 flex flex-col justify-center items-end text-right">
+            <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight leading-tight mb-6 max-w-lg">
+              Create your own <br />
+              <span className="text-[#e11d48]">AI Companion</span>
+            </h2>
+            
+            <button className="bg-[#e11d48] hover:bg-[#be123c] text-white px-8 py-4 rounded-xl font-bold text-lg md:text-xl transition-all active:scale-95 flex items-center gap-3 shadow-lg shadow-[#e11d48]/20 border border-white/10">
+              <Wand2 size={24} /> Create Your Own AI
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Footer */}
@@ -59,3 +86,8 @@ export default function HomePage() {
     </Layout>
   );
 }
+
+
+
+
+

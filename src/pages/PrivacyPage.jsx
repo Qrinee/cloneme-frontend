@@ -32,7 +32,7 @@ const sections = [
     title: "4. Information Sharing",
     content: "We do not sell your personal information. We may share information with service providers who assist in our operations, when required by law, or to protect our rights. Any data sharing is done with strict confidentiality.",
     icon: User,
-    color: "text-red-400",
+    color: "text-[#e11d48]",
     bg: "bg-red-400/10"
   },
   {
@@ -64,8 +64,8 @@ const sections = [
     title: "8. Children's Privacy",
     content: "Our platform is not intended for children under 18. We do not knowingly collect information from children. If we learn we have collected data from a child, we will delete it immediately.",
     icon: Heart,
-    color: "text-pink-400",
-    bg: "bg-pink-400/10"
+    color: "text-[#e11d48]",
+    bg: "bg-[#e11d48]/10"
   },
   {
     id: "changes",
@@ -82,15 +82,15 @@ export default function PrivacyPage() {
     <Layout>
       <div className="min-h-screen bg-[#0a0a0f] py-20 px-6 relative overflow-hidden">
         {/* Background Decorations */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#741818]/5 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-red-500/5 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#e11d48]/5 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#e11d48]/5 rounded-full blur-[120px] pointer-events-none" />
 
         <div className="max-w-4xl mx-auto relative z-10">
           
           {/* Header */}
           <div className="text-center mb-20">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/5 rounded-full mb-6">
-              <Shield size={14} className="text-[#741818]" />
+              <Shield size={14} className="text-[#e11d48]" />
               <span className="text-[10px] font-bold text-white uppercase tracking-[0.2em]">Privacy Framework</span>
             </div>
             <h1 className="text-6xl font-bold text-white tracking-tighter mb-6">Privacy Policy</h1>
@@ -166,3 +166,8 @@ export default function PrivacyPage() {
     </Layout>
   );
 }
+
+
+
+
+

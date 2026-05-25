@@ -8,7 +8,7 @@ import img2 from '../assets/task_01kmwzmaxbfbtrtm45b78g5cv6_1774794217_img_0.web
 
 export default function PremiumPage() {
   const [searchParams] = useSearchParams();
-  const [selectedPlan, setSelectedPlan] = useState('price_12month');
+  const [selectedPlan, setSelectedPlan] = useState('price_1TKc7ZC3BOlFgA9PiqYYgmMd');
   const [showCheckout, setShowCheckout] = useState(false);
   const isReturning = searchParams.get('return') === 'true';
 
@@ -16,7 +16,13 @@ export default function PremiumPage() {
     if (isReturning) {
       setShowCheckout(false);
     }
-  }, [isReturning]);
+    const planParam = searchParams.get('plan');
+    if (planParam === '1month') {
+      setSelectedPlan('price_1TKaJyC3BOlFgA9PtqmM5YNl');
+    } else if (planParam === '12month') {
+      setSelectedPlan('price_1TKc7ZC3BOlFgA9PiqYYgmMd');
+    }
+  }, [isReturning, searchParams]);
 
   const plans = [
     { title: "1 month", price: "13.99", discount: null, id: 'price_1TKaJyC3BOlFgA9PtqmM5YNl' },
@@ -30,7 +36,9 @@ export default function PremiumPage() {
     "Get 100 FREE tokens / month",
     "Remove image blur",
     "Generate images",
-    "Fast response time",
+    "Create photos 18+",
+    "Create videos 18+",
+    "Instant response",
   ];
 
   return (
@@ -76,72 +84,74 @@ export default function PremiumPage() {
                       key={plan.id}
                       onClick={() => setSelectedPlan(plan.id)}
                       className={`relative border rounded-xl p-4 transition cursor-pointer ${
-                        selectedPlan === plan.id
-                          ? "border-red-500 bg-red-500/10"
-                          : "border-gray-700 bg-[#1b1b24] hover:border-gray-600"
-                      }`}
-                    >
-                      {plan.badge && (
-                        <span className="absolute -top-3 left-3 bg-red-500 text-xs px-2 py-1 rounded font-bold">
-                          {plan.badge}
-                        </span>
-                      )}
+                      selectedPlan === plan.id
+                        ? "border-[#e11d48] bg-[#e11d48]/10"
+                        : "border-gray-700 bg-[#1b1b24] hover:border-gray-600"
+                    }`}
+                  >
+                    {plan.badge && (
+                      <span className="absolute -top-3 left-3 bg-[#e11d48] text-xs px-2 py-1 rounded font-bold">
+                        {plan.badge}
+                      </span>
+                    )}
+                    
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <p className="font-semibold">{plan.title}</p>
+                        {plan.discount && (
+                          <p className="text-xs text-[#e11d48] font-medium">{plan.discount}</p>
+                        )}
+                      </div>
 
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <p className="font-semibold">{plan.title}</p>
-                          {plan.discount && (
-                            <p className="text-xs text-red-400 font-medium">{plan.discount}</p>
-                          )}
-                        </div>
-
-                        <div className="text-right">
-                          {plan.oldPrice && (
-                            <p className="text-sm line-through text-gray-500">
-                              ${plan.oldPrice}
-                            </p>
-                          )}
-                          <p className="text-xl font-bold">${plan.price}</p>
-                        </div>
+                      <div className="text-right">
+                        {plan.oldPrice && (
+                          <p className="text-sm line-through text-gray-500">
+                            ${plan.oldPrice}
+                          </p>
+                        )}
+                        <p className="text-xl font-bold">
+                          ${plan.price} <span className="text-sm font-normal text-gray-400">/ mo</span>
+                        </p>
                       </div>
                     </div>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="mt-6 space-y-3">
+                <button 
+                  onClick={() => setShowCheckout(true)}
+                  className="w-full bg-[#e11d48] hover:bg-[#be123c] transition rounded-xl py-3 font-semibold text-white shadow-lg shadow-red-500/10 cursor-pointer"
+                >
+                  Pay with Credit / Debit Card
+                </button>
+              </div>
+
+              <p className="text-xs text-gray-500 mt-4 text-center">
+                {selectedPlan === 'price_1TKaJyC3BOlFgA9PtqmM5YNl' ? "Monthly billing. Cancel anytime." : selectedPlan === 'price_3month' ? "Quarterly billing. Cancel anytime." : "Annual payment billed as $47.88. Cancel anytime."}
+              </p>
+              <p className="text-xs text-gray-500 mt-2 text-center">
+                Charge shown as "Dyzmas" on your bank statement
+              </p>
+              <p className="text-xs text-gray-500 mt-1 text-center">
+                No hidden fees • Cancel subscription at any time
+              </p>
+            </div>
+            </div>
+
+            {/* Benefits */}
+            <div className="flex flex-col justify-between order-3">
+              <div>
+                <h2 className="text-xl font-bold mb-4">Premium Benefits</h2>
+                <ul className="space-y-3">
+                  {benefits.map((item, i) => (
+                    <li key={i} className="flex items-center gap-3 text-sm">
+                      <div className="w-5 h-5 bg-[#e11d48]/20 rounded-full flex items-center justify-center">
+                        <Check size={12} className="text-[#e11d48]" />
+                      </div>
+                      <span className="text-gray-300">{item}</span>
+                    </li>
                   ))}
-                </div>
-                
-                <div className="mt-6 space-y-3">
-                  <button 
-                    onClick={() => setShowCheckout(true)}
-                    className="w-full bg-red-500 hover:bg-red-600 transition rounded-xl py-3 font-semibold"
-                  >
-                    Pay with Credit / Debit Card
-                  </button>
-                </div>
-
-                <p className="text-xs text-gray-500 mt-4 text-center">
-                  {selectedPlan === 'price_1TKaJyC3BOlFgA9PtqmM5YNl' ? "Monthly billing. Cancel anytime." : selectedPlan === 'price_3month' ? "Quarterly billing. Cancel anytime." : "Annual payment billed as $47.88. Cancel anytime."}
-                </p>
-                <p className="text-xs text-gray-500 mt-2 text-center">
-                  Charge shown as 'EverAI' on your bank statement
-                </p>
-                <p className="text-xs text-gray-500 mt-1 text-center">
-                  No hidden fees • Cancel subscription at any time
-                </p>
-              </div>
-              </div>
-
-              {/* Benefits */}
-              <div className="flex flex-col justify-between order-3">
-                <div>
-                  <h2 className="text-xl font-bold mb-4">Premium Benefits</h2>
-                  <ul className="space-y-3">
-                    {benefits.map((item, i) => (
-                      <li key={i} className="flex items-center gap-3 text-sm">
-                        <div className="w-5 h-5 bg-red-500/20 rounded-full flex items-center justify-center">
-                          <Check size={12} className="text-red-400" />
-                        </div>
-                        <span className="text-gray-300">{item}</span>
-                      </li>
-                    ))}
                   </ul>
                 </div>
 
@@ -161,3 +171,8 @@ export default function PremiumPage() {
     </Layout>
   );
 }
+
+
+
+
+

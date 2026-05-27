@@ -371,7 +371,7 @@ export default function CreateGirlPage() {
 
         {/* --- MAIN CREATION PANEL --- */}
         {step <= 5 && (
-          <div className="max-w-3xl w-full text-center z-10 flex flex-col items-center pb-24 md:pb-0">
+          <div className="max-w-4xl w-full text-center z-10 flex flex-col items-center pb-24 md:pb-0">
 
             {/* Top progress tracker */}
             <div className="w-full max-w-xl mb-6 md:mb-12">
@@ -425,7 +425,7 @@ export default function CreateGirlPage() {
                   </div>
 
                   {/* Art Styles Grid */}
-                  <div className="grid grid-cols-2 gap-4 md:gap-6 w-full max-w-lg mx-auto">
+                  <div className="grid grid-cols-2 gap-4 md:gap-6 w-full max-w-lg md:max-w-2xl mx-auto">
                     {STYLES.map((style) => {
                       const isSelected = artStyle === style.id;
                       return (
@@ -459,7 +459,7 @@ export default function CreateGirlPage() {
 
               {/* Step 2: Basic Portrait (Ethnicity & Age) */}
               {step === 2 && (
-                <div className="space-y-6 md:space-y-8 w-full max-w-xl mx-auto animate-in fade-in duration-300">
+                <div className="space-y-6 md:space-y-8 w-full max-w-xl md:max-w-3xl mx-auto animate-in fade-in duration-300">
                   <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight">Basic Portrait</h2>
 
                   {/* Field 1: Ethnicity */}
@@ -524,7 +524,7 @@ export default function CreateGirlPage() {
 
               {/* Step 3: Hair & Eyes (Hairstyle, Hair Color & Eye Color) */}
               {step === 3 && (
-                <div className="space-y-6 md:space-y-8 w-full max-w-2xl mx-auto animate-in fade-in duration-300">
+                <div className="space-y-6 md:space-y-8 w-full max-w-2xl md:max-w-4xl mx-auto animate-in fade-in duration-300">
                   <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight">Hair & Eyes</h2>
 
                   {/* Field 1: Hairstyle */}
@@ -616,7 +616,7 @@ export default function CreateGirlPage() {
 
               {/* Step 4: Body Details (Body Type & Breast Size) */}
               {step === 4 && (
-                <div className="space-y-6 md:space-y-8 w-full max-w-xl mx-auto animate-in fade-in duration-300">
+                <div className="space-y-6 md:space-y-8 w-full max-w-xl md:max-w-3xl mx-auto animate-in fade-in duration-300">
                   <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight">Body Details</h2>
 
                   {/* Field 1: Body Type */}
@@ -680,7 +680,7 @@ export default function CreateGirlPage() {
 
               {/* Step 5: Identity & Personality (Name, Relationship & Personality Traits) */}
               {step === 5 && (
-                <div className="space-y-6 md:space-y-8 w-full max-w-xl mx-auto animate-in fade-in duration-300">
+                <div className="space-y-6 md:space-y-8 w-full max-w-xl md:max-w-3xl mx-auto animate-in fade-in duration-300">
                   <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight">Identity & Personality</h2>
 
                   {/* Field 1: Name */}

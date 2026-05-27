@@ -1,20 +1,15 @@
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthFetch } from "../utils/authFetch";
 import Layout from "../components/Layout";
-import DialogPremium from "../components/DialogPremium";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import Content from "../components/Content";
 import { useLayoutContext } from "../components/LayoutContext";
-import PaywallDialog from "../components/PaywallDialog";
-import { 
-  ArrowRight, ArrowLeft, Heart, Sparkles, Wand2, 
-  Eye, Smile, User, MessageCircle, Play, Lock, Crown,
-  Check, ChevronRight, Palette, Gem, Music, Camera, Star,
-  Droplets, Sun, Moon, Flame, Snowflake, Wind
+import StripeEmbeddedCheckout from "../components/StripeEmbeddedCheckout";
+import {
+  ArrowRight, ArrowLeft, Heart, Sparkles, User, MessageCircle, Lock, Crown, Check, X,
+  Flame, Gem, Infinity as InfinityIcon, Shield, Sparkle
 } from "lucide-react";
 
-
-
+// Asset Imports
 import africanEthnicity from '../assets/create/ethnicity/african.png';
 import asianEthnicity from '../assets/create/ethnicity/asian.png';
 import europeanEthnicity from '../assets/create/ethnicity/european.png';
@@ -28,775 +23,1107 @@ import blackHair from '../assets/create/hair/black.png';
 import pinkHair from '../assets/create/hair/pink.png';
 import silverHair from '../assets/create/hair/silver.png';
 
-import hazelEyes from '../assets/create/eyes/hazel.png'
-import blueEyes from '../assets/create/eyes/blue.png'
-import greenEyes from '../assets/create/eyes/green.png'
-import brownEyes from '../assets/create/eyes/brown.png'
-import purpleEyes from '../assets/create/eyes/purple.png'
-import blackEyes from '../assets/create/eyes/black.png'
+import hazelEyes from '../assets/create/eyes/hazel.png';
+import blueEyes from '../assets/create/eyes/blue.png';
+import greenEyes from '../assets/create/eyes/green.png';
+import brownEyes from '../assets/create/eyes/brown.png';
+import purpleEyes from '../assets/create/eyes/purple.png';
+import blackEyes from '../assets/create/eyes/black.png';
 
 import athleticBody from '../assets/create/body/athletic.png';
 import curvyBody from '../assets/create/body/curvy.png';
 import petiteBody from '../assets/create/body/petite.png';
 import slimBody from '../assets/create/body/slim.png';
 import thickBody from '../assets/create/body/thick.png';
-import { useEffect, useState } from "react";
 
+import realisticGirlImg from '../assets/realistic_girl_preview.png';
+import animeGirlImg from '../assets/anime_girl_preview.png';
 
-const steps = [
-  { id: 1, title: "Hair", icon: Sparkles },
-  { id: 2, title: "Eyes", icon: Eye },
-  { id: 3, title: "Body", icon: User },
-  { id: 4, title: "Ethnicity", icon: Gem },
-  { id: 5, title: "Info", icon: User },
-  { id: 6, title: "Personality", icon: Smile },
-  { id: 7, title: "Preview", icon: Sparkles },
-];
-
-
-const hairColors = [
-  { value: "brunette", label: "Brunette", image: brownHair },
-  { value: "blonde", label: "Blonde", image: blondeHair },
-  { value: "redhead", label: "Redhead", image: redHair },
-  { value: "black", label: "Black", image: blackHair },
-  { value: "pink", label: "Pink", image: pinkHair },
-  { value: "silver", label: "Silver", image: silverHair },
-];
-
-const actions = [
-  { _id: "kiss", label: "Kiss", messagesNeeded: 5, premium: false },
-  { _id: "hug", label: "Hug", messagesNeeded: 5, premium: false },
-  { _id: "flirt", label: "Flirt", messagesNeeded: 10, premium: false },
-  { _id: "dance", label: "Dance", messagesNeeded: 15, premium: true },
-  { _id: "sing", label: "Sing", messagesNeeded: 20, premium: true },
-  { _id: "joke", label: "Tell a Joke", messagesNeeded: 10, premium: false },
-  { _id: "compliment", label: "Give Compliment", messagesNeeded: 10, premium: false },
-  { _id: "confess", label: "Confess Love", messagesNeeded: 50, premium: true },
-  { _id: "roleplay", label: "Roleplay Scenario", messagesNeeded: 30, premium: true },
-  { _id: "custommessage", label: "Custom Message", messagesNeeded: 20, premium: false },
-];
-
-
-const tags = [
-  { _id: "sensual", label: "Sensual" },
-  { _id: "romantic", label: "Romantic" },
-  { _id: "flirty", label: "Flirty" },
-  { _id: "cute", label: "Cute" },
-  { _id: "shy", label: "Shy" },
-  { _id: "teasing", label: "Teasing" },
-  { _id: "experienced", label: "Experienced" },
-  { _id: "bold", label: "Bold" },
-  { _id: "daring", label: "Daring" },
-]
-
-const eyeColors = [
-  { value: "blue", label: "Blue", image: blueEyes },
-  { value: "green", label: "Green", image: greenEyes },
-  { value: "brown", label: "Brown", image: brownEyes },
-  { value: "hazel", label: "Hazel", image: hazelEyes },
-  { value: "purple", label: "Purple", image: purpleEyes },
-  { value: "black", label: "Black", image: blackEyes },
-];
-
-const relationshipOptions = [
-  { value: "girlfriend", label: "Girlfriend" },
-  { value: "sexfriend", label: "Sex Friend" },
-  { value: "schoolmate", label: "School Mate" },
-  { value: "workcolleague", label: "Work Colleague" },
-  { value: "wife", label: "Wife" },
-  { value: "stranger", label: "Stranger" },
-  { value: "mistress", label: "Mistress" },
-  { value: "friend", label: "Friend" },
-  { value: "stepsister", label: "Step Sister" },
-  { value: "stepmom", label: "Step Mom" }
-];
-const bodyTypes = [
-  { value: "slim", label: "Slim & Toned", image: slimBody },
-  { value: "curvy", label: "Curvy & Sexy", image: curvyBody },
-  { value: "athletic", label: "Athletic", image: athleticBody },
-  { value: "petite", label: "Petite & Cute", image: petiteBody },
-  { value: "thick", label: "Thick & Juicy", image: thickBody },
-];
-
-const ethnicities = [
+// Survey Data Lists (English Translation)
+const ETHNICITIES = [
   { value: "asian", label: "Asian", image: asianEthnicity },
   { value: "latina", label: "Latina", image: latinaEthnicity },
   { value: "european", label: "European", image: europeanEthnicity },
   { value: "african", label: "African", image: africanEthnicity },
   { value: "arabic", label: "Middle Eastern", image: arabicEthnicity },
-
 ];
 
+const HAIRSTYLES = [
+  { value: "short", label: "Short", gradient: "from-rose-500/20 to-pink-500/20" },
+  { value: "bob", label: "Bob", gradient: "from-purple-500/20 to-indigo-500/20" },
+  { value: "medium", label: "Medium", gradient: "from-blue-500/20 to-cyan-500/20" },
+  { value: "long", label: "Long", gradient: "from-emerald-500/20 to-teal-500/20" },
+  { value: "wavy", label: "Wavy", gradient: "from-amber-500/20 to-orange-500/20" },
+  { value: "curly", label: "Curly", gradient: "from-fuchsia-500/20 to-violet-500/20" }
+];
 
+const HAIR_COLORS = [
+  { value: "blonde", label: "Blonde", image: blondeHair },
+  { value: "brunette", label: "Brown", image: brownHair },
+  { value: "black", label: "Black", image: blackHair },
+  { value: "redhead", label: "Redhead", image: redHair },
+  { value: "pink", label: "Pink", image: pinkHair },
+  { value: "silver", label: "Silver", image: silverHair },
+];
 
-// Image Tile Component
-function ImageTile({ item, isSelected, onClick }) {
-  return (
-    <button
-      onClick={onClick}
-      className={`
-        relative overflow-hidden rounded-3xl aspect-[3/4] transition-all duration-500
-        border-2 ${isSelected ? 'border-[#e11d48]' : 'border-transparent opacity-60 hover:opacity-100'}
-      `}
-    >
-      <img 
-        src={item.image} 
-        alt={item.label}
-        className="w-full h-full object-cover"
-      />
-      <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-[#0a0a0f] to-transparent">
-        <span className="text-white font-bold text-sm tracking-tight">{item.label}</span>
-      </div>
+const EYE_COLORS = [
+  { value: "blue", label: "Blue", image: blueEyes },
+  { value: "green", label: "Green", image: greenEyes },
+  { value: "brown", label: "Brown", image: brownEyes },
+  { value: "hazel", label: "Hazel", image: hazelEyes },
+  { value: "black", label: "Black", image: blackEyes },
+  { value: "purple", label: "Purple", image: purpleEyes },
+];
 
-      {isSelected && (
-        <div className="absolute top-4 right-4 w-8 h-8 bg-[#e11d48] rounded-full flex items-center justify-center">
-          <Check className="w-5 h-5 text-white" />
-        </div>
-      )}
-    </button>
-  );
-}
+const BODY_TYPES = [
+  { value: "slim", label: "Slim", image: slimBody },
+  { value: "curvy", label: "Curvy", image: curvyBody },
+  { value: "athletic", label: "Athletic", image: athleticBody },
+  { value: "petite", label: "Petite", image: petiteBody },
+  { value: "thick", label: "Thick", image: thickBody },
+];
 
-// Age Slider Component
-function AgeSlider({ value, onChange }) {
-  return (
-    <div className="w-full py-6">
-      <div className="flex justify-between items-center mb-6">
-        <span className="text-white/40 text-[10px] font-bold uppercase tracking-widest">Target Age</span>
-        <div className="flex items-center gap-2">
-          <span className="text-4xl font-bold text-white tracking-tighter">{value}</span>
-          <span className="text-white/20 text-xs font-medium">years</span>
-        </div>
-      </div>
-      
-      <div className="relative h-2 bg-white/5 rounded-full">
-        <div 
-          className="absolute inset-y-0 left-0 bg-[#e11d48] rounded-full"
-          style={{ width: `${((value - 18) / (35 - 18)) * 100}%` }}
-        />
-        <input
-          type="range"
-          min={18}
-          max={35}
-          value={value}
-          onChange={(e) => onChange(parseInt(e.target.value))}
-          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-        />
-      </div>
-      
-      <div className="flex justify-between mt-4 text-[10px] font-bold text-white/10 tracking-widest uppercase">
-        <span>18</span>
-        <span>35</span>
-      </div>
-    </div>
-  );
-}
+const BREAST_SIZES = [
+  { value: "small", label: "Small", sizeText: "A-B" },
+  { value: "medium", label: "Medium", sizeText: "C-D" },
+  { value: "large", label: "Large", sizeText: "DD-E" },
+  { value: "extra_large", label: "Very Large", sizeText: "F+" }
+];
+
+const PERSONALITY_TRAITS = [
+  { value: "sensual", label: "Sensual" },
+  { value: "romantic", label: "Romantic" },
+  { value: "flirty", label: "Flirty" },
+  { value: "cute", label: "Cute" },
+  { value: "shy", label: "Shy" },
+  { value: "teasing", label: "Teasing" },
+  { value: "experienced", label: "Experienced" },
+  { value: "bold", label: "Bold" },
+  { value: "daring", label: "Daring" }
+];
+
+const RELATIONSHIPS = [
+  { value: "girlfriend", label: "Girlfriend" },
+  { value: "friend", label: "Friend" },
+  { value: "wife", label: "Wife" },
+  { value: "mistress", label: "Mistress" },
+  { value: "stranger", label: "Stranger" },
+  { value: "workcolleague", label: "Work colleague" }
+];
+
+// Random Name Suggestions
+const RANDOM_GIRL_NAMES = ["Emma", "Olivia", "Sophia", "Isabella", "Mia", "Charlotte", "Amelia", "Harper", "Evelyn", "Abigail", "Emily", "Elizabeth", "Avery", "Ella", "Madison", "Scarlett", "Victoria", "Chloe", "Camila", "Penelope", "Zoey", "Layla", "Riley"];
+const RANDOM_TRANS_NAMES = ["Ashley", "Nicole", "Maya", "Clara", "Zara", "Daisy", "Alice", "Lily", "Sophie", "Chloe", "Stella", "Luna", "Ruby", "Violet", "Elena"];
 
 export default function CreateGirlPage() {
   const navigate = useNavigate();
   const authFetch = useAuthFetch();
-  const { updateUser, premium, canCreateGirlfriend, setCanCreateGirlfriend, lastGirlfriendCreated, setLastGirlfriendCreated, isLoggedIn } = useLayoutContext();
-  
-  const getInitialState = () => {
-    const saved = localStorage.getItem('createGirlState');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        return { currentStep: parsed.currentStep || 1, formData: parsed.formData };
-      } catch (e) {
-        return { currentStep: 1, formData: null };
-      }
-    }
-    return { currentStep: 1, formData: null };
-  };
-  
-  const initialState = getInitialState();
-  const [currentStep, setCurrentStep] = useState(initialState.currentStep);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formData, setFormData] = useState(initialState.formData || {
-    hairColor: null,
-    eyeColor: null,
-    bodyType: null,
-    ethnicity: null,
-    name: '',
-    age: 18,
-    bio: '',
-    relationship: null,
-    initialMessage: '',
-    tags: [],
-    actions: [],
-  });
-  const [notification, setNotification] = useState(null);
-  const [showPremiumDialog, setShowPremiumDialog] = useState(false);
+  const { premium, isLoggedIn } = useLayoutContext();
+
+  // Wizard state: 1 to 11 = Survey steps. 12 = Loading preparation. 13 = Summary page
+  const [step, setStep] = useState(1);
+
+  // Selection States
+  const [gender, setGender] = useState("girls"); // girls | trans
+  const [artStyle, setArtStyle] = useState(null); // realistic | anime
+  const [ethnicity, setEthnicity] = useState(null);
+  const [age, setAge] = useState(18);
+  const [hairstyle, setHairstyle] = useState(null);
+  const [hairColor, setHairColor] = useState(null);
+  const [eyeColor, setEyeColor] = useState(null);
+  const [bodyType, setBodyType] = useState(null);
+  const [breastSize, setBreastSize] = useState(null);
+  const [name, setName] = useState("");
+  const [selectedTraits, setSelectedTraits] = useState([]);
+  const [relationship, setRelationship] = useState(null);
+
+  // Loading generation state
+  const [progress, setProgress] = useState(0);
+  const [loadingText, setLoadingText] = useState("Initializing connection...");
   const [previewImage, setPreviewImage] = useState(null);
-  const [generatingPreview, setGeneratingPreview] = useState(false);
-  const [previewProgress, setPreviewProgress] = useState(0);
+  const [savedGirlfriendId, setSavedGirlfriendId] = useState(null);
 
-  const clearSavedState = () => {
-    localStorage.removeItem('createGirlState');
+  // Overlay / Payment Dialog States
+  const [showPremiumOverlay, setShowPremiumOverlay] = useState(false);
+  const [premiumView, setPremiumView] = useState("benefits"); // benefits | plans | checkout
+  const [checkoutPlanId, setCheckoutPlanId] = useState(null);
+
+  // Set default random name based on selected gender
+  useEffect(() => {
+    if (!name) {
+      const list = gender === "trans" ? RANDOM_TRANS_NAMES : RANDOM_GIRL_NAMES;
+      const randomName = list[Math.floor(Math.random() * list.length)];
+      setName(randomName);
+    }
+  }, [gender]);
+
+  // Handle survey step progression
+  const nextStep = () => {
+    if (step === 1 && !artStyle) return;
+    if (step === 2 && !ethnicity) return;
+    if (step === 4 && !hairstyle) return;
+    if (step === 5 && !hairColor) return;
+    if (step === 6 && !eyeColor) return;
+    if (step === 7 && !bodyType) return;
+    if (step === 8 && !breastSize) return;
+    if (step === 9 && !name.trim()) return;
+    if (step === 10 && selectedTraits.length === 0) return;
+    if (step === 11 && !relationship) return;
+
+    if (step === 11) {
+      startGeneration();
+    } else {
+      setStep(prev => prev + 1);
+    }
   };
 
-  useEffect(() => {
-    const state = { currentStep, formData };
-    localStorage.setItem('createGirlState', JSON.stringify(state));
-  }, [currentStep, formData]);
+  const prevStep = () => {
+    setStep(prev => Math.max(1, prev - 1));
+  };
 
-  useEffect(() => {
-    if (window.pendingGirlfriendData) {
-      try {
-        const pendingData = JSON.parse(window.pendingGirlfriendData);
-        if (pendingData) {
-          setFormData(pendingData);
-          window.pendingGirlfriendData = null;
+  // Toggle trait select
+  const handleTraitToggle = (val) => {
+    setSelectedTraits(prev =>
+      prev.includes(val) ? prev.filter(t => t !== val) : [...prev, val]
+    );
+  };
+
+  // Start AI generation process (step 12)
+  const startGeneration = async () => {
+    setStep(12);
+    setProgress(0);
+    setLoadingText("Creating your AI companion...");
+    setPreviewImage(null); // Reset preview image to avoid showing old images
+
+    // 1. Kick off preview generation in background
+    let generatedImage = null;
+    let apiCompleted = false;
+    const bioText = `I am ${name}, I am ${age} years old, I am interested in many things and looking for someone to talk to.`;
+    const initialMsg = `Hi! I am really happy we can talk. How are you doing today?`;
+
+    const previewPayload = {
+      name,
+      age,
+      hairColor,
+      eyeColor,
+      bodyType,
+      ethnicity,
+      bio: bioText,
+      relationship,
+      tags: selectedTraits,
+      gender,
+      style: artStyle
+    };
+
+    const apiUrl = import.meta.env.VITE_API_URL || '/api/v1';
+
+    // Fire background preview image request
+    fetch(`${apiUrl}/girlfriends/preview`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(previewPayload)
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.type === "success" && data.previewImage) {
+          const fullUrl = data.previewImage.startsWith("/uploads/")
+            ? `${import.meta.env.VITE_API_URL?.replace('/api/v1', '') || 'http://localhost:3000'}${data.previewImage}`
+            : data.previewImage;
+
+          // Preload the image in browser cache
+          const img = new Image();
+          img.src = fullUrl;
+          img.onload = () => {
+            generatedImage = data.previewImage;
+            setPreviewImage(data.previewImage);
+            apiCompleted = true;
+          };
+          img.onerror = () => {
+            console.error("Failed to preload generated image, falling back");
+            generatedImage = data.previewImage;
+            setPreviewImage(data.previewImage);
+            apiCompleted = true;
+          };
+        } else {
+          apiCompleted = true;
         }
-      } catch (e) {
-        console.error('Error parsing pending girlfriend data:', e);
+      })
+      .catch(err => {
+        apiCompleted = true;
+        console.error("Failed to generate preview image in bg:", err);
+      });
+
+    // 2. Perform loading progress ticks (takes ~6-8 seconds)
+    const progressSteps = [
+      { val: 20, text: "Shaping facial features..." },
+      { val: 45, text: "Styling hair and matching aesthetics..." },
+      { val: 70, text: "Designing wardrobe..." },
+      { val: 90, text: "Learning personality patterns..." }
+    ];
+
+    let currentProgress = 0;
+    let stepIdx = 0;
+
+    const interval = setInterval(() => {
+      currentProgress += 1;
+
+      if (stepIdx < progressSteps.length && currentProgress >= progressSteps[stepIdx].val) {
+        setLoadingText(progressSteps[stepIdx].text);
+        stepIdx++;
       }
-    }
-  }, []);
 
-  useEffect(() => {
-    const hasGeneratedPreview = localStorage.getItem('previewGenerated');
-    const savedPreview = localStorage.getItem('previewImage');
-    
-    if (currentStep === 7 && !previewImage && !generatingPreview) {
-      if (hasGeneratedPreview && savedPreview) {
-        setPreviewImage(savedPreview);
-        setGeneratingPreview(false);
-      } else if (!hasGeneratedPreview) {
-        const generatePreview = async () => {
-          setGeneratingPreview(true);
-          setPreviewProgress(0);
-          
-          const progressInterval = setInterval(() => {
-            setPreviewProgress(prev => Math.min(prev + Math.random() * 15, 90));
-          }, 300);
-          
-          try {
-            const apiUrl = import.meta.env.VITE_API_URL || '/api/v1';
-            const res = await fetch(`${apiUrl}/girlfriends/preview`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(formData)
-            });
-            const data = await res.json();
-            
-            clearInterval(progressInterval);
-            setPreviewProgress(100);
-            
-            if (data.type === "success" && data.previewImage) {
-              setPreviewImage(data.previewImage);
-              localStorage.setItem('previewGenerated', 'true');
-              localStorage.setItem('previewImage', data.previewImage);
-            }
-          } catch (err) {
-            console.error('Preview error:', err);
-          } finally {
-            setGeneratingPreview(false);
-          }
-        };
-        
-        generatePreview();
+      if (currentProgress >= 98) {
+        if (!apiCompleted) {
+          setProgress(98);
+          setLoadingText("Finishing character portrait...");
+          return;
+        }
+
+        clearInterval(interval);
+        setProgress(100);
+        setLoadingText("Ready!");
+
+        // Save default fallback image if background preview did not complete
+        if (!generatedImage) {
+          setPreviewImage(artStyle === "anime" ? animeGirlImg : realisticGirlImg);
+        }
+
+        // Transition to summary page (step 13)
+        setTimeout(() => {
+          setStep(13);
+        }, 500);
+        return;
       }
+
+      setProgress(currentProgress);
+    }, 65);
+  };
+
+  // Final Action: Revive / Start chatting
+  const handleOżyw = async () => {
+    const chosenPayload = {
+      name,
+      age,
+      hairColor,
+      eyeColor,
+      bodyType,
+      ethnicity,
+      gender,
+      style: artStyle,
+      relationship,
+      tags: selectedTraits,
+      bio: `I am ${name}, I am ${age} years old, I am interested in many things and looking for someone to talk to.`,
+      initialMessage: `Hi! I am really happy we can talk. How are you doing today?`,
+      actions: ["kiss", "hug", "flirt", "dance"]
+    };
+
+    localStorage.setItem('pendingGirlfriendCreation', JSON.stringify(chosenPayload));
+
+    // Check if user is logged in AND is premium
+    const isPremiumActive = isLoggedIn && premium?.isActive &&
+      (!premium?.expiresAt || new Date(premium.expiresAt) > new Date());
+
+    if (!isPremiumActive) {
+      // Show premium features checklist overlay (Overlay 1)
+      setPremiumView("benefits");
+      setShowPremiumOverlay(true);
+      return;
     }
-  }, [currentStep, previewImage, generatingPreview]);
 
+    // User is premium! Proceed to save girlfriend in DB and redirect
+    try {
+      setStep(12);
+      setProgress(50);
+      setLoadingText("Saving your character to database...");
 
-  const updateFormData = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
+      const apiUrl = import.meta.env.VITE_API_URL || '/api/v1';
+      const res = await authFetch(`${apiUrl}/girlfriends`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(chosenPayload)
+      });
+      const data = await res.json();
 
-  const toggleTag = (tag) => {
-    setFormData(prev => ({
-      ...prev,
-      tags: (prev.tags || []).includes(tag) 
-        ? prev.tags.filter(t => t !== tag)
-        : [...prev.tags, tag]
-    }));
-  };
-
-  const toggleAction = (actionId) => {
-    setFormData(prev => ({
-      ...prev,
-      actions: (prev.actions || []).includes(actionId)
-        ? prev.actions.filter(id => id !== actionId)
-        : [...prev.actions, actionId]
-    }));
-  };
-
-  const canProceed = () => {
-    switch(currentStep) {
-      case 1: return formData.hairColor;
-      case 2: return formData.eyeColor;
-      case 3: return formData.bodyType;
-      case 5: return formData.name && formData.age && formData.bio;
-      case 6: return formData.relationship && formData.initialMessage;
-      case 7: return true; // Preview step - always valid
-      default: return true;
-    }
-  };
-
-  const renderStep = () => {
-    switch(currentStep) {
-      case 1:
-        return (
-          <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="text-center">
-              <h2 className="text-4xl font-bold text-white tracking-tighter">Hair Aesthetics</h2>
-              <p className="text-white/30 mt-2 font-medium">Select the signature style for your companion.</p>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-              {hairColors.map((color) => (
-                <ImageTile
-                  key={color.value}
-                  item={color}
-                  isSelected={formData.hairColor === color.value}
-                  onClick={() => updateFormData("hairColor", color.value)}
-                />
-              ))}
-            </div>
-          </div>
-        );
-
-      case 2:
-        return (
-          <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="text-center">
-              <h2 className="text-4xl font-bold text-white tracking-tighter">Ocular Hue</h2>
-              <p className="text-white/30 mt-2 font-medium">Choose the depth and color of her gaze.</p>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-              {eyeColors.map((color) => (
-                <ImageTile
-                  key={color.value}
-                  item={color}
-                  isSelected={formData.eyeColor === color.value}
-                  onClick={() => updateFormData("eyeColor", color.value)}
-                />
-              ))}
-            </div>
-          </div>
-        );
-
-      case 3:
-        return (
-          <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="text-center">
-              <h2 className="text-4xl font-bold text-white tracking-tighter">Physique Type</h2>
-              <p className="text-white/30 mt-2 font-medium">Define the silhouette of your perfect match.</p>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-              {bodyTypes.map((type) => (
-                <ImageTile
-                  key={type.value}
-                  item={type}
-                  isSelected={formData.bodyType === type.value}
-                  onClick={() => updateFormData("bodyType", type.value)}
-                />
-              ))}
-            </div>
-          </div>
-        );
-
-      case 4:
-        return (
-          <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="text-center">
-              <h2 className="text-4xl font-bold text-white tracking-tighter">Ethnicity</h2>
-              <p className="text-white/30 mt-2 font-medium">Optionally define her heritage and background.</p>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-              {ethnicities.map((eth) => (
-                <ImageTile
-                  key={eth.value}
-                  item={eth}
-                  isSelected={formData.ethnicity === eth.value}
-                  onClick={() => updateFormData("ethnicity", eth.value)}
-                />
-              ))}
-            </div>
-            <button
-              onClick={() => setCurrentStep(prev => prev + 1)}
-              className="w-full py-6 text-white/30 hover:text-white uppercase text-[10px] font-bold tracking-[0.2em] transition-all"
-            >
-              Skip this discovery
-            </button>
-          </div>
-        );
-
-      case 5:
-        return (
-          <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="text-center">
-              <h2 className="text-4xl font-bold text-white tracking-tighter">Identity</h2>
-              <p className="text-white/30 mt-2 font-medium">Provide a name and a narrative for her essence.</p>
-            </div>
-            <div className="space-y-8">
-              <div className="space-y-3">
-                <label className="text-white/40 text-[10px] font-bold uppercase tracking-widest block ml-1">Designation</label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => updateFormData("name", e.target.value)}
-                  placeholder="Enter her name..."
-                  className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-5 text-white placeholder-white/20 focus:outline-none focus:border-[#e11d48] transition-all text-xl font-bold tracking-tight"
-                />
-              </div>
-
-              <AgeSlider
-                value={formData.age}
-                onChange={(value) => updateFormData("age", value)}
-              />
-
-              <div className="space-y-3">
-                <label className="text-white/40 text-[10px] font-bold uppercase tracking-widest block ml-1">Narrative</label>
-                <textarea
-                  value={formData.bio}
-                  onChange={(e) => updateFormData("bio", e.target.value)}
-                  placeholder="What is her story?"
-                  rows={4}
-                  className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-5 text-white placeholder-white/20 focus:outline-none focus:border-[#e11d48] transition-all resize-none leading-relaxed font-medium"
-                />
-              </div>
-            </div>
-          </div>
-        );
-
-      case 6:
-        return (
-          <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="text-center">
-              <h2 className="text-4xl font-bold text-white tracking-tighter">Personality</h2>
-              <p className="text-white/30 mt-2 font-medium">Fine-tune her behavior and initial reception.</p>
-            </div>
-            <div className="space-y-10">
-              <div className="space-y-4">
-                <label className="text-white/40 text-[10px] font-bold uppercase tracking-widest block ml-1">Core Traits</label>
-                <div className="flex flex-wrap gap-3">
-                  {tags.map((tag) => (
-                    <button
-                      key={tag._id}
-                      onClick={() => toggleTag(tag._id)}
-                      className={`px-6 py-3.5 rounded-2xl font-bold text-xs tracking-tight transition-all border ${
-                        (formData.tags || []).includes(tag._id)
-                          ? 'bg-[#e11d48] border-[#e11d48] text-white'
-                          : 'bg-white/5 border-white/5 text-white/40 hover:text-white hover:border-white/10'
-                      }`}
-                    >
-                      {tag.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <label className="text-white/40 text-[10px] font-bold uppercase tracking-widest block ml-1">Relationship</label>
-                <div className="flex flex-wrap gap-3">
-                  {relationshipOptions.map((option) => (
-                    <button
-                      key={option.value}
-                      onClick={() => updateFormData("relationship", option.value)}
-                      className={`px-6 py-3.5 rounded-2xl font-bold text-xs tracking-tight transition-all border ${
-                        formData.relationship === option.value
-                          ? 'bg-[#e11d48] border-[#e11d48] text-white'
-                          : 'bg-white/5 border-white/5 text-white/40 hover:text-white hover:border-white/10'
-                      }`}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <label className="text-white/40 text-[10px] font-bold uppercase tracking-widest block ml-1">Opening Reception</label>
-                <textarea
-                  value={formData.initialMessage}
-                  onChange={(e) => updateFormData("initialMessage", e.target.value)}
-                  placeholder="The first words she will speak..."
-                  rows={3}
-                  className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-5 text-white placeholder-white/20 focus:outline-none focus:border-[#e11d48] transition-all resize-none leading-relaxed font-medium"
-                />
-              </div>
-            </div>
-          </div>
-        );
-
-      case 7:
-        return (
-          <div className="space-y-6 md:space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="text-center">
-              <h2 className="text-2xl md:text-4xl font-bold text-white tracking-tighter">
-                {generatingPreview ? "Creating Your Girl" : "Synthesis Complete"}
-              </h2>
-              <p className="text-white/30 mt-2 font-medium text-sm md:text-base">
-                {generatingPreview ? "Please wait while we bring her to life..." : "Review the essence of your creation."}
-              </p>
-            </div>
-
-            {generatingPreview ? (
-              <div className="bg-white/5 rounded-[2rem] md:rounded-[2.5rem] p-8 md:p-12 border border-white/5">
-                <div className="text-center space-y-6">
-                  <div className="relative w-32 h-32 mx-auto">
-                    <div className="absolute inset-0 rounded-full border-4 border-white/10"></div>
-                    <div 
-                      className="absolute inset-0 rounded-full border-4 border-[#e11d48] border-t-transparent animate-spin"
-                      style={{ animationDuration: '1s' }}
-                    ></div>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-2xl font-bold text-white">{Math.round(previewProgress)}%</span>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <p className="text-white/60 text-sm">Generating portrait...</p>
-                    <div className="h-1 bg-white/10 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-[#e11d48] rounded-full transition-all duration-300"
-                        style={{ width: `${previewProgress}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                  <p className="text-white/30 text-xs">This may take a few seconds</p>
-                </div>
-              </div>
-            ) : (
-              <div className="bg-white/5 rounded-[2rem] md:rounded-[2.5rem] p-4 md:p-8 border border-white/5">
-                <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6 mb-6 md:mb-8">
-                  {previewImage ? (
-                    <img 
-                      src={`${import.meta.env.VITE_API_URL?.replace('/api/v1', '') || 'http://localhost:3000'}${previewImage}`}
-                      alt={formData.name} 
-                      className="w-32 h-32 md:w-48 md:h-48 rounded-2xl object-cover border-2 border-white/10"
-                    />
-                  ) : (
-                    <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-white/5 border border-white/10 flex items-center justify-center relative overflow-hidden flex-shrink-0">
-                      <User className="w-8 h-8 md:w-10 md:h-10 text-white/20" />
-                    </div>
-                  )}
-                  <div className="text-center md:text-left">
-                    <h3 className="text-xl md:text-3xl font-bold text-white tracking-tighter">{formData.name || "Nameless Essence"}</h3>
-                    <p className="text-white/40 font-bold text-xs uppercase tracking-widest mt-1">
-                      {formData.age} Years Old • {formData.ethnicity || "Unknown origin"} • {formData.relationship || "Relationship undefined"}
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-3 gap-2 md:gap-4 mb-6 md:mb-8">
-                  {[
-                    { label: "Visual", val: formData.hairColor },
-                    { label: "Gaze", val: formData.eyeColor },
-                    { label: "Physique", val: formData.bodyType }
-                  ].map((stat, i) => (
-                    <div key={i} className="bg-white/5 rounded-xl md:rounded-2xl p-2 md:p-4 border border-white/5 text-center">
-                      <span className="text-[8px] md:text-[10px] font-bold text-white/20 uppercase tracking-widest block mb-1">{stat.label}</span>
-                      <p className="text-white text-sm md:text-base font-bold tracking-tight capitalize">{stat.val || "—"}</p>
-                    </div>
-                  ))}
-                </div>
-                
-                <div className="space-y-4 md:space-y-6">
-                  <div className="p-4 md:p-6 bg-white/5 rounded-xl md:rounded-2xl border border-white/5 italic text-white/70 leading-relaxed font-medium text-sm md:text-base">
-                    "{formData.bio || "Her story remains unwritten..."}"
-                  </div>
-                  
-                  <div className="flex flex-wrap gap-2 justify-center md:justify-start">
-                    {formData.tags.map(tagId => {
-                      const tag = tags.find(t => t._id === tagId);
-                      return tag ? (
-                        <span key={tagId} className="px-3 py-1.5 md:px-4 md:py-2 bg-[#e11d48]/20 border border-[#e11d48]/20 rounded-lg md:rounded-xl text-white text-[9px] md:text-[10px] font-bold uppercase tracking-widest">
-                          {tag.label}
-                        </span>
-                      ) : null;
-                    })}
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        );
-
-      default:
-        return null;
+      if (data.type === "success" && data.savedGirlfriend) {
+        setProgress(100);
+        setTimeout(() => {
+          navigate(`/chat/${data.savedGirlfriend._id}`);
+        }, 500);
+      } else {
+        throw new Error(data.message || "Failed to save character");
+      }
+    } catch (e) {
+      console.error(e);
+      setStep(13);
+      alert("An error occurred while saving the character. Please try again.");
     }
   };
+
+  // Plan subscriptions details (English Translation)
+  const plans = [
+    { title: "12 months", price: "3.99", discount: "70% OFF", id: 'price_1TKc7ZC3BOlFgA9PiqYYgmMd', badge: "BEST CHOICE", billText: "$47.88" },
+    { title: "3 months", price: "8.99", discount: "35% OFF", id: 'price_1TKc6XC3BOlFgA9Puv0bQMYe', billText: "$26.97" },
+    { title: "1 month", price: "13.99", discount: null, id: 'price_1TKaJyC3BOlFgA9PtqmM5YNl', billText: "$13.99" },
+  ];
 
   return (
     <Layout>
-      <div className="min-h-screen bg-[#0a0a0f] py-12 px-6 overflow-hidden">
-        <div className="max-w-3xl mx-auto">
-          {/* Progress Tracker - Modern Glass */}
-          <div className="bg-white/5 backdrop-blur-2xl border border-white/5 p-2 md:p-4 rounded-[2rem] md:rounded-[2.5rem] mb-8 md:mb-12 overflow-x-auto no-scrollbar">
-            <div className="flex items-center justify-between min-w-max px-1 md:px-2">
-              {steps.map((step, index) => (
-                <div key={step.id} className="flex items-center">
-                  <div className="flex flex-col items-center gap-2 md:gap-3">
-                    <div className={`
-                      w-8 h-8 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-500
-                      ${currentStep === step.id 
-                        ? 'bg-[#e11d48] text-white' 
-                        : currentStep > step.id 
-                          ? 'bg-white/10 text-white' 
-                          : 'bg-white/5 text-white/20'}
-                    `}>
-                      <step.icon size={14} md:size={18} strokeWidth={currentStep === step.id ? 2.5 : 2} />
+      <div className="min-h-screen bg-[#0a0a0f] flex flex-col justify-center items-center py-8 px-4 md:px-6 overflow-hidden relative select-none">
+
+        {/* Ambient background glows */}
+        <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#e11d48]/5 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-96 h-96 bg-purple-500/5 rounded-full blur-[120px] pointer-events-none" />
+
+        {/* --- MAIN CREATION PANEL --- */}
+        {step <= 11 && (
+          <div className="max-w-3xl w-full text-center z-10 flex flex-col items-center">
+
+            {/* Top progress tracker */}
+            <div className="w-full max-w-xl mb-12">
+              <div className="h-1.5 bg-white/5 rounded-full overflow-hidden w-full relative">
+                <div
+                  className="h-full bg-[#e11d48] rounded-full transition-all duration-500 ease-out shadow-[0_0_10px_rgba(225,29,72,0.6)]"
+                  style={{ width: `${(step / 11) * 100}%` }}
+                />
+              </div>
+              <div className="flex justify-between mt-3 text-[10px] text-white/20 tracking-wider font-semibold uppercase">
+                <span>Step {step} of 11</span>
+                <span>{Math.round((step / 11) * 100)}%</span>
+              </div>
+            </div>
+
+            {/* Render Steps */}
+            <div className="w-full min-h-[380px] flex items-center justify-center">
+
+              {/* Step 1: Category & Art Style */}
+              {step === 1 && (
+                <div className="space-y-8 w-full animate-in fade-in duration-300">
+                  <h2 className="text-3xl md:text-4xl font-black text-white tracking-tight">
+                    Create my AI Girlfriend
+                  </h2>
+
+                  {/* Category Pill Buttons */}
+                  <div className="flex justify-center items-center gap-4">
+                    {CATEGORIES_BUTTONS.map((cat) => {
+                      const isActive = gender === cat.id;
+                      return (
+                        <button
+                          key={cat.id}
+                          onClick={() => setGender(cat.id)}
+                          className={`
+                            flex items-center gap-2 px-6 py-3 rounded-full border font-bold text-sm tracking-wide transition-all duration-300
+                            ${isActive
+                              ? 'border-[#e11d48] bg-[#e11d48]/10 text-white shadow-[0_0_15px_rgba(225,29,72,0.15)]'
+                              : 'border-white/10 bg-white/5 text-white/40 hover:text-white hover:border-white/20'
+                            }
+                          `}
+                        >
+                          {cat.id === "girls" ? (
+                            <span className="text-pink-500 text-lg">♀</span>
+                          ) : (
+                            <span className="text-purple-400 text-lg">⚧</span>
+                          )}
+                          {cat.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Art Styles Grid */}
+                  <div className="grid grid-cols-2 gap-4 md:gap-6 w-full max-w-lg mx-auto">
+                    {STYLES.map((style) => {
+                      const isSelected = artStyle === style.id;
+                      return (
+                        <button
+                          key={style.id}
+                          onClick={() => setArtStyle(style.id)}
+                          className={`
+                            group relative overflow-hidden rounded-[1.5rem] aspect-[4/5] md:aspect-[3/4] transition-all duration-500 border-2
+                            ${isSelected
+                              ? 'border-[#e11d48] shadow-[0_0_25px_rgba(225,29,72,0.2)] scale-[1.02]'
+                              : 'border-transparent opacity-70 hover:opacity-100 hover:scale-[1.01]'
+                            }
+                          `}
+                        >
+                          <img src={style.image} alt={style.label} className="w-full h-full object-cover transition-transform duration-750 group-hover:scale-105" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
+                          <div className="absolute inset-x-0 bottom-4 text-center">
+                            <span className="text-white text-base md:text-lg font-bold">{style.label}</span>
+                          </div>
+                          {isSelected && (
+                            <div className="absolute top-4 right-4 w-7 h-7 bg-[#e11d48] rounded-full flex items-center justify-center border border-white/10">
+                              <Check className="w-4 h-4 text-white stroke-[3px]" />
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Step 2: Etniczność */}
+              {step === 2 && (
+                <div className="space-y-6 w-full animate-in fade-in duration-300">
+                  <h2 className="text-3xl font-black text-white tracking-tight">Choose ethnicity</h2>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 max-w-3xl mx-auto">
+                    {ETHNICITIES.map((eth) => {
+                      const isSelected = ethnicity === eth.value;
+                      return (
+                        <button
+                          key={eth.value}
+                          onClick={() => setEthnicity(eth.value)}
+                          className={`
+                            group relative overflow-hidden rounded-2xl aspect-[3/4] transition-all duration-300 border-2
+                            ${isSelected ? 'border-[#e11d48] scale-102 shadow-lg' : 'border-transparent opacity-60 hover:opacity-100'}
+                          `}
+                        >
+                          <img src={eth.image} alt={eth.label} className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                          <span className="absolute bottom-3 inset-x-0 text-center text-xs font-bold text-white">{eth.label}</span>
+                          {isSelected && (
+                            <div className="absolute top-2.5 right-2.5 w-6 h-6 bg-[#e11d48] rounded-full flex items-center justify-center">
+                              <Check className="w-3.5 h-3.5 text-white" />
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Step 3: Wiek */}
+              {step === 3 && (
+                <div className="space-y-8 w-full max-w-md mx-auto animate-in fade-in duration-300">
+                  <h2 className="text-3xl font-black text-white tracking-tight">Choose age</h2>
+                  <div className="bg-white/5 border border-white/5 rounded-3xl p-8 space-y-6">
+                    <div className="flex justify-between items-baseline">
+                      <span className="text-white/40 text-[10px] font-bold uppercase tracking-widest">Age</span>
+                      <span className="text-5xl font-black text-white tracking-tighter">{age} years</span>
+                    </div>
+                    <div className="relative h-2 bg-white/5 rounded-full mt-4">
+                      <div
+                        className="absolute inset-y-0 left-0 bg-[#e11d48] rounded-full shadow-[0_0_10px_rgba(225,29,72,0.4)]"
+                        style={{ width: `${((age - 18) / 17) * 100}%` }}
+                      />
+                      <input
+                        type="range"
+                        min="18"
+                        max="35"
+                        value={age}
+                        onChange={(e) => setAge(parseInt(e.target.value))}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      />
+                    </div>
+                    <div className="flex justify-between text-[10px] font-bold text-white/20 tracking-wider">
+                      <span>18 YEARS</span>
+                      <span>35 YEARS</span>
                     </div>
                   </div>
-                  {index < steps.length - 1 && (
-                    <div className={`w-4 md:w-8 h-px mx-1 md:mx-4 ${currentStep > step.id ? 'bg-[#e11d48]' : 'bg-white/5'}`} />
-                  )}
                 </div>
-              ))}
-            </div>
-          </div>
+              )}
 
-          {/* Form Content Area */}
-          <div className="bg-white/5 backdrop-blur-3xl rounded-[2rem] md:rounded-[3rem] p-6 md:p-14 border border-white/5 relative overflow-hidden mb-8 md:mb-10">
-            {/* Subtle light effect inside */}
-            <div className="absolute -top-24 -right-24 w-64 h-64 bg-[#e11d48]/5 rounded-full blur-[80px] pointer-events-none" />
-            
-            <div className="relative z-10">
-              {renderStep()}
-            </div>
-          </div>
+              {/* Step 4: Fryzura */}
+              {step === 4 && (
+                <div className="space-y-6 w-full animate-in fade-in duration-300">
+                  <h2 className="text-3xl font-black text-white tracking-tight">Choose hairstyle</h2>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-xl mx-auto">
+                    {HAIRSTYLES.map((style) => {
+                      const isSelected = hairstyle === style.value;
+                      return (
+                        <button
+                          key={style.value}
+                          onClick={() => setHairstyle(style.value)}
+                          className={`
+                            relative h-28 rounded-2xl border-2 flex flex-col items-center justify-center transition-all duration-300 bg-gradient-to-br ${style.gradient}
+                            ${isSelected ? 'border-[#e11d48] scale-102 shadow-md' : 'border-white/5 opacity-60 hover:opacity-100'}
+                          `}
+                        >
+                          <span className="text-white font-bold text-base tracking-wide">{style.label}</span>
+                          {isSelected && (
+                            <div className="absolute top-2.5 right-2.5 w-6 h-6 bg-[#e11d48] rounded-full flex items-center justify-center">
+                              <Check className="w-3.5 h-3.5 text-white" />
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
-          {/* Nav Buttons */}
-          <div className="flex justify-between items-center bg-white/5 p-2 md:p-3 rounded-[2rem] md:rounded-[2.5rem] border border-white/5">
-            <button
-              onClick={() => setCurrentStep(prev => Math.max(1, prev - 1))}
-              disabled={currentStep === 1 || previewImage}
-              className={`flex items-center gap-2 md:gap-3 px-4 md:px-8 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold transition-all text-sm md:text-base ${
-                currentStep === 1 || previewImage
-                  ? 'text-white/10 cursor-not-allowed opacity-50' 
+              {/* Step 5: Kolor włosów */}
+              {step === 5 && (
+                <div className="space-y-6 w-full animate-in fade-in duration-300">
+                  <h2 className="text-3xl font-black text-white tracking-tight">Choose hair color</h2>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 max-w-4xl mx-auto">
+                    {HAIR_COLORS.map((hair) => {
+                      const isSelected = hairColor === hair.value;
+                      return (
+                        <button
+                          key={hair.value}
+                          onClick={() => setHairColor(hair.value)}
+                          className={`
+                            relative rounded-2xl aspect-[3/4] overflow-hidden border-2 transition-all duration-300
+                            ${isSelected ? 'border-[#e11d48] scale-102 shadow-lg' : 'border-transparent opacity-60 hover:opacity-100'}
+                          `}
+                        >
+                          <img src={hair.image} alt={hair.label} className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                          <span className="absolute bottom-3 inset-x-0 text-center text-xs font-bold text-white">{hair.label}</span>
+                          {isSelected && (
+                            <div className="absolute top-2.5 right-2.5 w-6 h-6 bg-[#e11d48] rounded-full flex items-center justify-center">
+                              <Check className="w-3.5 h-3.5 text-white" />
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Step 6: Kolor oczu */}
+              {step === 6 && (
+                <div className="space-y-6 w-full animate-in fade-in duration-300">
+                  <h2 className="text-3xl font-black text-white tracking-tight">Choose eye color</h2>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 max-w-4xl mx-auto">
+                    {EYE_COLORS.map((eye) => {
+                      const isSelected = eyeColor === eye.value;
+                      return (
+                        <button
+                          key={eye.value}
+                          onClick={() => setEyeColor(eye.value)}
+                          className={`
+                            relative rounded-2xl aspect-[3/4] overflow-hidden border-2 transition-all duration-300
+                            ${isSelected ? 'border-[#e11d48] scale-102 shadow-lg' : 'border-transparent opacity-60 hover:opacity-100'}
+                          `}
+                        >
+                          <img src={eye.image} alt={eye.label} className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                          <span className="absolute bottom-3 inset-x-0 text-center text-xs font-bold text-white">{eye.label}</span>
+                          {isSelected && (
+                            <div className="absolute top-2.5 right-2.5 w-6 h-6 bg-[#e11d48] rounded-full flex items-center justify-center">
+                              <Check className="w-3.5 h-3.5 text-white" />
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Step 7: Sylwetka */}
+              {step === 7 && (
+                <div className="space-y-6 w-full animate-in fade-in duration-300">
+                  <h2 className="text-3xl font-black text-white tracking-tight">Choose body type</h2>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 max-w-3xl mx-auto">
+                    {BODY_TYPES.map((body) => {
+                      const isSelected = bodyType === body.value;
+                      return (
+                        <button
+                          key={body.value}
+                          onClick={() => setBodyType(body.value)}
+                          className={`
+                            relative rounded-2xl aspect-[3/4] overflow-hidden border-2 transition-all duration-300
+                            ${isSelected ? 'border-[#e11d48] scale-102 shadow-lg' : 'border-transparent opacity-60 hover:opacity-100'}
+                          `}
+                        >
+                          <img src={body.image} alt={body.label} className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                          <span className="absolute bottom-3 inset-x-0 text-center text-xs font-bold text-white">{body.label}</span>
+                          {isSelected && (
+                            <div className="absolute top-2.5 right-2.5 w-6 h-6 bg-[#e11d48] rounded-full flex items-center justify-center">
+                              <Check className="w-3.5 h-3.5 text-white" />
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Step 8: Rozmiar piersi */}
+              {step === 8 && (
+                <div className="space-y-6 w-full animate-in fade-in duration-300">
+                  <h2 className="text-3xl font-black text-white tracking-tight">Choose breast size</h2>
+                  <div className="grid grid-cols-2 gap-4 max-w-md mx-auto">
+                    {BREAST_SIZES.map((breast) => {
+                      const isSelected = breastSize === breast.value;
+                      return (
+                        <button
+                          key={breast.value}
+                          onClick={() => setBreastSize(breast.value)}
+                          className={`
+                            relative h-28 rounded-2xl border-2 flex flex-col items-center justify-center bg-white/5 transition-all duration-300
+                            ${isSelected ? 'border-[#e11d48] bg-[#e11d48]/10 scale-102 shadow-md' : 'border-white/5 opacity-60 hover:opacity-100'}
+                          `}
+                        >
+                          <span className="text-white font-bold text-lg">{breast.label}</span>
+                          <span className="text-white/40 text-xs font-semibold mt-1">Size {breast.sizeText}</span>
+                          {isSelected && (
+                            <div className="absolute top-2.5 right-2.5 w-6 h-6 bg-[#e11d48] rounded-full flex items-center justify-center">
+                              <Check className="w-3.5 h-3.5 text-white" />
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Step 9: Imię */}
+              {step === 9 && (
+                <div className="space-y-6 w-full max-w-sm mx-auto animate-in fade-in duration-300">
+                  <h2 className="text-3xl font-black text-white tracking-tight">Choose name</h2>
+                  <div className="space-y-4">
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Enter name..."
+                      maxLength={18}
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4.5 text-white placeholder-white/20 text-xl font-bold text-center focus:outline-none focus:border-[#e11d48] transition-all"
+                    />
+                    <button
+                      onClick={() => {
+                        const list = gender === "trans" ? RANDOM_TRANS_NAMES : RANDOM_GIRL_NAMES;
+                        setName(list[Math.floor(Math.random() * list.length)]);
+                      }}
+                      className="w-full py-3.5 rounded-2xl border border-white/5 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white font-bold text-xs tracking-wider uppercase transition-all"
+                    >
+                      Random Name 🎲
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 10: Osobowość */}
+              {step === 10 && (
+                <div className="space-y-6 w-full animate-in fade-in duration-300">
+                  <h2 className="text-3xl font-black text-white tracking-tight">Choose personality</h2>
+                  <div className="flex flex-wrap justify-center gap-3.5 max-w-xl mx-auto">
+                    {PERSONALITY_TRAITS.map((trait) => {
+                      const isSelected = selectedTraits.includes(trait.value);
+                      return (
+                        <button
+                          key={trait.value}
+                          onClick={() => handleTraitToggle(trait.value)}
+                          className={`
+                            px-6 py-3.5 rounded-2xl font-bold text-sm tracking-tight border transition-all duration-200
+                            ${isSelected
+                              ? 'bg-[#e11d48] border-[#e11d48] text-white shadow-md'
+                              : 'bg-white/5 border-white/5 text-white/50 hover:text-white hover:border-white/10'
+                            }
+                          `}
+                        >
+                          {trait.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Step 11: Relacja */}
+              {step === 11 && (
+                <div className="space-y-6 w-full animate-in fade-in duration-300">
+                  <h2 className="text-3xl font-black text-white tracking-tight">Choose relationship</h2>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-xl mx-auto">
+                    {RELATIONSHIPS.map((rel) => {
+                      const isSelected = relationship === rel.value;
+                      return (
+                        <button
+                          key={rel.value}
+                          onClick={() => setRelationship(rel.value)}
+                          className={`
+                            relative h-24 rounded-2xl border-2 flex items-center justify-center bg-white/5 transition-all duration-300
+                            ${isSelected ? 'border-[#e11d48] bg-[#e11d48]/10 scale-102' : 'border-white/5 opacity-60 hover:opacity-100'}
+                          `}
+                        >
+                          <span className="text-white font-bold text-base">{rel.label}</span>
+                          {isSelected && (
+                            <div className="absolute top-2.5 right-2.5 w-6 h-6 bg-[#e11d48] rounded-full flex items-center justify-center">
+                              <Check className="w-3.5 h-3.5 text-white" />
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Stepper buttons */}
+            <div className="flex justify-between items-center w-full max-w-md mt-10">
+              <button
+                onClick={prevStep}
+                disabled={step === 1}
+                className={`flex items-center gap-2 px-6 py-3.5 rounded-xl font-bold transition-all text-sm ${step === 1
+                  ? 'text-white/10 cursor-not-allowed opacity-30'
                   : 'text-white/60 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <ArrowLeft size={16} md:size={20} strokeWidth={3} />
-              <span className="hidden md:inline">Return</span>
-            </button>
+                  }`}
+              >
+                <ArrowLeft size={16} strokeWidth={2.5} />
+                <span>Back</span>
+              </button>
 
-            {currentStep < 7 ? (
               <button
-                onClick={() => setCurrentStep(prev => prev + 1)}
-                disabled={!canProceed()}
-                className={`flex items-center gap-2 md:gap-3 px-6 md:px-10 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold transition-all text-sm md:text-base ${
-                  canProceed()
-                    ? 'bg-[#e11d48] text-white hover:bg-[#be123c] active:scale-95'
-                    : 'bg-white/5 text-white/10 cursor-not-allowed'
-                }`}
+                onClick={nextStep}
+                className="flex items-center gap-2 px-10 py-3.5 bg-[#be123c] hover:bg-[#991b1b] text-white font-bold rounded-xl transition-all shadow-lg active:scale-95 text-sm"
               >
-                <span className="hidden md:inline">Continue</span>
-                <span className="md:hidden text-xs">Next</span>
-                <ArrowRight size={16} md:size={20} strokeWidth={3} />
+                <span>Next</span>
+                <ArrowRight size={16} strokeWidth={2.5} />
               </button>
-            ) : (
-              <button
-                onClick={async () => {
-                  if (!isLoggedIn) {
-                    localStorage.setItem('pendingGirlfriendCreation', JSON.stringify(formData));
-                    navigate('/premium');
-                    return;
-                  }
-                  
-                  try {
-                    setIsSubmitting(true);
-                    
-                    // Generate preview first
-                    setGeneratingPreview(true);
-                    const apiUrl = import.meta.env.VITE_API_URL || '/api/v1';
-                    const previewRes = await fetch(`${apiUrl}/girlfriends/preview`, {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify(formData)
-                    });
-                    const previewData = await previewRes.json();
-                    
-                    if (previewData.type === "success" && previewData.previewImage) {
-                      setPreviewImage(previewData.previewImage);
-                      setGeneratingPreview(false);
-                      // Show payment dialog after preview
-                      setShowPremiumDialog(true);
-                    } else {
-                      // If preview fails, still show payment
-                      setGeneratingPreview(false);
-                      setShowPremiumDialog(true);
-                    }
-                  } catch (err) {
-                    console.error(err);
-                    setGeneratingPreview(false);
-                    setShowPremiumDialog(true);
-                  }
-                }}
-                disabled={isSubmitting || (premium?.isActive && !canCreateGirlfriend)}
-                className="flex items-center gap-2 md:gap-3 px-6 md:px-12 py-3 md:py-4 bg-white text-black font-bold rounded-xl md:rounded-2xl hover:bg-white/90 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed text-sm md:text-base"
-              >
-                {generatingPreview ? "Generating Preview..." : isSubmitting ? "Creating..." : "Start Chatting"}
-                <MessageCircle size={16} md:size={20} fill="currentColor" />
-              </button>
-            )}
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* --- STEP 12: LOADER SCREEN --- */}
+        {step === 12 && (
+          <div className="max-w-xs w-full text-center z-10 space-y-8 animate-in fade-in duration-300">
+            <div className="relative w-28 h-28 mx-auto flex items-center justify-center">
+              {/* Spinning outer loader */}
+              <svg className="w-full h-full transform -rotate-90">
+                <circle
+                  cx="56"
+                  cy="56"
+                  r="50"
+                  className="stroke-white/5 fill-none"
+                  strokeWidth="6"
+                />
+                <circle
+                  cx="56"
+                  cy="56"
+                  r="50"
+                  className="stroke-[#e11d48] fill-none transition-all duration-300 ease-out"
+                  strokeWidth="6"
+                  strokeDasharray={2 * Math.PI * 50}
+                  strokeDashoffset={2 * Math.PI * 50 * (1 - progress / 100)}
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-2xl font-black text-white">{progress}%</span>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <h3 className="text-xl font-black text-white tracking-tight">
+                Creating Your AI Companion
+              </h3>
+              <p className="text-white/40 text-sm font-medium">
+                Hold on tight. This won't take long.
+              </p>
+              <p className="text-[#e11d48]/80 text-xs font-semibold italic mt-4">
+                {loadingText}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* --- STEP 13: SUMMARY PAGE --- */}
+        {step === 13 && (
+          <div className="max-w-4xl w-full z-10 bg-white/5 border border-white/5 rounded-[2.5rem] p-6 md:p-8 flex flex-col md:flex-row gap-8 items-stretch animate-in scale-in duration-500">
+            {/* Left side: Preview Image */}
+            <div className="w-full md:w-1/2 aspect-[3/4] md:aspect-auto rounded-3xl overflow-hidden relative border border-white/10">
+              <img
+                src={previewImage ? (previewImage.startsWith("/uploads/") ? `${import.meta.env.VITE_API_URL?.replace('/api/v1', '') || 'http://localhost:3000'}${previewImage}` : previewImage) : (artStyle === "anime" ? animeGirlImg : realisticGirlImg)}
+                alt="AI Girl Portrait"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
+
+              {/* Badge overlay showing category/style */}
+              <div className="absolute bottom-5 left-5 flex gap-2">
+                <span className="px-3.5 py-1.5 bg-[#e11d48]/80 backdrop-blur-md rounded-full text-[10px] font-bold text-white uppercase tracking-wider">
+                  {artStyle === "anime" ? "Anime" : "Realistic"}
+                </span>
+                <span className="px-3.5 py-1.5 bg-black/60 backdrop-blur-md rounded-full text-[10px] font-bold text-white/80 uppercase tracking-wider">
+                  {gender === "trans" ? "Trans" : "Girl"}
+                </span>
+              </div>
+            </div>
+
+            {/* Right side: Configuration Details */}
+            <div className="w-full md:w-1/2 flex flex-col justify-between space-y-6">
+
+              {/* Header Title */}
+              <div>
+                <h2 className="text-3xl md:text-4xl font-black text-white tracking-tight">
+                  {name}, {age}
+                </h2>
+                <div className="h-0.5 bg-white/10 rounded-full mt-3 w-16" />
+              </div>
+
+              {/* Traits checklist */}
+              <div className="grid grid-cols-2 gap-3.5 my-2">
+                {[
+                  { label: "Body Type", val: BODY_TYPES.find(b => b.value === bodyType)?.label || bodyType },
+                  { label: "Breast Size", val: BREAST_SIZES.find(b => b.value === breastSize)?.label || breastSize },
+                  { label: "Ethnicity", val: ETHNICITIES.find(e => e.value === ethnicity)?.label || ethnicity },
+                  { label: "Hairstyle", val: HAIRSTYLES.find(h => h.value === hairstyle)?.label || hairstyle },
+                  { label: "Hair Color", val: HAIR_COLORS.find(h => h.value === hairColor)?.label || hairColor },
+                  { label: "Eye Color", val: EYE_COLORS.find(e => e.value === eyeColor)?.label || eyeColor },
+                  { label: "Relationship", val: RELATIONSHIPS.find(r => r.value === relationship)?.label || relationship },
+                ].map((item, index) => (
+                  <div key={index} className="p-3 bg-white/5 rounded-xl border border-white/5">
+                    <span className="text-[9px] font-bold text-white/30 uppercase tracking-wider block mb-1">{item.label}</span>
+                    <span className="text-white text-sm font-bold capitalize">{item.val}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Personality traits */}
+              <div className="space-y-2">
+                <span className="text-[10px] font-bold text-white/30 uppercase tracking-wider block">Personality Traits</span>
+                <div className="flex flex-wrap gap-2">
+                  {selectedTraits.map(traitVal => {
+                    const label = PERSONALITY_TRAITS.find(p => p.value === traitVal)?.label || traitVal;
+                    return (
+                      <span key={traitVal} className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-white/80 text-xs font-bold capitalize">
+                        {label}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Confirm / Action button */}
+              <div className="pt-4">
+                <button
+                  onClick={handleOżyw}
+                  className="w-full py-4.5 bg-[#e11d48] hover:bg-[#be123c] text-white font-black uppercase text-sm tracking-widest rounded-2xl transition-all shadow-lg active:scale-[0.98] shadow-[#e11d48]/10"
+                >
+                  Revive my girlfriend
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* --- PREMIUM FEATURE & PLAN SELECTOR OVERLAYS --- */}
+        {showPremiumOverlay && (
+          <div className="fixed inset-0 z-50 bg-[#0a0a0f]/95 backdrop-blur-md overflow-y-auto animate-in fade-in duration-300">
+            <div className="min-h-screen w-full flex items-center justify-center md:p-8">
+              <div className="bg-[#12121a] border border-white/5 rounded-[2.5rem] w-full max-w-4xl overflow-hidden relative flex flex-col md:flex-row shadow-2xl my-auto">
+
+                {/* Close Button */}
+                <button
+                  onClick={() => setShowPremiumOverlay(false)}
+                  className="absolute top-6 right-6 z-20 p-2 rounded-full bg-black/40 hover:bg-black/60 text-white/60 hover:text-white transition-all duration-200 border border-white/5"
+                >
+                  <X size={18} />
+                </button>
+
+                {/* Overlay view 1: Benefits Promo */}
+                {premiumView === "benefits" && (
+                  <>
+                    {/* Left Column: Image of model */}
+                    <div className="w-full md:w-1/2 relative min-h-[300px] md:min-h-[500px]">
+                      <img
+                        src={realisticGirlImg}
+                        alt="Premium Girl"
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-black/80 via-black/20 to-transparent" />
+                    </div>
+
+                    {/* Right Column: Benefits checkmarks */}
+                    <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center space-y-8">
+                      <div className="space-y-2">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-500/10 border border-amber-500/20 rounded-full text-[10px] font-bold text-amber-400 uppercase tracking-widest">
+                          <Crown className="w-3 h-3" /> Premium
+                        </div>
+                        <h2 className="text-3xl font-black text-white tracking-tight">
+                          Become Premium and generate more!
+                        </h2>
+                      </div>
+
+                      {/* Features checklist */}
+                      <div className="space-y-4">
+                        {[
+                          { title: "Generate unlimited AI characters", iconColor: "text-amber-400" },
+                          { title: "Generate the most spicy photos and videos", iconColor: "text-[#e11d48]" },
+                          { title: "Chat, flirt, control", iconColor: "text-purple-400" }
+                        ].map((item, index) => (
+                          <div key={index} className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
+                              <Check className="w-4 h-4 text-emerald-400 stroke-[3px]" />
+                            </div>
+                            <span className="text-white/80 font-bold text-sm tracking-tight">{item.title}</span>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Action button */}
+                      <div className="pt-2">
+                        <button
+                          onClick={() => setPremiumView("plans")}
+                          className="w-full py-4.5 bg-[#e11d48] hover:bg-[#be123c] text-white font-black uppercase text-sm tracking-widest rounded-2xl transition-all shadow-lg shadow-[#e11d48]/20"
+                        >
+                          Become Premium
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {/* Overlay view 2: Plan Selectors */}
+                {premiumView === "plans" && (
+                  <div className="w-full  md:p-10 flex flex-col items-center space-y-8 animate-in fade-in duration-300">
+                    <div className="text-center space-y-2">
+                      <h2 className="text-3xl font-black text-white tracking-tight">Choose your plan</h2>
+                      <p className="text-white/40 text-xs tracking-wide font-medium">Trusted by 50 million people worldwide</p>
+                    </div>
+
+                    {/* Plan Options Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-3xl">
+                      {plans.map((plan) => (
+                        <div
+                          key={plan.id}
+                          className="bg-white/5 border border-white/5 rounded-3xl p-6 relative flex flex-col justify-between space-y-6 hover:border-white/10 transition-all duration-300"
+                        >
+                          {plan.badge && (
+                            <span className="absolute -top-3 left-6 bg-[#e11d48] text-white text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-wider shadow-md">
+                              {plan.badge}
+                            </span>
+                          )}
+
+                          <div className="space-y-2">
+                            <h3 className="text-white font-bold text-base tracking-wide">{plan.title}</h3>
+                            {plan.discount && (
+                              <span className="text-[10px] font-black text-[#e11d48] uppercase tracking-wider">{plan.discount}</span>
+                            )}
+                            <div className="pt-2">
+                              <span className="text-3xl font-black text-white">${plan.price}</span>
+                              <span className="text-white/30 text-xs"> / monthly</span>
+                            </div>
+                            <p className="text-white/30 text-[10px] font-medium pt-1">Billed annually as {plan.billText}</p>
+                          </div>
+
+                          <button
+                            onClick={() => {
+                              setCheckoutPlanId(plan.id);
+                              setPremiumView("checkout");
+                            }}
+                            className="w-full py-3 bg-[#e11d48] hover:bg-[#be123c] text-white font-bold text-xs tracking-wider uppercase rounded-xl transition-all shadow-md active:scale-95"
+                          >
+                            Get Started
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Pricing Benefits Checkmarks */}
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-3 pt-6 border-t border-white/5 w-full max-w-2xl text-left">
+                      {[
+                        { text: "Create your own AI girls", icon: <User className="w-4 h-4 text-amber-400" /> },
+                        { text: "Full live-action experience", icon: <Flame className="w-4 h-4 text-[#e11d48]" /> },
+                        { text: "Generate 18+ videos", icon: <Gem className="w-4 h-4 text-purple-400" /> },
+                        { text: "Unlimited text messages", icon: <MessageCircle className="w-4 h-4 text-blue-400" /> },
+                        { text: "Generate 18+ images", icon: <Sparkle className="w-4 h-4 text-emerald-400" /> },
+                        { text: "100 monthly tokens", icon: <Crown className="w-4 h-4 text-yellow-400" /> }
+                      ].map((benefit, i) => (
+                        <div key={i} className="flex items-center gap-2.5">
+                          <div className="w-6 h-6 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
+                            {benefit.icon}
+                          </div>
+                          <span className="text-white/70 text-xs font-semibold tracking-tight">{benefit.text}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Footers */}
+                    <div className="flex flex-col md:flex-row justify-center items-center gap-x-6 gap-y-2 pt-4 text-[10px] text-white/20 font-bold uppercase tracking-wider w-full border-t border-white/5">
+                      <div className="flex items-center gap-1.5">
+                        <Shield className="w-3.5 h-3.5 text-emerald-500/50" />
+                        <span>Charge will appear as "EverAI" on bank statement</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <Check className="w-3.5 h-3.5 text-emerald-500/50" />
+                        <span>Cancel subscription anytime in settings</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Overlay view 3: Stripe Embedded Checkout */}
+                {premiumView === "checkout" && (
+                  <div className="w-full flex flex-col items-center space-y-6 animate-in fade-in duration-300">
+                    <div className="flex items-center justify-between w-full border-b border-white/5 pb-4">
+                      <button
+                        onClick={() => setPremiumView("plans")}
+                        className="flex items-center gap-2 text-white/50 hover:text-white font-bold text-xs uppercase tracking-wider transition-colors"
+                      >
+                        <ArrowLeft size={14} strokeWidth={2.5} />
+                        Back to plans
+                      </button>
+                      <span className="text-[10px] font-black text-amber-400 uppercase tracking-widest">Secure Payment</span>
+                    </div>
+
+                    <div className="w-full max-w-md bg-[#12121a] rounded-3xl overflow-hidden p-2">
+                      <StripeEmbeddedCheckout
+                        selectedPlan={checkoutPlanId}
+                        onClose={() => setPremiumView("plans")}
+                      />
+                    </div>
+                  </div>
+                )}
+
+              </div>
+            </div>
+          </div>
+        )}
+
       </div>
 
-      {/* Notification Toast */}
-      {notification && (
-        <div className={`fixed top-6 left-1/2 -translate-x-1/2 z-50 px-6 py-4 rounded-2xl border shadow-2xl animate-in slide-in-from-top-2 ${
-          notification.type === 'success' 
-            ? 'bg-green-900/90 border-green-500/50 text-green-100' 
-            : 'bg-[#e11d48]/20 border-[#e11d48]/50 text-red-100'
-        }`}>
-          <div className="flex items-center gap-3">
-            {notification.type === 'success' ? (
-              <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center">
-                <svg className="w-5 h-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-            ) : (
-              <div className="w-8 h-8 rounded-full bg-[#e11d48]/20 flex items-center justify-center">
-                <svg className="w-5 h-5 text-[#e11d48]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </div>
-            )}
-            <div>
-              <p className="font-bold text-sm">{notification.message}</p>
-              {notification.type === 'success' && notification.points !== undefined && (
-                <p className="text-xs text-green-300/70 mt-1">Remaining points: {notification.points}</p>
-              )}
-              {notification.type === 'error' && notification.current !== undefined && (
-                <p className="text-xs text-[#e11d48]/80/70 mt-1">
-                  You have {notification.current} points, need {notification.required}
-                </p>
-              )}
-            </div>
-            <button 
-              onClick={() => setNotification(null)}
-              className="ml-4 p-1 hover:bg-white/10 rounded"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      )}
-
+      {/* Hide default HTML sliders thumb styles to style it nicely */}
       <style>{`
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
+        input[type="range"]::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          background: #ffffff;
+          border: 4px solid #e11d48;
+          box-shadow: 0 0 10px rgba(225, 29, 72, 0.4);
+          cursor: pointer;
+          transition: transform 0.15s ease;
+        }
+        input[type="range"]::-webkit-slider-thumb:hover {
+          transform: scale(1.1);
+        }
+        input[type="range"]::-moz-range-thumb {
+          width: 16px;
+          height: 16px;
+          border-radius: 50%;
+          background: #ffffff;
+          border: 4px solid #e11d48;
+          box-shadow: 0 0 10px rgba(225, 29, 72, 0.4);
+          cursor: pointer;
+          transition: transform 0.15s ease;
+        }
+        input[type="range"]::-moz-range-thumb:hover {
+          transform: scale(1.1);
+        }
       `}</style>
-
-      {/* Premium Dialog for payment with preview */}
-      <PaywallDialog 
-        open={showPremiumDialog} 
-        onOpenChange={setShowPremiumDialog}
-      />
     </Layout>
   );
 }
 
+// Category lists with helper constants
+const CATEGORIES_BUTTONS = [
+  { id: "girls", label: "Girls" },
+  { id: "trans", label: "Trans" }
+];
 
-
-
-
+const STYLES = [
+  { id: "realistic", label: "Realistic", image: realisticGirlImg },
+  { id: "anime", label: "Anime", image: animeGirlImg }
+];

@@ -73,7 +73,7 @@ export function LayoutProvider({ children }) {
                 // Store for later use - will be picked up by CreateGirlPage
                 window.pendingGirlfriendData = pendingGirlfriend;
                 // Navigate to create page
-                window.location.href = '/create';
+                window.location.href = '/create-girl';
               }
             }
           }

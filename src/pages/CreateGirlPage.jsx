@@ -161,16 +161,11 @@ export default function CreateGirlPage() {
   const nextStep = () => {
     if (step === 1 && !artStyle) return;
     if (step === 2 && !ethnicity) return;
-    if (step === 4 && !hairstyle) return;
-    if (step === 5 && !hairColor) return;
-    if (step === 6 && !eyeColor) return;
-    if (step === 7 && !bodyType) return;
-    if (step === 8 && !breastSize) return;
-    if (step === 9 && !name.trim()) return;
-    if (step === 10 && selectedTraits.length === 0) return;
-    if (step === 11 && !relationship) return;
+    if (step === 3 && (!hairstyle || !hairColor || !eyeColor)) return;
+    if (step === 4 && (!bodyType || !breastSize)) return;
+    if (step === 5 && (!name.trim() || selectedTraits.length === 0 || !relationship)) return;
 
-    if (step === 11) {
+    if (step === 5) {
       startGeneration();
     } else {
       setStep(prev => prev + 1);
@@ -188,9 +183,9 @@ export default function CreateGirlPage() {
     );
   };
 
-  // Start AI generation process (step 12)
+  // Start AI generation process (step 6)
   const startGeneration = async () => {
-    setStep(12);
+    setStep(6);
     setProgress(0);
     setLoadingText("Creating your AI companion...");
     setPreviewImage(null); // Reset preview image to avoid showing old images
@@ -288,9 +283,9 @@ export default function CreateGirlPage() {
           setPreviewImage(artStyle === "anime" ? animeGirlImg : realisticGirlImg);
         }
 
-        // Transition to summary page (step 13)
+        // Transition to summary page (step 7)
         setTimeout(() => {
-          setStep(13);
+          setStep(7);
         }, 500);
         return;
       }
@@ -332,7 +327,7 @@ export default function CreateGirlPage() {
 
     // User is premium! Proceed to save girlfriend in DB and redirect
     try {
-      setStep(12);
+      setStep(6);
       setProgress(50);
       setLoadingText("Saving your character to database...");
 
@@ -354,7 +349,7 @@ export default function CreateGirlPage() {
       }
     } catch (e) {
       console.error(e);
-      setStep(13);
+      setStep(7);
       alert("An error occurred while saving the character. Please try again.");
     }
   };
@@ -368,27 +363,27 @@ export default function CreateGirlPage() {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-[#0a0a0f] flex flex-col justify-center items-center py-8 px-4 md:px-6 overflow-hidden relative select-none">
+      <div className="min-h-screen bg-[#0a0a0f] flex flex-col justify-center items-center py-4 md:py-8 px-4 md:px-6 overflow-hidden relative select-none">
 
         {/* Ambient background glows */}
         <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#e11d48]/5 rounded-full blur-[120px] pointer-events-none" />
         <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-96 h-96 bg-purple-500/5 rounded-full blur-[120px] pointer-events-none" />
 
         {/* --- MAIN CREATION PANEL --- */}
-        {step <= 11 && (
-          <div className="max-w-3xl w-full text-center z-10 flex flex-col items-center">
+        {step <= 5 && (
+          <div className="max-w-3xl w-full text-center z-10 flex flex-col items-center pb-24 md:pb-0">
 
             {/* Top progress tracker */}
-            <div className="w-full max-w-xl mb-12">
+            <div className="w-full max-w-xl mb-6 md:mb-12">
               <div className="h-1.5 bg-white/5 rounded-full overflow-hidden w-full relative">
                 <div
                   className="h-full bg-[#e11d48] rounded-full transition-all duration-500 ease-out shadow-[0_0_10px_rgba(225,29,72,0.6)]"
-                  style={{ width: `${(step / 11) * 100}%` }}
+                  style={{ width: `${(step / 5) * 100}%` }}
                 />
               </div>
               <div className="flex justify-between mt-3 text-[10px] text-white/20 tracking-wider font-semibold uppercase">
-                <span>Step {step} of 11</span>
-                <span>{Math.round((step / 11) * 100)}%</span>
+                <span>Step {step} of 5</span>
+                <span>{Math.round((step / 5) * 100)}%</span>
               </div>
             </div>
 
@@ -462,305 +457,313 @@ export default function CreateGirlPage() {
                 </div>
               )}
 
-              {/* Step 2: Etniczność */}
+              {/* Step 2: Basic Portrait (Ethnicity & Age) */}
               {step === 2 && (
-                <div className="space-y-6 w-full animate-in fade-in duration-300">
-                  <h2 className="text-3xl font-black text-white tracking-tight">Choose ethnicity</h2>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 max-w-3xl mx-auto">
-                    {ETHNICITIES.map((eth) => {
-                      const isSelected = ethnicity === eth.value;
-                      return (
-                        <button
-                          key={eth.value}
-                          onClick={() => setEthnicity(eth.value)}
-                          className={`
-                            group relative overflow-hidden rounded-2xl aspect-[3/4] transition-all duration-300 border-2
-                            ${isSelected ? 'border-[#e11d48] scale-102 shadow-lg' : 'border-transparent opacity-60 hover:opacity-100'}
-                          `}
-                        >
-                          <img src={eth.image} alt={eth.label} className="w-full h-full object-cover" />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-                          <span className="absolute bottom-3 inset-x-0 text-center text-xs font-bold text-white">{eth.label}</span>
-                          {isSelected && (
-                            <div className="absolute top-2.5 right-2.5 w-6 h-6 bg-[#e11d48] rounded-full flex items-center justify-center">
-                              <Check className="w-3.5 h-3.5 text-white" />
-                            </div>
-                          )}
-                        </button>
-                      );
-                    })}
+                <div className="space-y-6 md:space-y-8 w-full max-w-xl mx-auto animate-in fade-in duration-300">
+                  <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight">Basic Portrait</h2>
+
+                  {/* Field 1: Ethnicity */}
+                  <div className="space-y-3 text-left">
+                    <span className="text-xs font-bold text-white/40 uppercase tracking-widest">1. Choose Ethnicity</span>
+                    <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+                      {ETHNICITIES.map((eth) => {
+                        const isSelected = ethnicity === eth.value;
+                        return (
+                          <button
+                            key={eth.value}
+                            onClick={() => setEthnicity(eth.value)}
+                            className={`
+                              group relative overflow-hidden rounded-xl aspect-[3/4] transition-all duration-300 border-2
+                              ${isSelected ? 'border-[#e11d48] scale-102 shadow-lg' : 'border-transparent opacity-60 hover:opacity-100'}
+                            `}
+                          >
+                            <img src={eth.image} alt={eth.label} className="w-full h-full object-cover" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
+                            <span className="absolute bottom-1.5 inset-x-0 text-center text-[10px] font-bold text-white leading-tight">{eth.label}</span>
+                            {isSelected && (
+                              <div className="absolute top-1.5 right-1.5 w-4 h-4 bg-[#e11d48] rounded-full flex items-center justify-center">
+                                <Check className="w-2.5 h-2.5 text-white" />
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Field 2: Age */}
+                  <div className="space-y-3 text-left">
+                    <span className="text-xs font-bold text-white/40 uppercase tracking-widest">2. Choose Age</span>
+                    <div className="bg-white/5 border border-white/5 rounded-2xl p-5 space-y-4">
+                      <div className="flex justify-between items-baseline">
+                        <span className="text-white/40 text-[9px] font-bold uppercase tracking-widest">Age</span>
+                        <span className="text-3xl font-black text-white tracking-tighter">{age} years</span>
+                      </div>
+                      <div className="relative h-2 bg-white/5 rounded-full mt-2">
+                        <div
+                          className="absolute inset-y-0 left-0 bg-[#e11d48] rounded-full shadow-[0_0_10px_rgba(225,29,72,0.4)]"
+                          style={{ width: `${((age - 18) / 17) * 100}%` }}
+                        />
+                        <input
+                          type="range"
+                          min="18"
+                          max="35"
+                          value={age}
+                          onChange={(e) => setAge(parseInt(e.target.value))}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        />
+                      </div>
+                      <div className="flex justify-between text-[8px] font-bold text-white/20 tracking-wider">
+                        <span>18 YEARS</span>
+                        <span>35 YEARS</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
 
-              {/* Step 3: Wiek */}
+              {/* Step 3: Hair & Eyes (Hairstyle, Hair Color & Eye Color) */}
               {step === 3 && (
-                <div className="space-y-8 w-full max-w-md mx-auto animate-in fade-in duration-300">
-                  <h2 className="text-3xl font-black text-white tracking-tight">Choose age</h2>
-                  <div className="bg-white/5 border border-white/5 rounded-3xl p-8 space-y-6">
-                    <div className="flex justify-between items-baseline">
-                      <span className="text-white/40 text-[10px] font-bold uppercase tracking-widest">Age</span>
-                      <span className="text-5xl font-black text-white tracking-tighter">{age} years</span>
+                <div className="space-y-6 md:space-y-8 w-full max-w-2xl mx-auto animate-in fade-in duration-300">
+                  <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight">Hair & Eyes</h2>
+
+                  {/* Field 1: Hairstyle */}
+                  <div className="space-y-3 text-left">
+                    <span className="text-xs font-bold text-white/40 uppercase tracking-widest">1. Hairstyle</span>
+                    <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                      {HAIRSTYLES.map((style) => {
+                        const isSelected = hairstyle === style.value;
+                        return (
+                          <button
+                            key={style.value}
+                            onClick={() => setHairstyle(style.value)}
+                            className={`
+                              relative py-2.5 rounded-xl border flex flex-col items-center justify-center transition-all duration-300 bg-gradient-to-br ${style.gradient}
+                              ${isSelected ? 'border-[#e11d48] scale-102 shadow-md' : 'border-white/5 opacity-60 hover:opacity-100'}
+                            `}
+                          >
+                            <span className="text-white font-bold text-xs tracking-wide">{style.label}</span>
+                            {isSelected && (
+                              <div className="absolute top-1 right-1 w-4.5 h-4.5 bg-[#e11d48] rounded-full flex items-center justify-center">
+                                <Check className="w-2.5 h-2.5 text-white" />
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
                     </div>
-                    <div className="relative h-2 bg-white/5 rounded-full mt-4">
-                      <div
-                        className="absolute inset-y-0 left-0 bg-[#e11d48] rounded-full shadow-[0_0_10px_rgba(225,29,72,0.4)]"
-                        style={{ width: `${((age - 18) / 17) * 100}%` }}
-                      />
-                      <input
-                        type="range"
-                        min="18"
-                        max="35"
-                        value={age}
-                        onChange={(e) => setAge(parseInt(e.target.value))}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                      />
+                  </div>
+
+                  {/* Field 2: Hair Color */}
+                  <div className="space-y-3 text-left">
+                    <span className="text-xs font-bold text-white/40 uppercase tracking-widest">2. Hair Color</span>
+                    <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                      {HAIR_COLORS.map((hair) => {
+                        const isSelected = hairColor === hair.value;
+                        return (
+                          <button
+                            key={hair.value}
+                            onClick={() => setHairColor(hair.value)}
+                            className={`
+                              relative rounded-xl aspect-[3/4] overflow-hidden border-2 transition-all duration-300
+                              ${isSelected ? 'border-[#e11d48] scale-102 shadow-lg' : 'border-transparent opacity-65 hover:opacity-100'}
+                            `}
+                          >
+                            <img src={hair.image} alt={hair.label} className="w-full h-full object-cover" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
+                            <span className="absolute bottom-1.5 inset-x-0 text-center text-[10px] font-bold text-white leading-tight">{hair.label}</span>
+                            {isSelected && (
+                              <div className="absolute top-1.5 right-1.5 w-4 h-4 bg-[#e11d48] rounded-full flex items-center justify-center">
+                                <Check className="w-2.5 h-2.5 text-white" />
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
                     </div>
-                    <div className="flex justify-between text-[10px] font-bold text-white/20 tracking-wider">
-                      <span>18 YEARS</span>
-                      <span>35 YEARS</span>
+                  </div>
+
+                  {/* Field 3: Eye Color */}
+                  <div className="space-y-3 text-left">
+                    <span className="text-xs font-bold text-white/40 uppercase tracking-widest">3. Eye Color</span>
+                    <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                      {EYE_COLORS.map((eye) => {
+                        const isSelected = eyeColor === eye.value;
+                        return (
+                          <button
+                            key={eye.value}
+                            onClick={() => setEyeColor(eye.value)}
+                            className={`
+                              relative rounded-xl aspect-[3/4] overflow-hidden border-2 transition-all duration-300
+                              ${isSelected ? 'border-[#e11d48] scale-102 shadow-lg' : 'border-transparent opacity-65 hover:opacity-100'}
+                            `}
+                          >
+                            <img src={eye.image} alt={eye.label} className="w-full h-full object-cover" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
+                            <span className="absolute bottom-1.5 inset-x-0 text-center text-[10px] font-bold text-white leading-tight">{eye.label}</span>
+                            {isSelected && (
+                              <div className="absolute top-1.5 right-1.5 w-4 h-4 bg-[#e11d48] rounded-full flex items-center justify-center">
+                                <Check className="w-2.5 h-2.5 text-white" />
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* Step 4: Fryzura */}
+              {/* Step 4: Body Details (Body Type & Breast Size) */}
               {step === 4 && (
-                <div className="space-y-6 w-full animate-in fade-in duration-300">
-                  <h2 className="text-3xl font-black text-white tracking-tight">Choose hairstyle</h2>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-xl mx-auto">
-                    {HAIRSTYLES.map((style) => {
-                      const isSelected = hairstyle === style.value;
-                      return (
-                        <button
-                          key={style.value}
-                          onClick={() => setHairstyle(style.value)}
-                          className={`
-                            relative h-28 rounded-2xl border-2 flex flex-col items-center justify-center transition-all duration-300 bg-gradient-to-br ${style.gradient}
-                            ${isSelected ? 'border-[#e11d48] scale-102 shadow-md' : 'border-white/5 opacity-60 hover:opacity-100'}
-                          `}
-                        >
-                          <span className="text-white font-bold text-base tracking-wide">{style.label}</span>
-                          {isSelected && (
-                            <div className="absolute top-2.5 right-2.5 w-6 h-6 bg-[#e11d48] rounded-full flex items-center justify-center">
-                              <Check className="w-3.5 h-3.5 text-white" />
-                            </div>
-                          )}
-                        </button>
-                      );
-                    })}
+                <div className="space-y-6 md:space-y-8 w-full max-w-xl mx-auto animate-in fade-in duration-300">
+                  <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight">Body Details</h2>
+
+                  {/* Field 1: Body Type */}
+                  <div className="space-y-3 text-left">
+                    <span className="text-xs font-bold text-white/40 uppercase tracking-widest">1. Body Type</span>
+                    <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+                      {BODY_TYPES.map((body) => {
+                        const isSelected = bodyType === body.value;
+                        return (
+                          <button
+                            key={body.value}
+                            onClick={() => setBodyType(body.value)}
+                            className={`
+                              relative rounded-xl aspect-[3/4] overflow-hidden border-2 transition-all duration-300
+                              ${isSelected ? 'border-[#e11d48] scale-102 shadow-lg' : 'border-transparent opacity-65 hover:opacity-100'}
+                            `}
+                          >
+                            <img src={body.image} alt={body.label} className="w-full h-full object-cover" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
+                            <span className="absolute bottom-1.5 inset-x-0 text-center text-[10px] font-bold text-white leading-tight">{body.label}</span>
+                            {isSelected && (
+                              <div className="absolute top-1.5 right-1.5 w-4 h-4 bg-[#e11d48] rounded-full flex items-center justify-center">
+                                <Check className="w-2.5 h-2.5 text-white" />
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Field 2: Breast Size */}
+                  <div className="space-y-3 text-left">
+                    <span className="text-xs font-bold text-white/40 uppercase tracking-widest">2. Breast Size</span>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                      {BREAST_SIZES.map((breast) => {
+                        const isSelected = breastSize === breast.value;
+                        return (
+                          <button
+                            key={breast.value}
+                            onClick={() => setBreastSize(breast.value)}
+                            className={`
+                              relative py-3 rounded-xl border-2 flex flex-col items-center justify-center bg-white/5 transition-all duration-300
+                              ${isSelected ? 'border-[#e11d48] bg-[#e11d48]/10 scale-102 shadow-md' : 'border-white/5 opacity-60 hover:opacity-100'}
+                            `}
+                          >
+                            <span className="text-white font-bold text-sm leading-none">{breast.label}</span>
+                            <span className="text-white/40 text-[10px] font-semibold mt-1">Size {breast.sizeText}</span>
+                            {isSelected && (
+                              <div className="absolute top-1.5 right-1.5 w-4 h-4 bg-[#e11d48] rounded-full flex items-center justify-center">
+                                <Check className="w-2.5 h-2.5 text-white" />
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
               )}
 
-              {/* Step 5: Kolor włosów */}
+              {/* Step 5: Identity & Personality (Name, Relationship & Personality Traits) */}
               {step === 5 && (
-                <div className="space-y-6 w-full animate-in fade-in duration-300">
-                  <h2 className="text-3xl font-black text-white tracking-tight">Choose hair color</h2>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 max-w-4xl mx-auto">
-                    {HAIR_COLORS.map((hair) => {
-                      const isSelected = hairColor === hair.value;
-                      return (
-                        <button
-                          key={hair.value}
-                          onClick={() => setHairColor(hair.value)}
-                          className={`
-                            relative rounded-2xl aspect-[3/4] overflow-hidden border-2 transition-all duration-300
-                            ${isSelected ? 'border-[#e11d48] scale-102 shadow-lg' : 'border-transparent opacity-60 hover:opacity-100'}
-                          `}
-                        >
-                          <img src={hair.image} alt={hair.label} className="w-full h-full object-cover" />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-                          <span className="absolute bottom-3 inset-x-0 text-center text-xs font-bold text-white">{hair.label}</span>
-                          {isSelected && (
-                            <div className="absolute top-2.5 right-2.5 w-6 h-6 bg-[#e11d48] rounded-full flex items-center justify-center">
-                              <Check className="w-3.5 h-3.5 text-white" />
-                            </div>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
+                <div className="space-y-6 md:space-y-8 w-full max-w-xl mx-auto animate-in fade-in duration-300">
+                  <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight">Identity & Personality</h2>
 
-              {/* Step 6: Kolor oczu */}
-              {step === 6 && (
-                <div className="space-y-6 w-full animate-in fade-in duration-300">
-                  <h2 className="text-3xl font-black text-white tracking-tight">Choose eye color</h2>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 max-w-4xl mx-auto">
-                    {EYE_COLORS.map((eye) => {
-                      const isSelected = eyeColor === eye.value;
-                      return (
-                        <button
-                          key={eye.value}
-                          onClick={() => setEyeColor(eye.value)}
-                          className={`
-                            relative rounded-2xl aspect-[3/4] overflow-hidden border-2 transition-all duration-300
-                            ${isSelected ? 'border-[#e11d48] scale-102 shadow-lg' : 'border-transparent opacity-60 hover:opacity-100'}
-                          `}
-                        >
-                          <img src={eye.image} alt={eye.label} className="w-full h-full object-cover" />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-                          <span className="absolute bottom-3 inset-x-0 text-center text-xs font-bold text-white">{eye.label}</span>
-                          {isSelected && (
-                            <div className="absolute top-2.5 right-2.5 w-6 h-6 bg-[#e11d48] rounded-full flex items-center justify-center">
-                              <Check className="w-3.5 h-3.5 text-white" />
-                            </div>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* Step 7: Sylwetka */}
-              {step === 7 && (
-                <div className="space-y-6 w-full animate-in fade-in duration-300">
-                  <h2 className="text-3xl font-black text-white tracking-tight">Choose body type</h2>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 max-w-3xl mx-auto">
-                    {BODY_TYPES.map((body) => {
-                      const isSelected = bodyType === body.value;
-                      return (
-                        <button
-                          key={body.value}
-                          onClick={() => setBodyType(body.value)}
-                          className={`
-                            relative rounded-2xl aspect-[3/4] overflow-hidden border-2 transition-all duration-300
-                            ${isSelected ? 'border-[#e11d48] scale-102 shadow-lg' : 'border-transparent opacity-60 hover:opacity-100'}
-                          `}
-                        >
-                          <img src={body.image} alt={body.label} className="w-full h-full object-cover" />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-                          <span className="absolute bottom-3 inset-x-0 text-center text-xs font-bold text-white">{body.label}</span>
-                          {isSelected && (
-                            <div className="absolute top-2.5 right-2.5 w-6 h-6 bg-[#e11d48] rounded-full flex items-center justify-center">
-                              <Check className="w-3.5 h-3.5 text-white" />
-                            </div>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* Step 8: Rozmiar piersi */}
-              {step === 8 && (
-                <div className="space-y-6 w-full animate-in fade-in duration-300">
-                  <h2 className="text-3xl font-black text-white tracking-tight">Choose breast size</h2>
-                  <div className="grid grid-cols-2 gap-4 max-w-md mx-auto">
-                    {BREAST_SIZES.map((breast) => {
-                      const isSelected = breastSize === breast.value;
-                      return (
-                        <button
-                          key={breast.value}
-                          onClick={() => setBreastSize(breast.value)}
-                          className={`
-                            relative h-28 rounded-2xl border-2 flex flex-col items-center justify-center bg-white/5 transition-all duration-300
-                            ${isSelected ? 'border-[#e11d48] bg-[#e11d48]/10 scale-102 shadow-md' : 'border-white/5 opacity-60 hover:opacity-100'}
-                          `}
-                        >
-                          <span className="text-white font-bold text-lg">{breast.label}</span>
-                          <span className="text-white/40 text-xs font-semibold mt-1">Size {breast.sizeText}</span>
-                          {isSelected && (
-                            <div className="absolute top-2.5 right-2.5 w-6 h-6 bg-[#e11d48] rounded-full flex items-center justify-center">
-                              <Check className="w-3.5 h-3.5 text-white" />
-                            </div>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* Step 9: Imię */}
-              {step === 9 && (
-                <div className="space-y-6 w-full max-w-sm mx-auto animate-in fade-in duration-300">
-                  <h2 className="text-3xl font-black text-white tracking-tight">Choose name</h2>
-                  <div className="space-y-4">
-                    <input
-                      type="text"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="Enter name..."
-                      maxLength={18}
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4.5 text-white placeholder-white/20 text-xl font-bold text-center focus:outline-none focus:border-[#e11d48] transition-all"
-                    />
+                  {/* Field 1: Name */}
+                  <div className="grid grid-cols-3 gap-3 items-end">
+                    <div className="col-span-2 space-y-2 text-left">
+                      <span className="text-xs font-bold text-white/40 uppercase tracking-widest">1. Choose Name</span>
+                      <input
+                        type="text"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="Enter name..."
+                        maxLength={18}
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-white/20 text-base font-bold focus:outline-none focus:border-[#e11d48] transition-all"
+                      />
+                    </div>
                     <button
                       onClick={() => {
                         const list = gender === "trans" ? RANDOM_TRANS_NAMES : RANDOM_GIRL_NAMES;
                         setName(list[Math.floor(Math.random() * list.length)]);
                       }}
-                      className="w-full py-3.5 rounded-2xl border border-white/5 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white font-bold text-xs tracking-wider uppercase transition-all"
+                      className="h-[42px] rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white font-bold text-xs tracking-wider uppercase transition-all"
                     >
-                      Random Name 🎲
+                      Random 🎲
                     </button>
                   </div>
-                </div>
-              )}
 
-              {/* Step 10: Osobowość */}
-              {step === 10 && (
-                <div className="space-y-6 w-full animate-in fade-in duration-300">
-                  <h2 className="text-3xl font-black text-white tracking-tight">Choose personality</h2>
-                  <div className="flex flex-wrap justify-center gap-3.5 max-w-xl mx-auto">
-                    {PERSONALITY_TRAITS.map((trait) => {
-                      const isSelected = selectedTraits.includes(trait.value);
-                      return (
-                        <button
-                          key={trait.value}
-                          onClick={() => handleTraitToggle(trait.value)}
-                          className={`
-                            px-6 py-3.5 rounded-2xl font-bold text-sm tracking-tight border transition-all duration-200
-                            ${isSelected
-                              ? 'bg-[#e11d48] border-[#e11d48] text-white shadow-md'
-                              : 'bg-white/5 border-white/5 text-white/50 hover:text-white hover:border-white/10'
-                            }
-                          `}
-                        >
-                          {trait.label}
-                        </button>
-                      );
-                    })}
+                  {/* Field 2: Choose Relationship */}
+                  <div className="space-y-3 text-left">
+                    <span className="text-xs font-bold text-white/40 uppercase tracking-widest">2. Choose Relationship</span>
+                    <div className="grid grid-cols-3 gap-2">
+                      {RELATIONSHIPS.map((rel) => {
+                        const isSelected = relationship === rel.value;
+                        return (
+                          <button
+                            key={rel.value}
+                            onClick={() => setRelationship(rel.value)}
+                            className={`
+                              relative py-3.5 rounded-xl border-2 flex items-center justify-center bg-white/5 transition-all duration-300
+                              ${isSelected ? 'border-[#e11d48] bg-[#e11d48]/10 scale-102' : 'border-white/5 opacity-60 hover:opacity-100'}
+                            `}
+                          >
+                            <span className="text-white font-bold text-xs leading-none">{rel.label}</span>
+                            {isSelected && (
+                              <div className="absolute top-1 right-1 w-4 h-4 bg-[#e11d48] rounded-full flex items-center justify-center">
+                                <Check className="w-2.5 h-2.5 text-white" />
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              )}
 
-              {/* Step 11: Relacja */}
-              {step === 11 && (
-                <div className="space-y-6 w-full animate-in fade-in duration-300">
-                  <h2 className="text-3xl font-black text-white tracking-tight">Choose relationship</h2>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-xl mx-auto">
-                    {RELATIONSHIPS.map((rel) => {
-                      const isSelected = relationship === rel.value;
-                      return (
-                        <button
-                          key={rel.value}
-                          onClick={() => setRelationship(rel.value)}
-                          className={`
-                            relative h-24 rounded-2xl border-2 flex items-center justify-center bg-white/5 transition-all duration-300
-                            ${isSelected ? 'border-[#e11d48] bg-[#e11d48]/10 scale-102' : 'border-white/5 opacity-60 hover:opacity-100'}
-                          `}
-                        >
-                          <span className="text-white font-bold text-base">{rel.label}</span>
-                          {isSelected && (
-                            <div className="absolute top-2.5 right-2.5 w-6 h-6 bg-[#e11d48] rounded-full flex items-center justify-center">
-                              <Check className="w-3.5 h-3.5 text-white" />
-                            </div>
-                          )}
-                        </button>
-                      );
-                    })}
+                  {/* Field 3: Personality Traits */}
+                  <div className="space-y-3 text-left">
+                    <span className="text-xs font-bold text-white/40 uppercase tracking-widest">3. Choose Personality (Select multiple)</span>
+                    <div className="flex flex-wrap gap-2">
+                      {PERSONALITY_TRAITS.map((trait) => {
+                        const isSelected = selectedTraits.includes(trait.value);
+                        return (
+                          <button
+                            key={trait.value}
+                            onClick={() => handleTraitToggle(trait.value)}
+                            className={`
+                              px-4 py-2 rounded-xl font-bold text-xs tracking-tight border transition-all duration-200
+                              ${isSelected
+                                ? 'bg-[#e11d48] border-[#e11d48] text-white shadow-md'
+                                : 'bg-white/5 border-white/5 text-white/50 hover:text-white hover:border-white/10'
+                              }
+                            `}
+                          >
+                            {trait.label}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
               )}
             </div>
 
             {/* Stepper buttons */}
-            <div className="flex justify-between items-center w-full max-w-md mt-10">
+            <div className="fixed bottom-0 left-0 right-0 z-30 bg-[#0a0a0f]/90 backdrop-blur-md border-t border-white/5 p-4 md:relative md:bottom-auto md:left-auto md:right-auto md:z-10 md:bg-transparent md:backdrop-blur-none md:border-none md:p-0 md:mt-10 flex justify-between items-center w-full md:max-w-md mx-auto">
               <button
                 onClick={prevStep}
                 disabled={step === 1}
@@ -777,15 +780,15 @@ export default function CreateGirlPage() {
                 onClick={nextStep}
                 className="flex items-center gap-2 px-10 py-3.5 bg-[#be123c] hover:bg-[#991b1b] text-white font-bold rounded-xl transition-all shadow-lg active:scale-95 text-sm"
               >
-                <span>Next</span>
+                <span>{step === 5 ? "Create" : "Next"}</span>
                 <ArrowRight size={16} strokeWidth={2.5} />
               </button>
             </div>
           </div>
         )}
 
-        {/* --- STEP 12: LOADER SCREEN --- */}
-        {step === 12 && (
+        {/* --- STEP 6: LOADER SCREEN --- */}
+        {step === 6 && (
           <div className="max-w-xs w-full text-center z-10 space-y-8 animate-in fade-in duration-300">
             <div className="relative w-28 h-28 mx-auto flex items-center justify-center">
               {/* Spinning outer loader */}
@@ -826,8 +829,8 @@ export default function CreateGirlPage() {
           </div>
         )}
 
-        {/* --- STEP 13: SUMMARY PAGE --- */}
-        {step === 13 && (
+        {/* --- STEP 7: SUMMARY PAGE --- */}
+        {step === 7 && (
           <div className="max-w-4xl w-full z-10 bg-white/5 border border-white/5 rounded-[2.5rem] p-6 md:p-8 flex flex-col md:flex-row gap-8 items-stretch animate-in scale-in duration-500">
             {/* Left side: Preview Image */}
             <div className="w-full md:w-1/2 aspect-[3/4] md:aspect-auto rounded-3xl overflow-hidden relative border border-white/10">

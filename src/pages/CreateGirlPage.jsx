@@ -36,7 +36,7 @@ import petiteBody from '../assets/create/body/petite.png';
 import slimBody from '../assets/create/body/slim.png';
 import thickBody from '../assets/create/body/thick.png';
 
-import realisticGirlImg from '../assets/realistic_girl_preview.png';
+import realisticGirlImg from '../assets/task_01kmwzbe1tfvp912tg8rwe5hay_1774793926_img_1.webp';
 import animeGirlImg from '../assets/anime_girl_preview.png';
 
 // Survey Data Lists (English Translation)

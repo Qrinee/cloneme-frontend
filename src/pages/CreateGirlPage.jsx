@@ -16,6 +16,11 @@ import europeanEthnicity from '../assets/create/ethnicity/european.png';
 import latinaEthnicity from '../assets/create/ethnicity/latina.png';
 import arabicEthnicity from '../assets/create/ethnicity/arabic.png';
 
+import smallBreast from '../assets/breast/small.png'
+import mediumBreast from '../assets/breast/medium.png'
+import bigBreast from '../assets/breast/big.png'
+import largeBreast from '../assets/breast/large.png'
+
 import brownHair from '../assets/create/hair/brown.png';
 import blondeHair from '../assets/create/hair/blonde.png';
 import redHair from '../assets/create/hair/redhair.png';
@@ -23,12 +28,9 @@ import blackHair from '../assets/create/hair/black.png';
 import pinkHair from '../assets/create/hair/pink.png';
 import silverHair from '../assets/create/hair/silver.png';
 
-import hazelEyes from '../assets/create/eyes/hazel.png';
 import blueEyes from '../assets/create/eyes/blue.png';
 import greenEyes from '../assets/create/eyes/green.png';
 import brownEyes from '../assets/create/eyes/brown.png';
-import purpleEyes from '../assets/create/eyes/purple.png';
-import blackEyes from '../assets/create/eyes/black.png';
 
 import athleticBody from '../assets/create/body/athletic.png';
 import curvyBody from '../assets/create/body/curvy.png';
@@ -70,9 +72,6 @@ const EYE_COLORS = [
   { value: "blue", label: "Blue", image: blueEyes },
   { value: "green", label: "Green", image: greenEyes },
   { value: "brown", label: "Brown", image: brownEyes },
-  { value: "hazel", label: "Hazel", image: hazelEyes },
-  { value: "black", label: "Black", image: blackEyes },
-  { value: "purple", label: "Purple", image: purpleEyes },
 ];
 
 const BODY_TYPES = [
@@ -84,10 +83,10 @@ const BODY_TYPES = [
 ];
 
 const BREAST_SIZES = [
-  { value: "small", label: "Small", sizeText: "A-B" },
-  { value: "medium", label: "Medium", sizeText: "C-D" },
-  { value: "large", label: "Large", sizeText: "DD-E" },
-  { value: "extra_large", label: "Very Large", sizeText: "F+" }
+  { value: "small", label: "Small", sizeText: "A-B", image: smallBreast },
+  { value: "medium", label: "Medium", sizeText: "C-D", image: mediumBreast },
+  { value: "large", label: "Large", sizeText: "DD-E", image: bigBreast },
+  { value: "extra_large", label: "Very Large", sizeText: "F+", image: largeBreast }
 ];
 
 const PERSONALITY_TRAITS = [
@@ -124,7 +123,7 @@ export default function CreateGirlPage() {
   const [step, setStep] = useState(1);
 
   // Selection States
-  const [gender, setGender] = useState("girls"); // girls | trans
+  const [gender, setGender] = useState("girl"); // girl | trans
   const [artStyle, setArtStyle] = useState(null); // realistic | anime
   const [ethnicity, setEthnicity] = useState(null);
   const [age, setAge] = useState(18);
@@ -142,28 +141,125 @@ export default function CreateGirlPage() {
   const [loadingText, setLoadingText] = useState("Initializing connection...");
   const [previewImage, setPreviewImage] = useState(null);
   const [savedGirlfriendId, setSavedGirlfriendId] = useState(null);
+  const [validationError, setValidationError] = useState("");
 
   // Overlay / Payment Dialog States
   const [showPremiumOverlay, setShowPremiumOverlay] = useState(false);
   const [premiumView, setPremiumView] = useState("benefits"); // benefits | plans | checkout
   const [checkoutPlanId, setCheckoutPlanId] = useState(null);
 
+  // Load saved generated girlfriend from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem("savedGeneratedGirlfriend");
+    if (saved) {
+      try {
+        const data = JSON.parse(saved);
+        if (data.name) setName(data.name);
+        if (data.age) setAge(data.age);
+        if (data.hairColor) setHairColor(data.hairColor);
+        if (data.hairstyle) setHairstyle(data.hairstyle);
+        if (data.eyeColor) setEyeColor(data.eyeColor);
+        if (data.bodyType) setBodyType(data.bodyType);
+        if (data.breastSize) setBreastSize(data.breastSize);
+        if (data.ethnicity) setEthnicity(data.ethnicity);
+        if (data.gender) setGender(data.gender);
+        if (data.artStyle) setArtStyle(data.artStyle);
+        if (data.selectedTraits) setSelectedTraits(data.selectedTraits);
+        if (data.relationship) setRelationship(data.relationship);
+        if (data.previewImage) setPreviewImage(data.previewImage);
+        setStep(7); // Go directly to Step 7 (Summary screen)
+      } catch (e) {
+        console.error("Failed to parse saved generated girlfriend:", e);
+      }
+    }
+  }, []);
+
   // Set default random name based on selected gender
   useEffect(() => {
-    if (!name) {
+    const hasSaved = localStorage.getItem("savedGeneratedGirlfriend");
+    if (!hasSaved && !name) {
       const list = gender === "trans" ? RANDOM_TRANS_NAMES : RANDOM_GIRL_NAMES;
       const randomName = list[Math.floor(Math.random() * list.length)];
       setName(randomName);
     }
-  }, [gender]);
+  }, [gender, name]);
+
+  // Reset the wizard and clear saved generated girlfriend
+  const handleReset = () => {
+    localStorage.removeItem("savedGeneratedGirlfriend");
+    localStorage.removeItem("pendingGirlfriendCreation");
+    setName("");
+    setAge(18);
+    setHairColor(null);
+    setHairstyle(null);
+    setEyeColor(null);
+    setBodyType(null);
+    setBreastSize(null);
+    setEthnicity(null);
+    setGender("girl");
+    setArtStyle(null);
+    setSelectedTraits([]);
+    setRelationship(null);
+    setPreviewImage(null);
+    setStep(1);
+  };
+
+  // Helper to check if the current step selections are fully complete
+  const isStepValid = (stepNum) => {
+    if (stepNum === 1) return !!artStyle;
+    if (stepNum === 2) return !!ethnicity;
+    if (stepNum === 3) return !!hairstyle && !!hairColor && !!eyeColor;
+    if (stepNum === 4) return !!bodyType && !!breastSize;
+    if (stepNum === 5) return !!name.trim() && selectedTraits.length > 0 && !!relationship;
+    return true;
+  };
+
+  // Clear validation errors when options change
+  useEffect(() => {
+    setValidationError("");
+  }, [artStyle, ethnicity, hairstyle, hairColor, eyeColor, bodyType, breastSize, name, selectedTraits, relationship, step]);
 
   // Handle survey step progression
   const nextStep = () => {
-    if (step === 1 && !artStyle) return;
-    if (step === 2 && !ethnicity) return;
-    if (step === 3 && (!hairstyle || !hairColor || !eyeColor)) return;
-    if (step === 4 && (!bodyType || !breastSize)) return;
-    if (step === 5 && (!name.trim() || selectedTraits.length === 0 || !relationship)) return;
+    setValidationError("");
+
+    if (step === 1 && !artStyle) {
+      setValidationError("Please select an art style to continue.");
+      return;
+    }
+    if (step === 2 && !ethnicity) {
+      setValidationError("Please select an ethnicity to continue.");
+      return;
+    }
+    if (step === 3) {
+      const missing = [];
+      if (!hairstyle) missing.push("Hairstyle");
+      if (!hairColor) missing.push("Hair color");
+      if (!eyeColor) missing.push("Eye color");
+      if (missing.length > 0) {
+        setValidationError(`Please select: ${missing.join(", ")}.`);
+        return;
+      }
+    }
+    if (step === 4) {
+      const missing = [];
+      if (!bodyType) missing.push("Body type");
+      if (!breastSize) missing.push("Breast size");
+      if (missing.length > 0) {
+        setValidationError(`Please select: ${missing.join(", ")}.`);
+        return;
+      }
+    }
+    if (step === 5) {
+      const missing = [];
+      if (!name.trim()) missing.push("Name");
+      if (!relationship) missing.push("Relationship type");
+      if (selectedTraits.length === 0) missing.push("at least one Personality Trait");
+      if (missing.length > 0) {
+        setValidationError(`Please select or fill in: ${missing.join(", ")}.`);
+        return;
+      }
+    }
 
     if (step === 5) {
       startGeneration();
@@ -190,6 +286,24 @@ export default function CreateGirlPage() {
     setLoadingText("Creating your AI companion...");
     setPreviewImage(null); // Reset preview image to avoid showing old images
 
+    const saveToLocalStorage = (imgUrl) => {
+      localStorage.setItem("savedGeneratedGirlfriend", JSON.stringify({
+        name,
+        age,
+        hairColor,
+        hairstyle,
+        eyeColor,
+        bodyType,
+        breastSize,
+        ethnicity,
+        gender,
+        artStyle,
+        selectedTraits,
+        relationship,
+        previewImage: imgUrl
+      }));
+    };
+
     // 1. Kick off preview generation in background
     let generatedImage = null;
     let apiCompleted = false;
@@ -200,8 +314,10 @@ export default function CreateGirlPage() {
       name,
       age,
       hairColor,
+      hairstyle,
       eyeColor,
       bodyType,
+      breastSize,
       ethnicity,
       bio: bioText,
       relationship,
@@ -232,12 +348,14 @@ export default function CreateGirlPage() {
             generatedImage = data.previewImage;
             setPreviewImage(data.previewImage);
             apiCompleted = true;
+            saveToLocalStorage(data.previewImage);
           };
           img.onerror = () => {
             console.error("Failed to preload generated image, falling back");
             generatedImage = data.previewImage;
             setPreviewImage(data.previewImage);
             apiCompleted = true;
+            saveToLocalStorage(data.previewImage);
           };
         } else {
           apiCompleted = true;
@@ -280,7 +398,9 @@ export default function CreateGirlPage() {
 
         // Save default fallback image if background preview did not complete
         if (!generatedImage) {
-          setPreviewImage(artStyle === "anime" ? animeGirlImg : realisticGirlImg);
+          const fallbackImg = artStyle === "anime" ? animeGirlImg : realisticGirlImg;
+          setPreviewImage(fallbackImg);
+          saveToLocalStorage(fallbackImg);
         }
 
         // Transition to summary page (step 7)
@@ -300,8 +420,10 @@ export default function CreateGirlPage() {
       name,
       age,
       hairColor,
+      hairstyle,
       eyeColor,
       bodyType,
+      breastSize,
       ethnicity,
       gender,
       style: artStyle,
@@ -340,6 +462,8 @@ export default function CreateGirlPage() {
       const data = await res.json();
 
       if (data.type === "success" && data.savedGirlfriend) {
+        localStorage.removeItem("savedGeneratedGirlfriend");
+        localStorage.removeItem("pendingGirlfriendCreation");
         setProgress(100);
         setTimeout(() => {
           navigate(`/chat/${data.savedGirlfriend._id}`);
@@ -413,7 +537,7 @@ export default function CreateGirlPage() {
                             }
                           `}
                         >
-                          {cat.id === "girls" ? (
+                          {cat.id === "girl" ? (
                             <span className="text-pink-500 text-lg">♀</span>
                           ) : (
                             <span className="text-purple-400 text-lg">⚧</span>
@@ -502,12 +626,12 @@ export default function CreateGirlPage() {
                       <div className="relative h-2 bg-white/5 rounded-full mt-2">
                         <div
                           className="absolute inset-y-0 left-0 bg-[#e11d48] rounded-full shadow-[0_0_10px_rgba(225,29,72,0.4)]"
-                          style={{ width: `${((age - 18) / 17) * 100}%` }}
+                          style={{ width: `${((age - 18) / 70) * 100}%` }}
                         />
                         <input
                           type="range"
                           min="18"
-                          max="35"
+                          max="88"
                           value={age}
                           onChange={(e) => setAge(parseInt(e.target.value))}
                           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
@@ -515,7 +639,7 @@ export default function CreateGirlPage() {
                       </div>
                       <div className="flex justify-between text-[8px] font-bold text-white/20 tracking-wider">
                         <span>18 YEARS</span>
-                        <span>35 YEARS</span>
+                        <span>88 YEARS</span>
                       </div>
                     </div>
                   </div>
@@ -584,9 +708,9 @@ export default function CreateGirlPage() {
                   </div>
 
                   {/* Field 3: Eye Color */}
-                  <div className="space-y-3 text-left">
-                    <span className="text-xs font-bold text-white/40 uppercase tracking-widest">3. Eye Color</span>
-                    <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                  <div className="space-y-3 max-w-xs sm:max-w-sm mx-auto w-full">
+                    <span className="text-xs font-bold text-white/40 uppercase tracking-widest block text-left">3. Eye Color</span>
+                    <div className="grid grid-cols-3 gap-2">
                       {EYE_COLORS.map((eye) => {
                         const isSelected = eyeColor === eye.value;
                         return (
@@ -659,12 +783,16 @@ export default function CreateGirlPage() {
                             key={breast.value}
                             onClick={() => setBreastSize(breast.value)}
                             className={`
-                              relative py-3 rounded-xl border-2 flex flex-col items-center justify-center bg-white/5 transition-all duration-300
-                              ${isSelected ? 'border-[#e11d48] bg-[#e11d48]/10 scale-102 shadow-md' : 'border-white/5 opacity-60 hover:opacity-100'}
+                              relative rounded-xl aspect-[3/4] overflow-hidden border-2 transition-all duration-300
+                              ${isSelected ? 'border-[#e11d48] scale-102 shadow-lg' : 'border-transparent opacity-65 hover:opacity-100'}
                             `}
                           >
-                            <span className="text-white font-bold text-sm leading-none">{breast.label}</span>
-                            <span className="text-white/40 text-[10px] font-semibold mt-1">Size {breast.sizeText}</span>
+                            <img src={breast.image} alt={breast.label} className="w-full h-full object-cover" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+                            <div className="absolute bottom-2.5 inset-x-0 text-center flex flex-col items-center justify-center">
+                              <span className="text-white font-bold text-xs sm:text-sm leading-none">{breast.label}</span>
+                              <span className="text-white/60 text-[9px] sm:text-[10px] font-semibold mt-1">Size {breast.sizeText}</span>
+                            </div>
                             {isSelected && (
                               <div className="absolute top-1.5 right-1.5 w-4 h-4 bg-[#e11d48] rounded-full flex items-center justify-center">
                                 <Check className="w-2.5 h-2.5 text-white" />
@@ -763,26 +891,38 @@ export default function CreateGirlPage() {
             </div>
 
             {/* Stepper buttons */}
-            <div className="fixed bottom-0 left-0 right-0 z-30 bg-[#0a0a0f]/90 backdrop-blur-md border-t border-white/5 p-4 md:relative md:bottom-auto md:left-auto md:right-auto md:z-10 md:bg-transparent md:backdrop-blur-none md:border-none md:p-0 md:mt-10 flex justify-between items-center w-full md:max-w-md mx-auto">
-              <button
-                onClick={prevStep}
-                disabled={step === 1}
-                className={`flex items-center gap-2 px-6 py-3.5 rounded-xl font-bold transition-all text-sm ${step === 1
-                  ? 'text-white/10 cursor-not-allowed opacity-30'
-                  : 'text-white/60 hover:text-white hover:bg-white/5'
-                  }`}
-              >
-                <ArrowLeft size={16} strokeWidth={2.5} />
-                <span>Back</span>
-              </button>
+            <div className="fixed bottom-0 left-0 right-0 z-30 bg-[#0a0a0f]/90 backdrop-blur-md border-t border-white/5 p-4 md:relative md:bottom-auto md:left-auto md:right-auto md:z-10 md:bg-transparent md:backdrop-blur-none md:border-none md:p-0 md:mt-10 flex flex-col gap-3 w-full md:max-w-md mx-auto">
+              
+              {/* Validation Error Message */}
+              {validationError && (
+                <div className="text-[#e11d48] font-bold text-xs tracking-wide uppercase text-center animate-in fade-in slide-in-from-bottom-2 duration-300">
+                  ⚠️ {validationError}
+                </div>
+              )}
 
-              <button
-                onClick={nextStep}
-                className="flex items-center gap-2 px-10 py-3.5 bg-[#be123c] hover:bg-[#991b1b] text-white font-bold rounded-xl transition-all shadow-lg active:scale-95 text-sm"
-              >
-                <span>{step === 5 ? "Create" : "Next"}</span>
-                <ArrowRight size={16} strokeWidth={2.5} />
-              </button>
+              <div className="flex justify-between items-center w-full">
+                <button
+                  onClick={prevStep}
+                  disabled={step === 1}
+                  className={`flex items-center gap-2 px-6 py-3.5 rounded-xl font-bold transition-all text-sm ${step === 1
+                    ? 'text-white/10 cursor-not-allowed opacity-30'
+                    : 'text-white/60 hover:text-white hover:bg-white/5'
+                    }`}
+                >
+                  <ArrowLeft size={16} strokeWidth={2.5} />
+                  <span>Back</span>
+                </button>
+
+                <button
+                  onClick={nextStep}
+                  className={`flex items-center gap-2 px-10 py-3.5 bg-[#be123c] hover:bg-[#991b1b] text-white font-bold rounded-xl transition-all shadow-lg active:scale-95 text-sm ${
+                    !isStepValid(step) ? 'opacity-80 hover:opacity-100' : ''
+                  }`}
+                >
+                  <span>{step === 5 ? "Create" : "Next"}</span>
+                  <ArrowRight size={16} strokeWidth={2.5} />
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -1122,7 +1262,7 @@ export default function CreateGirlPage() {
 
 // Category lists with helper constants
 const CATEGORIES_BUTTONS = [
-  { id: "girls", label: "Girls" },
+  { id: "girl", label: "Girls" },
   { id: "trans", label: "Trans" }
 ];
 

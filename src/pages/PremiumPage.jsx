@@ -54,8 +54,11 @@ export default function PremiumPage() {
                 <Check size={40} className="text-green-500" />
               </div>
               <h1 className="text-3xl md:text-4xl font-bold mb-4">Payment Successful!</h1>
-              <p className="text-lg text-gray-400 mb-8 max-w-md">
+              <p className="text-lg text-gray-400 mb-4 max-w-md">
                 Thank you for your purchase. Your Premium subscription is now active and you have full access to all features.
+              </p>
+              <p className="text-sm text-gray-500 mb-8 max-w-md">
+                (If you created a new account during checkout, please check your email for your login credentials.)
               </p>
               <a href="/profile" className="bg-[#e11d48] hover:bg-[#be123c] transition rounded-xl px-8 py-4 font-semibold text-white shadow-lg shadow-red-500/10 inline-block">
                 Go to Profile

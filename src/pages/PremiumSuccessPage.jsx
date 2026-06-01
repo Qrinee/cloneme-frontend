@@ -2,7 +2,6 @@ import { Check } from "lucide-react";
 import Layout from "@/components/Layout";
 import { useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
-import confetti from "canvas-confetti"; // I'll add a simple confetti effect for better UX if possible, or just standard UI. We'll skip confetti if it's not installed. Let's just use the existing UI.
 
 export default function PremiumSuccessPage() {
   const [searchParams] = useSearchParams();

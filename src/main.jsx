@@ -21,6 +21,7 @@ import TermsPage from './pages/TermsPage'
 import PrivacyPage from './pages/PrivacyPage'
 import ProfilePage from './pages/ProfilePage'
 import PremiumPage from './pages/PremiumPage'
+import PremiumSuccessPage from './pages/PremiumSuccessPage'
 import { LayoutProvider, useLayoutContext } from './components/LayoutContext'
 
 function Application() {
@@ -123,6 +124,10 @@ function Application() {
       <Route 
         path='/premium' 
         element={<PremiumPage />} 
+      />
+      <Route 
+        path='/premium-success' 
+        element={<PremiumSuccessPage />} 
       />
 
       <Route path="*" element={<NotFound />} />

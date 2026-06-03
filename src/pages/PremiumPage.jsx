@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
+import DoctorTiles from "@/components/DoctorTiles";
 import { Crown, MessageCircle, Heart, Image, Video, Coins, Check } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import StripeEmbeddedCheckout from "@/components/StripeEmbeddedCheckout";
@@ -168,6 +169,7 @@ export default function PremiumPage() {
 
           )}
         </div>
+        <DoctorTiles />
    </div>
     </Layout>
   );

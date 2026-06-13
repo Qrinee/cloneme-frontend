@@ -4,10 +4,8 @@ import { useAuthFetch } from "../utils/authFetch";
 import Layout from "../components/Layout";
 import { useLayoutContext } from "../components/LayoutContext";
 import StripeEmbeddedCheckout from "../components/StripeEmbeddedCheckout";
-import {
-  ArrowRight, ArrowLeft, Heart, Sparkles, User, MessageCircle, Lock, Crown, Check, X,
-  Flame, Gem, Infinity as InfinityIcon, Shield, Sparkle
-} from "lucide-react";
+import { Heart, Star, Sparkles, UserPlus, SlidersHorizontal, Image as ImageIcon, MessageSquareHeart, Check, ArrowRight, ArrowLeft, X, Flame, Gem, Infinity as InfinityIcon, Shield, Sparkle, User, MessageCircle, Lock, Crown, Dices, Play } from "lucide-react";
+import LoginModal from "../components/LoginModal";
 
 // Asset Imports
 import africanEthnicity from '../assets/create/ethnicity/african.png';
@@ -90,15 +88,54 @@ const BREAST_SIZES = [
 ];
 
 const PERSONALITY_TRAITS = [
-  { value: "sensual", label: "Sensual" },
-  { value: "romantic", label: "Romantic" },
-  { value: "flirty", label: "Flirty" },
-  { value: "cute", label: "Cute" },
-  { value: "shy", label: "Shy" },
-  { value: "teasing", label: "Teasing" },
-  { value: "experienced", label: "Experienced" },
-  { value: "bold", label: "Bold" },
-  { value: "daring", label: "Daring" }
+  { value: "nimfomanka", label: "Nymphomaniac" },
+  { value: "kochanka", label: "Lover" },
+  { value: "ulegla", label: "Submissive" },
+  { value: "dominujaca", label: "Dominant" },
+  { value: "kusicielka", label: "Temptress" },
+  { value: "niewinna", label: "Innocent" },
+  { value: "opiekunka", label: "Caregiver" },
+  { value: "eksperymentatorka", label: "Experimental" },
+  { value: "wredna", label: "Bratty" },
+  { value: "powierniczka", label: "Confidante" },
+  { value: "niesmiala", label: "Shy" },
+  { value: "krolowa", label: "Queen" }
+];
+
+const PROFESSIONS = [
+  "Engineer", "Dancer", "Model", "Student",
+  "Stripper", "Maid", "Camgirl",
+  "Boss / CEO", "Babysitter", "Pornstar",
+  "Streamer", "Bartender", "Lifeguard", "Cashier",
+  "Masseuse", "Teacher", "Nurse", "Secretary",
+  "Yoga Instructor", "Fitness Trainer", "Cook", "Artist",
+  "Movie Star / Actress", "Doctor", "Librarian",
+  "Spy", "Police Officer", "Soldier", "Lawyer",
+  "Hairdresser", "Dentist", "Singer / Musician",
+  "Gynecologist", "Writer", "Flight Attendant",
+  "Pro Athlete", "Scientist", "Florist",
+  "Makeup Artist", "Photographer", "Social Worker"
+];
+
+const FETISHES = [
+  "Bondage", "Spanking", "Collar & Leash", "Punishment", "Humiliation",
+  "Public play", "Roleplay", "Anal play",
+  "Oral play", "Cum play", "Creampie", "Squirting",
+  "Dirty talk", "Breeding", "Daddy dom", "Edging",
+  "Obedience", "Control", "Inexperienced", "Shy teasing",
+  "Playful teasing", "Cuddling", "Slow and sensual", "Hair pulling"
+];
+
+const VOICES = [
+  { value: "voice_1", label: "Voice 1 Confident" },
+  { value: "voice_2", label: "Voice 2 Cheerful" },
+  { value: "voice_3", label: "Voice 3 Dominant" },
+  { value: "voice_4", label: "Voice 4 Innocent" },
+  { value: "voice_5", label: "Voice 5 Sweet" },
+  { value: "voice_6", label: "Voice 6 Sensual" },
+  { value: "voice_7", label: "Voice 7 Calm" },
+  { value: "voice_8", label: "Voice 8 Thoughtful" },
+  { value: "voice_9", label: "Voice 9 Moody" }
 ];
 
 const RELATIONSHIPS = [
@@ -126,7 +163,7 @@ export default function CreateGirlPage() {
   const [gender, setGender] = useState("girl"); // girl | trans
   const [artStyle, setArtStyle] = useState(null); // realistic | anime
   const [ethnicity, setEthnicity] = useState(null);
-  const [age, setAge] = useState(18);
+  const [age, setAge] = useState(21);
   const [hairstyle, setHairstyle] = useState(null);
   const [hairColor, setHairColor] = useState(null);
   const [eyeColor, setEyeColor] = useState(null);
@@ -135,6 +172,9 @@ export default function CreateGirlPage() {
   const [name, setName] = useState("");
   const [selectedTraits, setSelectedTraits] = useState([]);
   const [relationship, setRelationship] = useState(null);
+  const [profession, setProfession] = useState(null);
+  const [voice, setVoice] = useState(null);
+  const [selectedFetishes, setSelectedFetishes] = useState([]);
 
   // Loading generation state
   const [progress, setProgress] = useState(0);
@@ -147,6 +187,52 @@ export default function CreateGirlPage() {
   const [showPremiumOverlay, setShowPremiumOverlay] = useState(false);
   const [premiumView, setPremiumView] = useState("benefits"); // benefits | plans | checkout
   const [checkoutPlanId, setCheckoutPlanId] = useState(null);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+
+  // Auto-resume creation if logged in and pending creation exists
+  useEffect(() => {
+    if (isLoggedIn) {
+      const pendingStr = localStorage.getItem("pendingGirlfriendCreation");
+      if (pendingStr) {
+        try {
+          const pendingData = JSON.parse(pendingStr);
+          // Try to execute the save and navigate
+          (async () => {
+            setStep(6);
+            setProgress(50);
+            setLoadingText("Saving your character to database...");
+
+            const apiUrl = import.meta.env.VITE_API_URL || '/api/v1';
+            const res = await authFetch(`${apiUrl}/girlfriends`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(pendingData)
+            });
+            const data = await res.json();
+
+            if (data.type === "success" && data.savedGirlfriend) {
+              localStorage.removeItem("savedGeneratedGirlfriend");
+              localStorage.removeItem("pendingGirlfriendCreation");
+              setProgress(100);
+              setTimeout(() => {
+                navigate(`/chat/${data.savedGirlfriend._id}`);
+              }, 500);
+            } else {
+              throw new Error(data.message || "Failed to save character");
+            }
+          })().catch(e => {
+            console.error(e);
+            setStep(7);
+            alert("An error occurred while saving the character. Please try again.");
+            localStorage.removeItem("pendingGirlfriendCreation"); // Clear to prevent infinite loop
+          });
+        } catch (e) {
+          console.error("Failed to parse pending girlfriend", e);
+          localStorage.removeItem("pendingGirlfriendCreation");
+        }
+      }
+    }
+  }, [isLoggedIn]);
 
   // Load saved generated girlfriend from localStorage on mount
   useEffect(() => {
@@ -166,6 +252,9 @@ export default function CreateGirlPage() {
         if (data.artStyle) setArtStyle(data.artStyle);
         if (data.selectedTraits) setSelectedTraits(data.selectedTraits);
         if (data.relationship) setRelationship(data.relationship);
+        if (data.profession) setProfession(data.profession);
+        if (data.voice) setVoice(data.voice);
+        if (data.selectedFetishes) setSelectedFetishes(data.selectedFetishes);
         if (data.previewImage) setPreviewImage(data.previewImage);
         setStep(7); // Go directly to Step 7 (Summary screen)
       } catch (e) {
@@ -200,6 +289,9 @@ export default function CreateGirlPage() {
     setArtStyle(null);
     setSelectedTraits([]);
     setRelationship(null);
+    setProfession(null);
+    setVoice(null);
+    setSelectedFetishes([]);
     setPreviewImage(null);
     setStep(1);
   };
@@ -210,14 +302,14 @@ export default function CreateGirlPage() {
     if (stepNum === 2) return !!ethnicity;
     if (stepNum === 3) return !!hairstyle && !!hairColor && !!eyeColor;
     if (stepNum === 4) return !!bodyType && !!breastSize;
-    if (stepNum === 5) return !!name.trim() && selectedTraits.length > 0 && !!relationship;
+    if (stepNum === 5) return !!name.trim() && selectedTraits.length > 0 && !!relationship && !!profession && !!voice && selectedFetishes.length > 0;
     return true;
   };
 
   // Clear validation errors when options change
   useEffect(() => {
     setValidationError("");
-  }, [artStyle, ethnicity, hairstyle, hairColor, eyeColor, bodyType, breastSize, name, selectedTraits, relationship, step]);
+  }, [artStyle, ethnicity, hairstyle, hairColor, eyeColor, bodyType, breastSize, name, selectedTraits, relationship, profession, voice, selectedFetishes, step]);
 
   // Handle survey step progression
   const nextStep = () => {
@@ -254,7 +346,10 @@ export default function CreateGirlPage() {
       const missing = [];
       if (!name.trim()) missing.push("Name");
       if (!relationship) missing.push("Relationship type");
+      if (!profession) missing.push("Profession");
+      if (!voice) missing.push("Voice");
       if (selectedTraits.length === 0) missing.push("at least one Personality Trait");
+      if (selectedFetishes.length === 0) missing.push("at least one Fetish");
       if (missing.length > 0) {
         setValidationError(`Please select or fill in: ${missing.join(", ")}.`);
         return;
@@ -300,6 +395,9 @@ export default function CreateGirlPage() {
         artStyle,
         selectedTraits,
         relationship,
+        profession,
+        voice,
+        selectedFetishes,
         previewImage: imgUrl
       }));
     };
@@ -323,7 +421,10 @@ export default function CreateGirlPage() {
       relationship,
       tags: selectedTraits,
       gender,
-      style: artStyle
+      style: artStyle,
+      profession,
+      fetishes: selectedFetishes,
+      personality: selectedTraits
     };
 
     const apiUrl = import.meta.env.VITE_API_URL || '/api/v1';
@@ -429,6 +530,10 @@ export default function CreateGirlPage() {
       style: artStyle,
       relationship,
       tags: selectedTraits,
+      profession,
+      voice,
+      fetishes: selectedFetishes,
+      personality: selectedTraits,
       bio: `I am ${name}, I am ${age} years old, I am interested in many things and looking for someone to talk to.`,
       initialMessage: `Hi! I am really happy we can talk. How are you doing today?`,
       actions: ["kiss", "hug", "flirt", "dance"]
@@ -436,18 +541,12 @@ export default function CreateGirlPage() {
 
     localStorage.setItem('pendingGirlfriendCreation', JSON.stringify(chosenPayload));
 
-    // Check if user is logged in AND is premium
-    const isPremiumActive = isLoggedIn && premium?.isActive &&
-      (!premium?.expiresAt || new Date(premium.expiresAt) > new Date());
-
-    if (!isPremiumActive) {
-      // Show premium features checklist overlay (Overlay 1)
-      setPremiumView("benefits");
-      setShowPremiumOverlay(true);
+    if (!isLoggedIn) {
+      setShowLoginModal(true);
       return;
     }
 
-    // User is premium! Proceed to save girlfriend in DB and redirect
+    // User is logged in! Proceed to save girlfriend in DB and redirect
     try {
       setStep(6);
       setProgress(50);
@@ -491,7 +590,7 @@ export default function CreateGirlPage() {
 
         {/* Ambient background glows */}
         <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#e11d48]/5 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-96 h-96 bg-purple-500/5 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-96 h-96 bg-[#e11d48]/5 rounded-full blur-[120px] pointer-events-none" />
 
         {/* --- MAIN CREATION PANEL --- */}
         {step <= 5 && (
@@ -806,10 +905,10 @@ export default function CreateGirlPage() {
                 </div>
               )}
 
-              {/* Step 5: Identity & Personality (Name, Relationship & Personality Traits) */}
+              {/* Step 5: Identity & Personality */}
               {step === 5 && (
-                <div className="space-y-6 md:space-y-8 w-full max-w-xl md:max-w-3xl mx-auto animate-in fade-in duration-300">
-                  <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight">Identity & Personality</h2>
+                <div className="space-y-6 md:space-y-8 w-full max-w-xl md:max-w-4xl mx-auto animate-in fade-in duration-300 pb-20 max-h-[70vh] overflow-y-auto custom-scrollbar pr-2">
+                  <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight">Identity & Details</h2>
 
                   {/* Field 1: Name */}
                   <div className="grid grid-cols-3 gap-3 items-end">
@@ -829,16 +928,42 @@ export default function CreateGirlPage() {
                         const list = gender === "trans" ? RANDOM_TRANS_NAMES : RANDOM_GIRL_NAMES;
                         setName(list[Math.floor(Math.random() * list.length)]);
                       }}
-                      className="h-[42px] rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white font-bold text-xs tracking-wider uppercase transition-all"
+                      className="h-[42px] rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white font-bold text-xs tracking-wider uppercase transition-all flex items-center justify-center gap-2"
                     >
-                      Random 🎲
+                      <Dices className="w-4 h-4" />
+                      Random
                     </button>
                   </div>
 
-                  {/* Field 2: Choose Relationship */}
+                  {/* Field 2: Personality */}
                   <div className="space-y-3 text-left">
-                    <span className="text-xs font-bold text-white/40 uppercase tracking-widest">2. Choose Relationship</span>
-                    <div className="grid grid-cols-3 gap-2">
+                    <span className="text-xs font-bold text-white/40 uppercase tracking-widest">2. Choose Personality</span>
+                    <div className="flex flex-wrap gap-2 max-h-[160px] overflow-y-auto custom-scrollbar pr-2">
+                      {PERSONALITY_TRAITS.map((trait) => {
+                        const isSelected = selectedTraits.includes(trait.value);
+                        return (
+                          <button
+                            key={trait.value}
+                            onClick={() => handleTraitToggle(trait.value)}
+                            className={`
+                              px-4 py-2 rounded-xl font-bold text-xs tracking-tight border transition-all duration-200
+                              ${isSelected
+                                ? 'bg-[#e11d48] border-[#e11d48] text-white shadow-md scale-105'
+                                : 'bg-white/5 border-white/5 text-white/50 hover:text-white hover:border-white/10 hover:scale-105'
+                              }
+                            `}
+                          >
+                            {trait.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Field 3: Relationship */}
+                  <div className="space-y-3 text-left">
+                    <span className="text-xs font-bold text-white/40 uppercase tracking-widest">3. Choose Relationship</span>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-[160px] overflow-y-auto custom-scrollbar pr-2">
                       {RELATIONSHIPS.map((rel) => {
                         const isSelected = relationship === rel.value;
                         return (
@@ -847,7 +972,7 @@ export default function CreateGirlPage() {
                             onClick={() => setRelationship(rel.value)}
                             className={`
                               relative py-3.5 rounded-xl border-2 flex items-center justify-center bg-white/5 transition-all duration-300
-                              ${isSelected ? 'border-[#e11d48] bg-[#e11d48]/10 scale-102' : 'border-white/5 opacity-60 hover:opacity-100'}
+                              ${isSelected ? 'border-[#e11d48] bg-[#e11d48]/10 scale-102' : 'border-white/5 opacity-60 hover:opacity-100 hover:scale-105'}
                             `}
                           >
                             <span className="text-white font-bold text-xs leading-none">{rel.label}</span>
@@ -862,25 +987,84 @@ export default function CreateGirlPage() {
                     </div>
                   </div>
 
-                  {/* Field 3: Personality Traits */}
+                  {/* Field 4: Profession */}
                   <div className="space-y-3 text-left">
-                    <span className="text-xs font-bold text-white/40 uppercase tracking-widest">3. Choose Personality (Select multiple)</span>
-                    <div className="flex flex-wrap gap-2">
-                      {PERSONALITY_TRAITS.map((trait) => {
-                        const isSelected = selectedTraits.includes(trait.value);
+                    <span className="text-xs font-bold text-white/40 uppercase tracking-widest">4. Choose Profession</span>
+                    <div className="flex flex-wrap gap-2 max-h-[200px] overflow-y-auto custom-scrollbar pr-2">
+                      {PROFESSIONS.map((prof) => {
+                        const isSelected = profession === prof;
                         return (
                           <button
-                            key={trait.value}
-                            onClick={() => handleTraitToggle(trait.value)}
+                            key={prof}
+                            onClick={() => setProfession(prof)}
                             className={`
                               px-4 py-2 rounded-xl font-bold text-xs tracking-tight border transition-all duration-200
                               ${isSelected
-                                ? 'bg-[#e11d48] border-[#e11d48] text-white shadow-md'
-                                : 'bg-white/5 border-white/5 text-white/50 hover:text-white hover:border-white/10'
+                                ? 'bg-[#e11d48] border-[#e11d48] text-white shadow-md scale-105'
+                                : 'bg-white/5 border-white/5 text-white/50 hover:text-white hover:border-white/10 hover:scale-105'
                               }
                             `}
                           >
-                            {trait.label}
+                            {prof}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Field 5: Fetishes */}
+                  <div className="space-y-3 text-left">
+                    <span className="text-xs font-bold text-white/40 uppercase tracking-widest">5. What Fetishes Do You Like?</span>
+                    <div className="flex flex-wrap gap-2 max-h-[180px] overflow-y-auto custom-scrollbar pr-2">
+                      {FETISHES.map((fetish) => {
+                        const isSelected = selectedFetishes.includes(fetish);
+                        return (
+                          <button
+                            key={fetish}
+                            onClick={() => {
+                              setSelectedFetishes(prev =>
+                                prev.includes(fetish) ? prev.filter(t => t !== fetish) : [...prev, fetish]
+                              );
+                            }}
+                            className={`
+                              px-3 py-1.5 rounded-lg font-bold text-[10px] sm:text-xs tracking-tight border transition-all duration-200
+                              ${isSelected
+                                ? 'bg-[#e11d48] border-[#e11d48] text-white shadow-md scale-105'
+                                : 'bg-white/5 border-white/5 text-white/50 hover:text-white hover:border-white/10 hover:scale-105'
+                              }
+                            `}
+                          >
+                            {fetish}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Field 6: Voice */}
+                  <div className="space-y-3 text-left">
+                    <span className="text-xs font-bold text-white/40 uppercase tracking-widest">6. Choose Voice</span>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-[180px] overflow-y-auto custom-scrollbar pr-2">
+                      {VOICES.map((v) => {
+                        const isSelected = voice === v.value;
+                        return (
+                          <button
+                            key={v.value}
+                            onClick={() => setVoice(v.value)}
+                            className={`
+                              relative p-3 rounded-xl border flex flex-col items-center justify-center bg-white/5 transition-all duration-300
+                              ${isSelected ? 'border-[#e11d48] bg-[#e11d48]/10 scale-105 shadow-md' : 'border-white/5 opacity-60 hover:opacity-100 hover:scale-105'}
+                            `}
+                          >
+                            <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center mb-2">
+                              <Play className="w-4 h-4 text-white" />
+                            </div>
+                            <span className="text-white font-bold text-xs leading-none">{v.label}</span>
+                            {isSelected && (
+                              <div className="absolute top-1 right-1 w-4 h-4 bg-[#e11d48] rounded-full flex items-center justify-center">
+                                <Check className="w-2.5 h-2.5 text-white" />
+                              </div>
+                            )}
                           </button>
                         );
                       })}
@@ -892,7 +1076,7 @@ export default function CreateGirlPage() {
 
             {/* Stepper buttons */}
             <div className="fixed bottom-0 left-0 right-0 z-30 bg-[#0a0a0f]/90 backdrop-blur-md border-t border-white/5 p-4 md:relative md:bottom-auto md:left-auto md:right-auto md:z-10 md:bg-transparent md:backdrop-blur-none md:border-none md:p-0 md:mt-10 flex flex-col gap-3 w-full md:max-w-md mx-auto">
-              
+
               {/* Validation Error Message */}
               {validationError && (
                 <div className="text-[#e11d48] font-bold text-xs tracking-wide uppercase text-center animate-in fade-in slide-in-from-bottom-2 duration-300">
@@ -915,9 +1099,8 @@ export default function CreateGirlPage() {
 
                 <button
                   onClick={nextStep}
-                  className={`flex items-center gap-2 px-10 py-3.5 bg-[#be123c] hover:bg-[#991b1b] text-white font-bold rounded-xl transition-all shadow-lg active:scale-95 text-sm ${
-                    !isStepValid(step) ? 'opacity-80 hover:opacity-100' : ''
-                  }`}
+                  className={`flex items-center gap-2 px-10 py-3.5 bg-[#be123c] hover:bg-[#991b1b] text-white font-bold rounded-xl transition-all shadow-lg active:scale-95 text-sm ${!isStepValid(step) ? 'opacity-80 hover:opacity-100' : ''
+                    }`}
                 >
                   <span>{step === 5 ? "Create" : "Next"}</span>
                   <ArrowRight size={16} strokeWidth={2.5} />
@@ -1036,13 +1219,43 @@ export default function CreateGirlPage() {
                 </div>
               </div>
 
-              {/* Confirm / Action button */}
-              <div className="pt-4">
+              {/* Fetishes */}
+              <div className="space-y-2">
+                <span className="text-[10px] font-bold text-white/30 uppercase tracking-wider block">Fetishes</span>
+                <div className="flex flex-wrap gap-2">
+                  {selectedFetishes.map(fetishVal => (
+                    <span key={fetishVal} className="px-3 py-1.5 bg-rose-500/10 border border-rose-500/20 text-rose-300 rounded-lg text-[10px] font-bold">
+                      {fetishVal}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Extras (Profession, Voice) */}
+              <div className="grid grid-cols-2 gap-3.5 my-2">
+                <div className="p-3 bg-white/5 rounded-xl border border-white/5">
+                  <span className="text-[9px] font-bold text-white/30 uppercase tracking-wider block mb-1">Profession</span>
+                  <span className="text-white text-sm font-bold capitalize">{profession}</span>
+                </div>
+                <div className="p-3 bg-white/5 rounded-xl border border-white/5">
+                  <span className="text-[9px] font-bold text-white/30 uppercase tracking-wider block mb-1">Voice</span>
+                  <span className="text-white text-sm font-bold capitalize">{VOICES.find(v => v.value === voice)?.label || voice}</span>
+                </div>
+              </div>
+
+              {/* Confirm / Action buttons */}
+              <div className="pt-4 flex flex-col gap-3">
                 <button
                   onClick={handleOżyw}
                   className="w-full py-4.5 bg-[#e11d48] hover:bg-[#be123c] text-white font-black uppercase text-sm tracking-widest rounded-2xl transition-all shadow-lg active:scale-[0.98] shadow-[#e11d48]/10"
                 >
                   Revive my girlfriend
+                </button>
+                <button
+                  onClick={handleReset}
+                  className="w-full py-3 bg-transparent border border-white/10 hover:bg-white/5 text-white/60 hover:text-white font-bold uppercase text-xs tracking-widest rounded-xl transition-all active:scale-[0.98]"
+                >
+                  Start Over
                 </button>
               </div>
             </div>
@@ -1092,7 +1305,7 @@ export default function CreateGirlPage() {
                         {[
                           { title: "Generate unlimited AI characters", iconColor: "text-amber-400" },
                           { title: "Generate the most spicy photos and videos", iconColor: "text-[#e11d48]" },
-                          { title: "Chat, flirt, control", iconColor: "text-purple-400" }
+                          { title: "Chat, flirt, control", iconColor: "text-[#e11d48]" }
                         ].map((item, index) => (
                           <div key={index} className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
@@ -1167,7 +1380,7 @@ export default function CreateGirlPage() {
                       {[
                         { text: "Create your own AI girls", icon: <User className="w-4 h-4 text-amber-400" /> },
                         { text: "Full live-action experience", icon: <Flame className="w-4 h-4 text-[#e11d48]" /> },
-                        { text: "Generate 18+ videos", icon: <Gem className="w-4 h-4 text-purple-400" /> },
+                        { text: "Generate 18+ videos", icon: <Gem className="w-4 h-4 text-[#e11d48]" /> },
                         { text: "Unlimited text messages", icon: <MessageCircle className="w-4 h-4 text-blue-400" /> },
                         { text: "Generate 18+ images", icon: <Sparkle className="w-4 h-4 text-emerald-400" /> },
                         { text: "100 monthly tokens", icon: <Crown className="w-4 h-4 text-yellow-400" /> }
@@ -1222,6 +1435,9 @@ export default function CreateGirlPage() {
             </div>
           </div>
         )}
+
+        {/* --- LOGIN MODAL --- */}
+        <LoginModal open={showLoginModal} onClose={() => setShowLoginModal(false)} />
 
       </div>
 

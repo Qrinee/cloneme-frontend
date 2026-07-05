@@ -169,7 +169,6 @@ export default function PremiumPage() {
 
           )}
         </div>
-        <DoctorTiles />
    </div>
     </Layout>
   );

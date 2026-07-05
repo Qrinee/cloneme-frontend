@@ -165,7 +165,7 @@ export default function MainPage() {
 
           {/* Title */}
           <div className="mb-8">
-            <h1 className="text-2xl font-semibold text-[var(--foreground)]">
+            <h1 className="text-2xl font-semibold text-white">
               {view === "register" ? "Create account" : view === "register-password" ? "Set password" : view === "login" ? "Welcome back" : "Verify Email"}
             </h1>
             <p className="text-sm text-[var(--text-muted)] mt-2">
@@ -214,7 +214,7 @@ export default function MainPage() {
                     placeholder="name@example.com"
                     required
                     onChange={handleChange}
-                    className="h-10 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)]"
+                    className="h-10 bg-transparent border-[var(--border-subtle)] text-white placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)]"
                   />
                 </div>
 
@@ -226,7 +226,7 @@ export default function MainPage() {
                     placeholder="••••••••"
                     required
                     onChange={handleChange}
-                    className="h-10 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)]"
+                    className="h-10 bg-transparent border-[var(--border-subtle)] text-white placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)]"
                   />
                 </div>
 
@@ -243,7 +243,7 @@ export default function MainPage() {
                 <div className="flex justify-center mt-4">
                   <button
                     type="button"
-                    className="text-md text-[var(--text-muted)] hover:text-[var(--foreground)] cursor-pointer"
+                    className="text-md text-[var(--text-muted)] hover:text-white cursor-pointer"
                     onClick={() => setView("register")}
                   >
                     Don't have an account? Create one
@@ -286,7 +286,7 @@ export default function MainPage() {
                         placeholder="name@example.com"
                         required
                         onChange={handleChange}
-                        className="h-10 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)]"
+                        className="h-10 bg-transparent border-[var(--border-subtle)] text-white placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)]"
                       />
                     </div>
                   </>
@@ -302,7 +302,7 @@ export default function MainPage() {
                         readOnly
                         value={registeredEmail || form.email || ""}
                         onChange={handleChange}
-                        className="h-10 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)]"
+                        className="h-10 bg-transparent border-[var(--border-subtle)] text-white placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)]"
                       />
                     </div>
 
@@ -314,7 +314,7 @@ export default function MainPage() {
                         placeholder="••••••••"
                         required
                         onChange={handleChange}
-                        className="h-10 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)]"
+                        className="h-10 bg-transparent border-[var(--border-subtle)] text-white placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)]"
                       />
                     </div>
 
@@ -326,7 +326,7 @@ export default function MainPage() {
                         placeholder="••••••••"
                         required
                         onChange={handleChange}
-                        className="h-10 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)]"
+                        className="h-10 bg-transparent border-[var(--border-subtle)] text-white placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)]"
                       />
                     </div>
                   </>
@@ -345,7 +345,7 @@ export default function MainPage() {
                 <div className="flex justify-center mt-4">
                   <button
                     type="button"
-                    className="text-md text-[var(--text-muted)] hover:text-[var(--foreground)] cursor-pointer"
+                    className="text-md text-[var(--text-muted)] hover:text-white cursor-pointer"
                     onClick={() => {
                       if (view === "register-password") {
                         setRegisteredEmail("");
@@ -368,7 +368,7 @@ export default function MainPage() {
                 className="space-y-4"
               >
                 <p className="text-sm text-center text-[var(--text-muted)] mb-4">
-                  Verification code sent to:<br/><span className="text-[var(--foreground)] font-medium">{verifyEmail}</span>
+                  Verification code sent to:<br/><span className="text-white font-medium">{verifyEmail}</span>
                 </p>
                 <div className="space-y-3">
                   <Label htmlFor="verificationCode" className="text-xs text-[var(--text-muted)] mb-2 block">
@@ -381,7 +381,7 @@ export default function MainPage() {
                     required
                     value={verificationCode}
                     onChange={(e) => setVerificationCode(e.target.value)}
-                    className="text-center tracking-widest text-lg h-11 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] focus:border-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
+                    className="text-center tracking-widest text-lg h-11 bg-transparent border-[var(--border-subtle)] text-white focus:border-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
                     maxLength={6}
                   />
                 </div>
@@ -401,9 +401,9 @@ export default function MainPage() {
 
           <p className="text-xs text-[var(--text-muted)] text-center mt-8">
             By continuing, you agree to our{" "}
-            <a href="/terms" className="underline hover:text-[var(--foreground)]">Terms</a>
+            <a href="/terms" className="underline hover:text-white">Terms</a>
             {" "}and{" "}
-            <a href="/privacy" className="underline hover:text-[var(--foreground)]">Privacy</a>
+            <a href="/privacy" className="underline hover:text-white">Privacy</a>
           </p>
         </div>
       </div>

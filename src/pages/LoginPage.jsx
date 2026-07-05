@@ -160,7 +160,7 @@ export default function LoginPage() {
         <div className="w-full max-w-sm sm:max-w-md">
           {/* Logo section */}
           <div className="text-center mb-6 sm:mb-8">
-            <h1 className="text-xl sm:text-2xl font-semibold text-[var(--foreground)]">
+            <h1 className="text-xl sm:text-2xl font-semibold text-white">
               {view === "register" ? "Create account" : view === "login" ? "Welcome back" : view === "verify" ? "Verify Email" : "Sign in"}
             </h1>
             <p className="text-xs sm:text-sm text-[var(--text-muted)] mt-2">
@@ -211,9 +211,9 @@ export default function LoginPage() {
 
                 <p className="text-xs text-[var(--text-muted)] text-center mt-4 sm:mt-6">
                   By continuing, you agree to our{" "}
-                  <a href="#" className="underline hover:text-[var(--foreground)]">Terms</a>
+                  <a href="#" className="underline hover:text-white">Terms</a>
                   {" "}and{" "}
-                  <a href="#" className="underline hover:text-[var(--foreground)]">Privacy</a>
+                  <a href="#" className="underline hover:text-white">Privacy</a>
                 </p>
               </motion.div>
             )}
@@ -237,7 +237,7 @@ export default function LoginPage() {
                     placeholder="name@example.com"
                     required
                     onChange={handleChange}
-                    className="h-10 sm:h-11 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
+                    className="h-10 sm:h-11 bg-transparent border-[var(--border-subtle)] text-white placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
                   />
                 </div>
 
@@ -249,7 +249,7 @@ export default function LoginPage() {
                     type="password"
                     required
                     onChange={handleChange}
-                    className="h-10 sm:h-11 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
+                    className="h-10 sm:h-11 bg-transparent border-[var(--border-subtle)] text-white placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
                   />
                 </div>
 
@@ -266,14 +266,14 @@ export default function LoginPage() {
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-0 mt-3 sm:mt-4">
                   <button
                     type="button"
-                    className="text-xs text-[var(--text-muted)] hover:text-[var(--foreground)] transition-colors"
+                    className="text-xs text-[var(--text-muted)] hover:text-white transition-colors"
                     onClick={() => setView("register")}
                   >
                     Create account
                   </button>
                   <button
                     type="button"
-                    className="text-xs text-[var(--text-muted)] hover:text-[var(--foreground)] transition-colors"
+                    className="text-xs text-[var(--text-muted)] hover:text-white transition-colors"
                   >
                     Forgot password?
                   </button>
@@ -300,7 +300,7 @@ export default function LoginPage() {
                     type="text"
                     required
                     onChange={handleChange}
-                    className="h-10 sm:h-11 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
+                    className="h-10 sm:h-11 bg-transparent border-[var(--border-subtle)] text-white placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
                   />
                 </div>
 
@@ -312,7 +312,7 @@ export default function LoginPage() {
                     placeholder="name@example.com"
                     required
                     onChange={handleChange}
-                    className="h-10 sm:h-11 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
+                    className="h-10 sm:h-11 bg-transparent border-[var(--border-subtle)] text-white placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
                   />
                 </div>
 
@@ -324,7 +324,7 @@ export default function LoginPage() {
                     placeholder="••••••••"
                     required
                     onChange={handleChange}
-                    className="h-10 sm:h-11 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
+                    className="h-10 sm:h-11 bg-transparent border-[var(--border-subtle)] text-white placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
                   />
                 </div>
 
@@ -336,7 +336,7 @@ export default function LoginPage() {
                     placeholder="••••••••"
                     required
                     onChange={handleChange}
-                    className="h-10 sm:h-11 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
+                    className="h-10 sm:h-11 bg-transparent border-[var(--border-subtle)] text-white placeholder:text-[var(--text-muted)] focus:border-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
                   />
                 </div>
 
@@ -375,7 +375,7 @@ export default function LoginPage() {
                 onSubmit={handleVerify}
               >
                 <p className="text-sm text-center text-[var(--text-muted)] mb-4">
-                  Verification code sent to:<br/><span className="text-[var(--foreground)] font-medium">{verifyEmail}</span>
+                  Verification code sent to:<br/><span className="text-white font-medium">{verifyEmail}</span>
                 </p>
                 <div>
                   <Label htmlFor="verificationCode" className="text-xs sm:text-sm text-[var(--text-muted)] mb-2 block">
@@ -388,7 +388,7 @@ export default function LoginPage() {
                     required
                     value={verificationCode}
                     onChange={(e) => setVerificationCode(e.target.value)}
-                    className="text-center tracking-widest text-lg h-11 bg-transparent border-[var(--border-subtle)] text-[var(--foreground)] focus:border-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
+                    className="text-center tracking-widest text-lg h-11 bg-transparent border-[var(--border-subtle)] text-white focus:border-[var(--accent-primary)] focus:ring-[var(--accent-primary)]"
                     maxLength={6}
                   />
                 </div>
@@ -406,7 +406,7 @@ export default function LoginPage() {
 
       {/* Minimal footer */}
       <footer className="py-3 sm:py-4 text-center">
-        <Link to="/" className="text-xs sm:text-sm text-[var(--text-muted)] hover:text-[var(--foreground)] transition-colors">
+        <Link to="/" className="text-xs sm:text-sm text-[var(--text-muted)] hover:text-white transition-colors">
           ← Back to home
         </Link>
       </footer>

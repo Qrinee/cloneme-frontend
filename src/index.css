@@ -544,3 +544,12 @@ input, textarea, select {
 }
 
 
+/ *   F i x   a u t o f i l l   i n   d a r k   m o d e   * / 
+ i n p u t : - w e b k i t - a u t o f i l l , 
+ i n p u t : - w e b k i t - a u t o f i l l : h o v e r ,   
+ i n p u t : - w e b k i t - a u t o f i l l : f o c u s ,   
+ i n p u t : - w e b k i t - a u t o f i l l : a c t i v e { 
+         - w e b k i t - b o x - s h a d o w :   0   0   0   3 0 p x   v a r ( - - b g - p r i m a r y )   i n s e t   ! i m p o r t a n t ; 
+         - w e b k i t - t e x t - f i l l - c o l o r :   w h i t e   ! i m p o r t a n t ; 
+ }  
+ 

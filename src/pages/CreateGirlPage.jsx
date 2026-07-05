@@ -4,7 +4,7 @@ import { useAuthFetch } from "../utils/authFetch";
 import Layout from "../components/Layout";
 import { useLayoutContext } from "../components/LayoutContext";
 import StripeEmbeddedCheckout from "../components/StripeEmbeddedCheckout";
-import { Heart, Star, Sparkles, UserPlus, SlidersHorizontal, Image as ImageIcon, MessageSquareHeart, Check, ArrowRight, ArrowLeft, X, Flame, Gem, Infinity as InfinityIcon, Shield, Sparkle, User, MessageCircle, Lock, Crown, Dices, Play, Pause } from "lucide-react";
+import { Heart, Star, Sparkles, UserPlus, SlidersHorizontal, Image as ImageIcon, MessageSquareHeart, Check, ArrowRight, ArrowLeft, X, Flame, Gem, Infinity as InfinityIcon, Shield, Sparkle, User, MessageCircle, Lock, Crown, Dices, Play, Pause, Pencil, Search } from "lucide-react";
 import LoginModal from "../components/LoginModal";
 
 // Asset Imports
@@ -189,6 +189,10 @@ export default function CreateGirlPage() {
   const [checkoutPlanId, setCheckoutPlanId] = useState(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
 
+  const [editingField, setEditingField] = useState(null);
+  const [tempSelection, setTempSelection] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+
   const audioRef = useRef(null);
   const [playingVoice, setPlayingVoice] = useState(null);
 
@@ -214,6 +218,25 @@ export default function CreateGirlPage() {
       audioRef.current = audio;
       setPlayingVoice(voiceObj.value);
     }
+  };
+
+  const handleEditClick = (field, currentValue) => {
+    setEditingField(field);
+    setTempSelection(currentValue);
+    setSearchQuery("");
+  };
+
+  const handleSaveEdit = () => {
+    if (editingField === 'personality') setSelectedTraits(tempSelection);
+    if (editingField === 'relationship') setRelationship(tempSelection);
+    if (editingField === 'profession') setProfession(tempSelection);
+    if (editingField === 'fetishes') setSelectedFetishes(tempSelection);
+    if (editingField === 'voice') {
+      if (audioRef.current) audioRef.current.pause();
+      setPlayingVoice(null);
+      setVoice(tempSelection);
+    }
+    setEditingField(null);
   };
 
   // Auto-resume creation if logged in and pending creation exists
@@ -933,14 +956,13 @@ export default function CreateGirlPage() {
               )}
 
               {/* Step 5: Identity & Personality */}
-              {step === 5 && (
+              {step === 5 && !editingField && (
                 <div className="space-y-6 md:space-y-8 w-full max-w-xl md:max-w-4xl mx-auto animate-in fade-in duration-300 pb-20 max-h-[70vh] overflow-y-auto custom-scrollbar pr-2">
-                  <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight">Identity & Details</h2>
-
+                  
                   {/* Field 1: Name */}
-                  <div className="grid grid-cols-3 gap-3 items-end">
+                  <div className="grid grid-cols-3 gap-3 items-end max-w-2xl mx-auto">
                     <div className="col-span-2 space-y-2 text-left">
-                      <span className="text-xs font-bold text-white/40 uppercase tracking-widest">1. Choose Name</span>
+                      <span className="text-xs font-bold text-white/40 uppercase tracking-widest">Choose Name</span>
                       <input
                         type="text"
                         value={name}
@@ -962,152 +984,285 @@ export default function CreateGirlPage() {
                     </button>
                   </div>
 
-                  {/* Field 2: Personality */}
-                  <div className="space-y-3 text-left">
-                    <span className="text-xs font-bold text-white/40 uppercase tracking-widest">2. Choose Personality</span>
-                    <div className="flex flex-wrap gap-2 max-h-[160px] overflow-y-auto custom-scrollbar pr-2">
-                      {PERSONALITY_TRAITS.map((trait) => {
-                        const isSelected = selectedTraits.includes(trait.value);
-                        return (
-                          <button
-                            key={trait.value}
-                            onClick={() => handleTraitToggle(trait.value)}
-                            className={`
-                              px-4 py-2 rounded-xl font-bold text-xs tracking-tight border transition-all duration-200
-                              ${isSelected
-                                ? 'bg-[#e11d48] border-[#e11d48] text-white shadow-md scale-105'
-                                : 'bg-white/5 border-white/5 text-white/50 hover:text-white hover:border-white/10 hover:scale-105'
-                              }
-                            `}
-                          >
-                            {trait.label}
-                          </button>
-                        );
-                      })}
+                  {/* Cards Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+                    {/* Personality Card */}
+                    <div onClick={() => handleEditClick('personality', selectedTraits)} className="bg-[#1a1518] border border-white/5 rounded-2xl p-4 flex justify-between items-center cursor-pointer hover:bg-white/5 transition-colors">
+                      <div className="text-left">
+                        <p className="text-[10px] text-white/50 uppercase font-bold tracking-wider mb-1">Choose Personality</p>
+                        <p className="text-white font-bold text-sm">
+                          {selectedTraits.length > 0 
+                            ? (selectedTraits.length > 2 ? `${selectedTraits.length} selected` : selectedTraits.map(t => PERSONALITY_TRAITS.find(p => p.value === t)?.label || t).join(", "))
+                            : "Select"}
+                        </p>
+                      </div>
+                      <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center border border-white/10 shrink-0 ml-4">
+                        <Pencil className="w-3.5 h-3.5 text-white/70" />
+                      </div>
+                    </div>
+
+                    {/* Relationship Card */}
+                    <div onClick={() => handleEditClick('relationship', relationship)} className="bg-[#1a1518] border border-white/5 rounded-2xl p-4 flex justify-between items-center cursor-pointer hover:bg-white/5 transition-colors">
+                      <div className="text-left">
+                        <p className="text-[10px] text-white/50 uppercase font-bold tracking-wider mb-1">Choose Relationship</p>
+                        <p className="text-white font-bold text-sm">
+                          {relationship ? (RELATIONSHIPS.find(r => r.value === relationship)?.label || relationship) : "Select"}
+                        </p>
+                      </div>
+                      <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center border border-white/10 shrink-0 ml-4">
+                        <Pencil className="w-3.5 h-3.5 text-white/70" />
+                      </div>
+                    </div>
+
+                    {/* Occupation Card */}
+                    <div onClick={() => handleEditClick('profession', profession)} className="bg-[#1a1518] border border-white/5 rounded-2xl p-4 flex justify-between items-center cursor-pointer hover:bg-white/5 transition-colors">
+                      <div className="text-left">
+                        <p className="text-[10px] text-white/50 uppercase font-bold tracking-wider mb-1">Choose Occupation</p>
+                        <p className="text-white font-bold text-sm flex items-center gap-2">
+                          {profession ? <>🎓 {profession}</> : "Select"}
+                        </p>
+                      </div>
+                      <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center border border-white/10 shrink-0 ml-4">
+                        <Pencil className="w-3.5 h-3.5 text-white/70" />
+                      </div>
+                    </div>
+
+                    {/* Kinks Card */}
+                    <div onClick={() => handleEditClick('fetishes', selectedFetishes)} className="bg-[#1a1518] border border-white/5 rounded-2xl p-4 flex justify-between items-center cursor-pointer hover:bg-white/5 transition-colors">
+                      <div className="text-left">
+                        <p className="text-[10px] text-white/50 uppercase font-bold tracking-wider mb-1">What Kinks Are They Into? (Max. 3)</p>
+                        <p className="text-white font-bold text-sm">
+                          {selectedFetishes.length > 0 
+                            ? (selectedFetishes.length > 2 ? `${selectedFetishes.length} selected` : selectedFetishes.join(", "))
+                            : "Select"}
+                        </p>
+                      </div>
+                      <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center border border-white/10 shrink-0 ml-4">
+                        <Pencil className="w-3.5 h-3.5 text-white/70" />
+                      </div>
+                    </div>
+
+                    {/* Voice Card - spans 2 columns on desktop maybe, or just normal */}
+                    <div onClick={() => handleEditClick('voice', voice)} className="relative md:col-span-2 rounded-2xl p-4 flex justify-between items-center cursor-pointer border border-purple-500/20 overflow-hidden group">
+                      <div className="absolute inset-0 bg-gradient-to-r from-[#2a1b38] to-[#1a1224] z-0"></div>
+                      <div className="absolute inset-0 opacity-30 z-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-purple-500/30 via-transparent to-transparent scale-150"></div>
+                      <div className="relative z-10 text-left">
+                        <p className="text-[10px] text-white/50 uppercase font-bold tracking-wider mb-1">Choose Voice</p>
+                        <p className="text-white font-bold text-sm">
+                          {voice ? (VOICES.find(v => v.value === voice)?.label || voice) : "Select"}
+                        </p>
+                      </div>
+                      <div className="relative z-10 w-8 h-8 rounded-full bg-black/40 flex items-center justify-center border border-white/10 group-hover:bg-black/60 transition-colors shrink-0 ml-4">
+                        <Pencil className="w-3.5 h-3.5 text-white/90" />
+                      </div>
                     </div>
                   </div>
+                </div>
+              )}
 
-                  {/* Field 3: Relationship */}
-                  <div className="space-y-3 text-left">
-                    <span className="text-xs font-bold text-white/40 uppercase tracking-widest">3. Choose Relationship</span>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-[160px] overflow-y-auto custom-scrollbar pr-2">
-                      {RELATIONSHIPS.map((rel) => {
-                        const isSelected = relationship === rel.value;
-                        return (
-                          <button
-                            key={rel.value}
-                            onClick={() => setRelationship(rel.value)}
-                            className={`
-                              relative py-3.5 rounded-xl border-2 flex items-center justify-center bg-white/5 transition-all duration-300
-                              ${isSelected ? 'border-[#e11d48] bg-[#e11d48]/10 scale-102' : 'border-white/5 opacity-60 hover:opacity-100 hover:scale-105'}
-                            `}
-                          >
-                            <span className="text-white font-bold text-xs leading-none">{rel.label}</span>
-                            {isSelected && (
-                              <div className="absolute top-1 right-1 w-4 h-4 bg-[#e11d48] rounded-full flex items-center justify-center">
-                                <Check className="w-2.5 h-2.5 text-white" />
-                              </div>
-                            )}
-                          </button>
-                        );
-                      })}
-                    </div>
+              {/* Step 5 Edit Views */}
+              {step === 5 && editingField && (
+                <div className="w-full flex flex-col items-center animate-in fade-in slide-in-from-bottom-4 duration-300 pb-24">
+                  <div className="w-full max-w-2xl text-center mb-6 relative">
+                    <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight">
+                      {editingField === 'personality' && 'Choose Personality'}
+                      {editingField === 'relationship' && 'Choose Relationship'}
+                      {editingField === 'profession' && 'Choose Occupation'}
+                      {editingField === 'fetishes' && 'Edit Kinks'}
+                      {editingField === 'voice' && 'Choose Voice'}
+                    </h2>
                   </div>
 
-                  {/* Field 4: Profession */}
-                  <div className="space-y-3 text-left">
-                    <span className="text-xs font-bold text-white/40 uppercase tracking-widest">4. Choose Profession</span>
-                    <div className="flex flex-wrap gap-2 max-h-[200px] overflow-y-auto custom-scrollbar pr-2">
-                      {PROFESSIONS.map((prof) => {
-                        const isSelected = profession === prof;
-                        return (
-                          <button
-                            key={prof}
-                            onClick={() => setProfession(prof)}
-                            className={`
-                              px-4 py-2 rounded-xl font-bold text-xs tracking-tight border transition-all duration-200
-                              ${isSelected
-                                ? 'bg-[#e11d48] border-[#e11d48] text-white shadow-md scale-105'
-                                : 'bg-white/5 border-white/5 text-white/50 hover:text-white hover:border-white/10 hover:scale-105'
-                              }
-                            `}
-                          >
-                            {prof}
-                          </button>
-                        );
-                      })}
+                  {/* Search Bar for Fetishes and Profession */}
+                  {['fetishes', 'profession', 'personality'].includes(editingField) && (
+                    <div className="w-full max-w-2xl bg-[#222222] rounded-xl p-3 flex items-center gap-3 mb-6 border border-white/5 focus-within:border-white/20 transition-colors">
+                      <Search className="w-5 h-5 text-white/40" />
+                      <input
+                        type="text"
+                        placeholder="Search"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="bg-transparent border-none text-white text-sm outline-none w-full placeholder:text-white/40 font-medium"
+                      />
                     </div>
-                  </div>
+                  )}
 
-                  {/* Field 5: Fetishes */}
-                  <div className="space-y-3 text-left">
-                    <span className="text-xs font-bold text-white/40 uppercase tracking-widest">5. What Fetishes Do You Like?</span>
-                    <div className="flex flex-wrap gap-2 max-h-[180px] overflow-y-auto custom-scrollbar pr-2">
-                      {FETISHES.map((fetish) => {
-                        const isSelected = selectedFetishes.includes(fetish);
-                        return (
-                          <button
-                            key={fetish}
-                            onClick={() => {
-                              setSelectedFetishes(prev =>
-                                prev.includes(fetish) ? prev.filter(t => t !== fetish) : [...prev, fetish]
-                              );
-                            }}
-                            className={`
-                              px-3 py-1.5 rounded-lg font-bold text-[10px] sm:text-xs tracking-tight border transition-all duration-200
-                              ${isSelected
-                                ? 'bg-[#e11d48] border-[#e11d48] text-white shadow-md scale-105'
-                                : 'bg-white/5 border-white/5 text-white/50 hover:text-white hover:border-white/10 hover:scale-105'
-                              }
-                            `}
-                          >
-                            {fetish}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Field 6: Voice */}
-                  <div className="space-y-3 text-left">
-                    <span className="text-xs font-bold text-white/40 uppercase tracking-widest">6. Choose Voice</span>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-[180px] overflow-y-auto custom-scrollbar pr-2">
-                      {VOICES.map((v) => {
-                        const isSelected = voice === v.value;
-                        const isPlaying = playingVoice === v.value;
-                        return (
-                          <button
-                            key={v.value}
-                            onClick={() => setVoice(v.value)}
-                            className={`
-                              relative p-3 rounded-xl border flex flex-col items-center justify-center bg-white/5 transition-all duration-300
-                              ${isSelected ? 'border-[#e11d48] bg-[#e11d48]/10 scale-105 shadow-md' : 'border-white/5 opacity-60 hover:opacity-100 hover:scale-105'}
-                            `}
-                          >
-                            <div 
-                              onClick={(e) => togglePlayVoice(e, v)}
-                              className={`w-8 h-8 rounded-full flex items-center justify-center mb-2 transition-colors
-                                ${isPlaying ? 'bg-[#e11d48] shadow-[0_0_10px_rgba(225,29,72,0.6)]' : 'bg-white/10 hover:bg-white/20'}`}
-                            >
-                              {isPlaying ? <Pause className="w-4 h-4 text-white" /> : <Play className="w-4 h-4 text-white" />}
+                  {/* Selected items pills (Fetishes and Personality) */}
+                  {(editingField === 'fetishes' || editingField === 'personality') && tempSelection?.length > 0 && (
+                    <div className="w-full max-w-2xl text-left mb-6">
+                      <div className="flex flex-wrap gap-2">
+                        {tempSelection.map(val => {
+                          const label = editingField === 'personality' ? (PERSONALITY_TRAITS.find(p => p.value === val)?.label || val) : val;
+                          return (
+                            <div key={val} className="px-4 py-2 rounded-xl border border-white/30 text-white flex items-center gap-3 text-sm font-bold bg-transparent">
+                              {label}
+                              <button onClick={() => setTempSelection(prev => prev.filter(t => t !== val))} className="hover:text-[#e11d48] transition-colors">
+                                <X className="w-4 h-4" />
+                              </button>
                             </div>
-                            <span className="text-white font-bold text-xs leading-none">{v.label}</span>
-                            {isSelected && (
-                              <div className="absolute top-1 right-1 w-4 h-4 bg-[#e11d48] rounded-full flex items-center justify-center">
-                                <Check className="w-2.5 h-2.5 text-white" />
-                              </div>
-                            )}
-                          </button>
-                        );
-                      })}
+                          );
+                        })}
+                      </div>
                     </div>
+                  )}
+
+                  {/* Options List */}
+                  <div className="w-full max-w-2xl bg-transparent">
+                    {/* Fetishes */}
+                    {editingField === 'fetishes' && (
+                      <div className="flex flex-wrap gap-2 justify-start">
+                        {FETISHES.filter(f => f.toLowerCase().includes(searchQuery.toLowerCase())).map((fetish) => {
+                          const isSelected = tempSelection?.includes(fetish);
+                          return (
+                            <button
+                              key={fetish}
+                              onClick={() => {
+                                setTempSelection(prev => {
+                                  if (prev.includes(fetish)) return prev.filter(t => t !== fetish);
+                                  if (prev.length >= 3) return prev; // max 3
+                                  return [...prev, fetish];
+                                });
+                              }}
+                              className={`px-4 py-2 rounded-xl font-bold text-sm tracking-tight border transition-all duration-200
+                                ${isSelected
+                                  ? 'bg-transparent border-white/30 text-white'
+                                  : 'bg-transparent border-white/5 text-white/50 hover:text-white hover:border-white/20'
+                                }
+                              `}
+                            >
+                              {fetish}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {/* Personality */}
+                    {editingField === 'personality' && (
+                      <div className="flex flex-wrap gap-2 justify-start">
+                        {PERSONALITY_TRAITS.filter(p => p.label.toLowerCase().includes(searchQuery.toLowerCase())).map((trait) => {
+                          const isSelected = tempSelection?.includes(trait.value);
+                          return (
+                            <button
+                              key={trait.value}
+                              onClick={() => {
+                                setTempSelection(prev => {
+                                  if (prev.includes(trait.value)) return prev.filter(t => t !== trait.value);
+                                  return [...prev, trait.value];
+                                });
+                              }}
+                              className={`px-4 py-2 rounded-xl font-bold text-sm tracking-tight border transition-all duration-200
+                                ${isSelected
+                                  ? 'bg-transparent border-white/30 text-white'
+                                  : 'bg-transparent border-white/5 text-white/50 hover:text-white hover:border-white/20'
+                                }
+                              `}
+                            >
+                              {trait.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {/* Profession */}
+                    {editingField === 'profession' && (
+                      <div className="flex flex-wrap gap-2 justify-start">
+                        {PROFESSIONS.filter(p => p.toLowerCase().includes(searchQuery.toLowerCase())).map((prof) => {
+                          const isSelected = tempSelection === prof;
+                          return (
+                            <button
+                              key={prof}
+                              onClick={() => setTempSelection(prof)}
+                              className={`px-4 py-2 rounded-xl font-bold text-sm tracking-tight border transition-all duration-200
+                                ${isSelected
+                                  ? 'bg-white/10 border-white/30 text-white'
+                                  : 'bg-transparent border-white/5 text-white/50 hover:text-white hover:border-white/20'
+                                }
+                              `}
+                            >
+                              {prof}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {/* Relationship */}
+                    {editingField === 'relationship' && (
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                        {RELATIONSHIPS.map((rel) => {
+                          const isSelected = tempSelection === rel.value;
+                          return (
+                            <button
+                              key={rel.value}
+                              onClick={() => setTempSelection(rel.value)}
+                              className={`relative py-4 rounded-xl border flex items-center justify-center transition-all duration-200
+                                ${isSelected ? 'bg-white/10 border-white/30 text-white scale-102' : 'bg-transparent border-white/5 text-white/50 hover:text-white hover:border-white/20'}
+                              `}
+                            >
+                              <span className="font-bold text-sm">{rel.label}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {/* Voice */}
+                    {editingField === 'voice' && (
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        {VOICES.map((v) => {
+                          const isSelected = tempSelection === v.value;
+                          const isPlaying = playingVoice === v.value;
+                          return (
+                            <button
+                              key={v.value}
+                              onClick={() => setTempSelection(v.value)}
+                              className={`relative p-4 rounded-xl border flex flex-col items-center justify-center transition-all duration-300
+                                ${isSelected ? 'bg-[#2a1b38]/40 border-purple-500/40 text-white scale-105' : 'bg-white/5 border-white/5 text-white/60 hover:text-white hover:border-white/20'}
+                              `}
+                            >
+                              <div 
+                                onClick={(e) => togglePlayVoice(e, v)}
+                                className={`w-10 h-10 rounded-full flex items-center justify-center mb-3 transition-colors
+                                  ${isPlaying ? 'bg-[#e11d48] shadow-[0_0_15px_rgba(225,29,72,0.5)]' : 'bg-white/10 hover:bg-white/20'}`}
+                              >
+                                {isPlaying ? <Pause className="w-5 h-5 text-white" /> : <Play className="w-5 h-5 text-white" />}
+                              </div>
+                              <span className="font-bold text-sm">{v.label}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="w-full max-w-2xl flex justify-center gap-4 mt-10 border-t border-white/5 pt-6">
+                    <button 
+                      onClick={() => {
+                        setEditingField(null);
+                        setSearchQuery("");
+                        if (audioRef.current) audioRef.current.pause();
+                        setPlayingVoice(null);
+                      }} 
+                      className="px-8 py-3 rounded-xl border border-white/10 bg-transparent hover:bg-white/5 text-white font-bold text-sm transition-all"
+                    >
+                      Cancel
+                    </button>
+                    <button 
+                      onClick={handleSaveEdit} 
+                      className="px-8 py-3 rounded-xl bg-[#9f3f50] hover:bg-[#be123c] text-white/90 hover:text-white font-bold text-sm transition-all shadow-lg"
+                    >
+                      Save Changes
+                    </button>
                   </div>
                 </div>
               )}
             </div>
 
             {/* Stepper buttons */}
-            <div className="fixed bottom-0 left-0 right-0 z-30 bg-[#0a0a0f]/90 backdrop-blur-md border-t border-white/5 p-4 md:relative md:bottom-auto md:left-auto md:right-auto md:z-10 md:bg-transparent md:backdrop-blur-none md:border-none md:p-0 md:mt-10 flex flex-col gap-3 w-full md:max-w-md mx-auto">
+            <div className={`fixed bottom-0 left-0 right-0 z-30 bg-[#0a0a0f]/90 backdrop-blur-md border-t border-white/5 p-4 md:relative md:bottom-auto md:left-auto md:right-auto md:z-10 md:bg-transparent md:backdrop-blur-none md:border-none md:p-0 md:mt-10 flex-col gap-3 w-full md:max-w-md mx-auto ${editingField ? 'hidden md:hidden' : 'flex'}`}>
 
               {/* Validation Error Message */}
               {validationError && (

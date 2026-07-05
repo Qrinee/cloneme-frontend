@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthFetch } from "../utils/authFetch";
 import Layout from "../components/Layout";
 import { useLayoutContext } from "../components/LayoutContext";
 import StripeEmbeddedCheckout from "../components/StripeEmbeddedCheckout";
-import { Heart, Star, Sparkles, UserPlus, SlidersHorizontal, Image as ImageIcon, MessageSquareHeart, Check, ArrowRight, ArrowLeft, X, Flame, Gem, Infinity as InfinityIcon, Shield, Sparkle, User, MessageCircle, Lock, Crown, Dices, Play } from "lucide-react";
+import { Heart, Star, Sparkles, UserPlus, SlidersHorizontal, Image as ImageIcon, MessageSquareHeart, Check, ArrowRight, ArrowLeft, X, Flame, Gem, Infinity as InfinityIcon, Shield, Sparkle, User, MessageCircle, Lock, Crown, Dices, Play, Pause } from "lucide-react";
 import LoginModal from "../components/LoginModal";
 
 // Asset Imports
@@ -127,15 +127,15 @@ const FETISHES = [
 ];
 
 const VOICES = [
-  { value: "voice_1", label: "Voice 1 Confident" },
-  { value: "voice_2", label: "Voice 2 Cheerful" },
-  { value: "voice_3", label: "Voice 3 Dominant" },
-  { value: "voice_4", label: "Voice 4 Innocent" },
-  { value: "voice_5", label: "Voice 5 Sweet" },
-  { value: "voice_6", label: "Voice 6 Sensual" },
-  { value: "voice_7", label: "Voice 7 Calm" },
-  { value: "voice_8", label: "Voice 8 Thoughtful" },
-  { value: "voice_9", label: "Voice 9 Moody" }
+  { value: "voice_1", label: "Voice 1 Confident", file: "/voice/cma_voice_1.mp3" },
+  { value: "voice_2", label: "Voice 2 Cheerful", file: "/voice/cma_voice_2.mp3" },
+  { value: "voice_3", label: "Voice 3 Dominant", file: "/voice/cma_voice_3.mp3" },
+  { value: "voice_4", label: "Voice 4 Innocent", file: "/voice/cma_voice_4.mp3" },
+  { value: "voice_5", label: "Voice 5 Sweet", file: "/voice/cma_voice_5.mp3" },
+  { value: "voice_6", label: "Voice 6 Sultry", file: "/voice/cma_voice_6.mp3" },
+  { value: "voice_7", label: "Voice 7 Calm", file: "/voice/cma_voice_7.mp3" },
+  { value: "voice_8", label: "Voice 8 Thoughtful", file: "/voice/cma_voice_8.mp3" },
+  { value: "voice_9", label: "Voice 9 Whimsical", file: "/voice/cma_voice_9.mp3" }
 ];
 
 const RELATIONSHIPS = [
@@ -188,6 +188,33 @@ export default function CreateGirlPage() {
   const [premiumView, setPremiumView] = useState("benefits"); // benefits | plans | checkout
   const [checkoutPlanId, setCheckoutPlanId] = useState(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
+
+  const audioRef = useRef(null);
+  const [playingVoice, setPlayingVoice] = useState(null);
+
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+    };
+  }, []);
+
+  const togglePlayVoice = (e, voiceObj) => {
+    e.stopPropagation();
+    
+    if (playingVoice === voiceObj.value) {
+      if (audioRef.current) audioRef.current.pause();
+      setPlayingVoice(null);
+    } else {
+      if (audioRef.current) audioRef.current.pause();
+      const audio = new Audio(voiceObj.file);
+      audio.onended = () => setPlayingVoice(null);
+      audio.play().catch(console.error);
+      audioRef.current = audio;
+      setPlayingVoice(voiceObj.value);
+    }
+  };
 
   // Auto-resume creation if logged in and pending creation exists
   useEffect(() => {
@@ -1047,6 +1074,7 @@ export default function CreateGirlPage() {
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-[180px] overflow-y-auto custom-scrollbar pr-2">
                       {VOICES.map((v) => {
                         const isSelected = voice === v.value;
+                        const isPlaying = playingVoice === v.value;
                         return (
                           <button
                             key={v.value}
@@ -1056,8 +1084,12 @@ export default function CreateGirlPage() {
                               ${isSelected ? 'border-[#e11d48] bg-[#e11d48]/10 scale-105 shadow-md' : 'border-white/5 opacity-60 hover:opacity-100 hover:scale-105'}
                             `}
                           >
-                            <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center mb-2">
-                              <Play className="w-4 h-4 text-white" />
+                            <div 
+                              onClick={(e) => togglePlayVoice(e, v)}
+                              className={`w-8 h-8 rounded-full flex items-center justify-center mb-2 transition-colors
+                                ${isPlaying ? 'bg-[#e11d48] shadow-[0_0_10px_rgba(225,29,72,0.6)]' : 'bg-white/10 hover:bg-white/20'}`}
+                            >
+                              {isPlaying ? <Pause className="w-4 h-4 text-white" /> : <Play className="w-4 h-4 text-white" />}
                             </div>
                             <span className="text-white font-bold text-xs leading-none">{v.label}</span>
                             {isSelected && (

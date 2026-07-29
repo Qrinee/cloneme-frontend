@@ -127,6 +127,7 @@ const FETISHES = [
 ];
 
 const VOICES = [
+  { value: "voice_0", label: "Voice 0 Natural", file: "/voice/cma_voice_0.mp3" },
   { value: "voice_1", label: "Voice 1 Confident", file: "/voice/cma_voice_1.mp3" },
   { value: "voice_2", label: "Voice 2 Cheerful", file: "/voice/cma_voice_2.mp3" },
   { value: "voice_3", label: "Voice 3 Dominant", file: "/voice/cma_voice_3.mp3" },
